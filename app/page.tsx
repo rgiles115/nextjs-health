@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import ActivityChart from '../components/ActivityChart';
+import ActivityChart from './components/ActivityChart';
 
 export default function Home() {
   return (
