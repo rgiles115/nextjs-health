@@ -46,7 +46,7 @@ const ActivityChart = () => {
     }, [activityData]);
 
     return (
-        <canvas ref={chartRef} width="800" height="800"></canvas>
+        <canvas ref={chartRef} width="800" height="800" /></canvas>
     );
 };
 
