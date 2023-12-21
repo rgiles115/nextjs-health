@@ -6,7 +6,7 @@ const ActivityChart = () => {
     const chartRef = useRef(null);
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/getActivityData')  // Replace with your server API endpoint
+        fetch('/api/getActivityData')  // Replace with your server API endpoint
             .then(response => response.json())
             .then(data => {
                 const dates = data.data.map(entry => entry.day);
