@@ -24,35 +24,9 @@ interface ActivityEntry {
     }, []);
 
     useEffect(() => {
-        if (activityData.dates.length > 0 && chartRef.current) {
-            const ctx = chartRef.current.getContext('2d');
-            
-            if (ctx) {
-                const gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.clientHeight);
-                gradientFill.addColorStop(0, 'rgba(138, 43, 226, 0.6)');
-                gradientFill.addColorStop(1, 'rgba(138, 43, 226, 0)');
-    
-                new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: activityData.dates,
-                    datasets: [{
-                        label: 'Active Calories',
-                        data: activityData.activeCalories,
-                        fill: true,
-                        backgroundColor: gradientFill,
-                        borderColor: 'rgba(138, 43, 226, 1)',
-                        pointBackgroundColor: 'rgba(138, 43, 226, 1)',
-                        borderWidth: 2,
-                        // lineTension: 0.3
-                    }]
-                },
-                options: {
-                    // ...your options here
-                }
-            });
-        }
+        console.log('Testing useEffect');
     }, [activityData]);
+    
 
     return (
         <div>
