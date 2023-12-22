@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     
     try {
         const response = await fetch(ouraApiUrl, {
-            headers: { 'Authorization': 'Bearer YOUR_API_KEY' }  // Replace YOUR_API_KEY with your actual key
+            headers: { 'Authorization': 'Bearer K7TE26ZW3UOTPK727W7UQ7ZYLAUXKMJF' }  // Replace YOUR_API_KEY with your actual key
         });
         const data = await response.json();
 
