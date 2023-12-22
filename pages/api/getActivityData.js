@@ -1,7 +1,7 @@
 // pages/api/getActivityData.js
 
 export default async function handler(req, res) {
-    const ouraApiUrl = 'https://api.ouraring.com/v2/usercollection/daily_activity?start_date=2023-12-01&end_date=2023-12-18';
+    const ouraApiUrl = 'https://api.ouraring.com/v2/usercollection/daily_activity?start_date=2023-12-01&end_date=2023-12-21';
     
     try {
         const response = await fetch(ouraApiUrl, {
