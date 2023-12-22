@@ -2,10 +2,11 @@
 
 export default async function handler(req, res) {
     const ouraApiUrl = 'https://api.ouraring.com/v2/usercollection/daily_activity?start_date=2023-12-01&end_date=2023-12-21';
-    
+    const token = process.env.OURA_API_BEARER_TOKEN;
+
     try {
         const response = await fetch(ouraApiUrl, {
-            headers: { 'Authorization': 'Bearer K7TE26ZW3UOTPK727W7UQ7ZYLAUXKMJF' }  // Replace YOUR_API_KEY with your actual key
+            headers: { 'Authorization': `Bearer ${token}` }  // Corrected this line
         });
         const data = await response.json();
 
