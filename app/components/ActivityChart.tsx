@@ -16,6 +16,7 @@ interface ActivityEntry {
         fetch('/api/getActivityData')
             .then(response => response.json())
             .then(data => {
+                console.log('Fetched data:', data); // Log the fetched data
                 const dates = data.data.map((entry: ActivityEntry) => entry.day);
                 const activeCalories = data.data.map((entry: ActivityEntry) => entry.active_calories);
                 setActivityData({ dates, activeCalories });
