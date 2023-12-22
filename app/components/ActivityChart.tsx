@@ -7,16 +7,16 @@ interface ActivityEntry {
     active_calories: number; // Assuming 'active_calories' is a number
   }
 
-const ActivityChart = () => {
+  const ActivityChart = () => {
     const [activityData, setActivityData] = useState({ dates: [], activeCalories: [] });
     const chartRef = useRef(null);
 
     useEffect(() => {
-        fetch('/api/getActivityData')  // Replace with your server API endpoint
+        fetch('/api/getActivityData')
             .then(response => response.json())
             .then(data => {
-                const dates = data.data.map(entry => entry.day);
-                const activeCalories = data.data.map(entry => entry.active_calories);
+                const dates = data.data.map((entry: ActivityEntry) => entry.day);
+                const activeCalories = data.data.map((entry: ActivityEntry) => entry.active_calories);
                 setActivityData({ dates, activeCalories });
             })
             .catch(error => console.error('Error:', error));
