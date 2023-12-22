@@ -9,7 +9,8 @@ interface ActivityEntry {
 
   const ActivityChart = () => {
     const [activityData, setActivityData] = useState({ dates: [], activeCalories: [] });
-    const chartRef = useRef(null);
+    const chartRef = useRef<HTMLCanvasElement>(null);
+
 
     useEffect(() => {
         fetch('/api/getActivityData')
@@ -23,13 +24,15 @@ interface ActivityEntry {
     }, []);
 
     useEffect(() => {
-        if (activityData.dates.length > 0) {
+        if (activityData.dates.length > 0 && chartRef.current) {
             const ctx = chartRef.current.getContext('2d');
-            const gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.clientHeight);
-            gradientFill.addColorStop(0, 'rgba(138, 43, 226, 0.6)');
-            gradientFill.addColorStop(1, 'rgba(138, 43, 226, 0)');
-
-            new Chart(ctx, {
+            
+            if (ctx) {
+                const gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.clientHeight);
+                gradientFill.addColorStop(0, 'rgba(138, 43, 226, 0.6)');
+                gradientFill.addColorStop(1, 'rgba(138, 43, 226, 0)');
+    
+                new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: activityData.dates,
@@ -41,7 +44,7 @@ interface ActivityEntry {
                         borderColor: 'rgba(138, 43, 226, 1)',
                         pointBackgroundColor: 'rgba(138, 43, 226, 1)',
                         borderWidth: 2,
-                        lineTension: 0.3
+                        // lineTension: 0.3
                     }]
                 },
                 options: {
