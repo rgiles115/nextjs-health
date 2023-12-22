@@ -2,6 +2,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 
+interface ActivityEntry {
+    day: string;           // Assuming 'day' is a string
+    active_calories: number; // Assuming 'active_calories' is a number
+  }
+
 const ActivityChart = () => {
     const [activityData, setActivityData] = useState({ dates: [], activeCalories: [] });
     const chartRef = useRef(null);
