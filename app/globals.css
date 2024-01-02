@@ -4,8 +4,6 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -16,17 +14,45 @@
   }
 }
 
+
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  font-family: Arial, sans-serif;
 }
 
-.chart-container canvas {
-  width: 400px;
-  height: 400px;
+#pageTitle {
+  margin-top: 10px;  /* Adjust the value as needed */
+  font-weight: bold;     /* Makes the text bold */
+  font-size: 1.5em;      /* Increases the font size, adjust as needed */
+  margin-left: 110px; /* Align with the left edge of the graph-container */
+  /* Add any other styles you need */
+}
+
+#datePicker {
+  margin-top: 10px;  /* Adjust the value as needed */
+  margin-left: 110px; /* Align with the left edge of the graph-container */
+}
+
+.graph-container {
+    justify-content: center;
+    align-items: center;
+    height: 30vh;
+    width: 100%;
+    max-width: 80%; /* Optional: Maximum width */
+    margin-left: 100px;
+    margin-top: 20px;  /* Adjust the value as needed */
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.graph-container canvas {
+  width: 100%; /* Ensure the canvas can grow */
+  height: auto; /* Responsive height */
+}
+
+.custom-datepicker {
+  background: url('/caret-down-regular.svg') no-repeat right;
+  background-size: 20px 20px; /* Adjust size as needed */
+  padding-right: 0px; /* Adjust padding to not overlap the text */
+  margin-right: 50px;
 }

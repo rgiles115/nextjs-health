@@ -1,7 +1,19 @@
+'use client'
+
 import Head from 'next/head';
 import ActivityChart from './components/ActivityChart';
+import React, { useState } from 'react';
+import ReactDatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default function Home() {
+  // Calculate the dates
+  const currentDate = new Date();
+  const thirtyDaysAgo = new Date(currentDate.getTime() - (30 * 24 * 60 * 60 * 1000));
+
+  const [startDate, setStartDate] = useState(thirtyDaysAgo);
+  const [endDate, setEndDate] = useState(currentDate);
+
   return (
     <div>
       <Head>
@@ -9,9 +21,15 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="/style.css" />
       </Head>
-      <h1>Last 7 Days Activity Data from Oura Ring</h1>
-      <div id="activityData"></div>
-      <ActivityChart />
+      <div id="pageTitle">Oura Ring Data</div>
+      <div id="datePicker">
+      <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker"/>
+      <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker"/>
+      </div>
+      <div className="graph-container">
+        <ActivityChart startDate={startDate} endDate={endDate} />
+
+      </div>
     </div>
   )
 }
