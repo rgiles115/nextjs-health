@@ -67,19 +67,23 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate }) =
                             {
                                 label: 'Resting Heart Rate',
                                 data: readinessData.restingHeartRate,
-                                pointRadius: 0 // Set point radius to 0 to hide the dots
+                                pointRadius: 0, // Set point radius to 0 to hide the dots
+                                backgroundColor: 'rgba(93, 166, 180, 0.5)', // Pale Turquoise with transparency
+                                borderColor: '#5da6b4', // Pale Turquoise
                             },
                             {
                                 label: 'HRV Balance',
                                 data: readinessData.hrvBalance,
-                                pointRadius: 0 // Set point radius to 0 to hide the dots
-
+                                pointRadius: 0, // Set point radius to 0 to hide the dots
+                                backgroundColor: 'rgba(50, 115, 136, 0.5)', // Teal Blue with some transparency
+                                borderColor: '#327388', // Teal Blue
                             },
                             {
                                 label: 'Body Temperature',
                                 data: readinessData.bodyTemperature,
-                                pointRadius: 0 // Set point radius to 0 to hide the dots
-
+                                pointRadius: 0, // Set point radius to 0 to hide the dots
+                                backgroundColor: 'rgba(87, 160, 174, 0.5)', // Soft Cyan with some transparency
+                                borderColor: '#57a0ae', // Soft Cyan
                             }
                         ]
                     },
