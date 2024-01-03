@@ -35,13 +35,14 @@ const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
             .then(response => response.json())
             .then(data => {
                 const formattedDates = data.data.map((entry: SleepEntry) => format(new Date(entry.day), 'do MMM yyyy'));
+                const total = data.data.map((entry: SleepEntry) => entry.contributors.total_sleep);
                 setSleepData({
                     dates: formattedDates,
-                    total: data.data.map((entry) => entry.contributors.total_sleep),
-                    rem: data.data.map((entry) => entry.contributors.rem_sleep),
-                    deep: data.data.map((entry) => entry.contributors.deep_sleep),
-                    light: data.data.map((entry) => entry.score),
-                    restfulness: data.data.map((entry) => entry.contributors.restfulness),
+                    total: data.data.map((entry: SleepEntry) => entry.contributors.total_sleep),
+                    rem: data.data.map((entry: SleepEntry) => entry.contributors.rem_sleep),
+                    deep: data.data.map((entry: SleepEntry) => entry.contributors.deep_sleep),
+                    light: data.data.map((entry: SleepEntry) => entry.score),
+                    restfulness: data.data.map((entry: SleepEntry) => entry.contributors.restfulness),
                 });
             })
             .catch(error => console.error('Error:', error));
