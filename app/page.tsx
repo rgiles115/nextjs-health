@@ -3,6 +3,7 @@
 import Head from 'next/head';
 import ActivityChart from './components/ActivityChart';
 import SleepChart from './components/SleepChart'; // Import SleepChart
+import ReadinessChart from './components/ReadinessChart'; // Import ReadinessChart
 import React, { useState } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -32,6 +33,9 @@ export default function Home() {
       </div>
       <div className="graph-container">
         <SleepChart startDate={startDate} endDate={endDate} />
+      </div>
+      <div className="graph-container">
+        <ReadinessChart startDate={startDate} endDate={endDate} />
       </div>
     </div>
   );
