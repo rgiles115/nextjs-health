@@ -35,7 +35,7 @@ body {
 .graph-container {
     justify-content: center;
     align-items: center;
-    height: 30vh;
+    height: 100%;
     width: 100%;
     max-width: 80%; /* Optional: Maximum width */
     margin-left: 100px;
@@ -46,8 +46,9 @@ body {
 }
 
 .graph-container canvas {
-  width: 100%; /* Ensure the canvas can grow */
+  width: auto; /* Ensure the canvas can grow */
   height: auto; /* Responsive height */
+  padding: 20px;
 }
 
 .custom-datepicker {

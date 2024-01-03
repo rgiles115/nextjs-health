@@ -2,6 +2,7 @@
 
 import Head from 'next/head';
 import ActivityChart from './components/ActivityChart';
+import SleepChart from './components/SleepChart'; // Import SleepChart
 import React, { useState } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -23,13 +24,15 @@ export default function Home() {
       </Head>
       <div id="pageTitle">Oura Ring Data</div>
       <div id="datePicker">
-      <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker"/>
-      <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker"/>
+        <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker"/>
+        <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker"/>
       </div>
       <div className="graph-container">
         <ActivityChart startDate={startDate} endDate={endDate} />
-
+      </div>
+      <div className="graph-container">
+        <SleepChart startDate={startDate} endDate={endDate} />
       </div>
     </div>
-  )
+  );
 }

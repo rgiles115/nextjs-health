@@ -19,10 +19,6 @@ interface ActivityEntry {
 
 const ActivityChart: React.FC<ActivityChartProps> = ({ startDate, endDate }) => {
 
-    // Calculate the dates
-    const currentDate = new Date();
-    const thirtyDaysAgo = new Date(currentDate.getTime() - (30 * 24 * 60 * 60 * 1000));
-
     // Initialize state
     const [activityData, setActivityData] = useState({ dates: [], activeCalories: [] });
     const chartRef = useRef<HTMLCanvasElement>(null);
