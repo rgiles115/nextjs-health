@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Oura Ring Data',
-  description: 'an app to diaply Oura data',
+  title: 'Oura Ring Stats',
+  description: 'an app to display Oura data',
 }
 
 export default function RootLayout({
