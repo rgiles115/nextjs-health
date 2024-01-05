@@ -16,7 +16,7 @@ const getStravaAuthURL = () => {
   const root = 'http://www.strava.com/oauth/authorize';
   const clientId = process.env.STRAVA_CLIENT_ID;
 
-  const redirectUri = encodeURIComponent(process.env.STRAVA_REDIRECT_URI);
+  const redirectUri = process.env.STRAVA_REDIRECT_URI ? encodeURIComponent(process.env.STRAVA_REDIRECT_URI) : ''; // Specify the type and provide a default value
   
   const responseType = 'code';
   const approvalPrompt = 'auto';
