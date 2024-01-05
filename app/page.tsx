@@ -15,11 +15,13 @@ import { parse } from 'cookie';
 const getStravaAuthURL = () => {
   const root = 'http://www.strava.com/oauth/authorize';
   const clientId = process.env.STRAVA_CLIENT_ID;
+
   const redirectUri = encodeURIComponent(process.env.STRAVA_REDIRECT_URI);
   
   const responseType = 'code';
   const approvalPrompt = 'auto';
   const scope = 'read,activity:read';
+
 
   return `${root}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&approval_prompt=${approvalPrompt}&scope=${scope}`;
 };
@@ -55,7 +57,7 @@ export default function Home() {
         <link rel="stylesheet" href="/style.css" />
       </Head>
       <div id="pageTitle">Oura Ring Data</div>
-      <a href={getStravaAuthURL()}>Authenticate with Strava</a>
+      <div id="authButton"><a href={getStravaAuthURL()}>Authenticate with Strava</a></div>
 
       <div id="datePicker">
         <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker"/>

@@ -23,6 +23,7 @@
     "recharts": "^2.10.3"
   },
   "devDependencies": {
+    "@types/cookie": "^0.6.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-datepicker": "^4.19.5",

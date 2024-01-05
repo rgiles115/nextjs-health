@@ -13,6 +13,12 @@ interface Activity {
   start_date: string;
 }
 
+declare global {
+    interface Window {
+      myStravaChart: Chart | undefined; // Define the type here (Chart or undefined)
+    }
+  }
+
 const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> = ({ startDate, endDate }) => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const chartRef = useRef<HTMLCanvasElement>(null);
@@ -38,7 +44,8 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
 
     const filledActivities = dateSeries.map(date => ({
         date: format(parseISO(date), 'do MMM yyyy'),
-        distance: activitiesDict[date] ? activitiesDict[date] / 1000 : 0 // Convert meters to kilometers
+        distance: activitiesDict[date] ? activitiesDict[date] / 1000 : 0, // Convert meters to kilometers
+        start_date: format(parseISO(date), 'do MMM yyyy')
       }));
       
 

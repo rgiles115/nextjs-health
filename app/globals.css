@@ -32,6 +32,11 @@ body {
   margin-left: 110px; /* Align with the left edge of the graph-container */
 }
 
+#authButton {
+  margin-top: 10px;  /* Adjust the value as needed */
+  margin-left: 110px; /* Align with the left edge of the graph-container */
+}
+
 .graph-container {
     justify-content: center;
     align-items: center;
