@@ -10,6 +10,7 @@ Chart.register(...registerables);
 interface Activity {
   date: string;
   distance: number;
+  start_date: string;
 }
 
 const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> = ({ startDate, endDate }) => {
