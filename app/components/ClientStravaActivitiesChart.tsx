@@ -8,7 +8,7 @@ import { eachDayOfInterval, format, parseISO } from 'date-fns';
 Chart.register(...registerables);
 
 interface Activity {
-  start_date: string;
+  date: string;
   distance: number;
 }
 
@@ -31,9 +31,9 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
 
     const activitiesDict = data.reduce((acc: { [key: string]: number }, activity: Activity) => {
         const sortableDate = format(parseISO(activity.start_date), 'yyyy-MM-dd');
-        acc[sortableDate] = activity.distance;
-        return acc;
-      }, {});
+      acc[sortableDate] = activity.distance;
+      return acc;
+    }, {});
 
     const filledActivities = dateSeries.map(date => ({
         date: format(parseISO(date), 'do MMM yyyy'),
@@ -96,20 +96,19 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
     };
   }, [activities]);
 
-  useEffect(() => {
-    const handleResize = () => {
-        if (chartInstanceRef.current) {
-            chartInstanceRef.current.resize();
-        }
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-        window.removeEventListener('resize', handleResize);
-    };
-}, []);
-
+      useEffect(() => {
+        const handleResize = () => {
+            if (chartInstanceRef.current) {
+                chartInstanceRef.current.resize();
+            }
+        };
+    
+        window.addEventListener('resize', handleResize);
+    
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
   return <canvas ref={chartRef}></canvas>;
 };
 

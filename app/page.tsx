@@ -40,7 +40,7 @@ export default function Home() {
     
     if (parsedCookies.stravaData) {
       // Cookie exists, you can access it as parsedCookies.stravaData
-      console.log('Strava Data:', JSON.parse(parsedCookies.stravaData));
+
     } else {
       // Cookie doesn't exist
       console.log('Strava Data cookie not found');
