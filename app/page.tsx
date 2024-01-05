@@ -34,20 +34,23 @@ export default function Home() {
   const [startDate, setStartDate] = useState(thirtyDaysAgo);
   const [endDate, setEndDate] = useState(currentDate);
   const [decodedStravaCookie, setDecodedStravaCookie] = useState('');
+  const [isStravaAuthenticated, setIsStravaAuthenticated] = useState(false);
+
 
   useEffect(() => {
     // Check the cookie on the client side
     const cookies = document.cookie;
     const parsedCookies = parse(cookies);
-    
+
     if (parsedCookies.stravaData) {
       // Cookie exists, you can access it as parsedCookies.stravaData
-
+      setIsStravaAuthenticated(true);
     } else {
       // Cookie doesn't exist
-      console.log('Strava Data cookie not found');
+      setIsStravaAuthenticated(false);
     }
-  }, []); 
+  }, []); // This useEffect runs once when the component mounts
+
 
   return (
     <div>
@@ -72,11 +75,11 @@ export default function Home() {
       <div className="graph-container">
         <ReadinessChart startDate={startDate} endDate={endDate} />
       </div>
-
+      {isStravaAuthenticated && (
         <div className="graph-container">
         <ClientStravaActivitiesChart startDate={startDate} endDate={endDate} />
         </div>
-      
+      )}
     </div>
   );
 }
