@@ -8,7 +8,7 @@ import { eachDayOfInterval, format, parseISO } from 'date-fns';
 Chart.register(...registerables);
 
 interface Activity {
-  date: string;
+  start_date: string;
   distance: number;
 }
 
@@ -29,11 +29,11 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
       format(date, 'yyyy-MM-dd')
     );
 
-    const activitiesDict = data.reduce((acc, activity) => {
-      const sortableDate = format(parseISO(activity.start_date), 'yyyy-MM-dd');
-      acc[sortableDate] = activity.distance;
-      return acc;
-    }, {});
+    const activitiesDict = data.reduce((acc: { [key: string]: number }, activity: Activity) => {
+        const sortableDate = format(parseISO(activity.start_date), 'yyyy-MM-dd');
+        acc[sortableDate] = activity.distance;
+        return acc;
+      }, {});
 
     const filledActivities = dateSeries.map(date => ({
         date: format(parseISO(date), 'do MMM yyyy'),
