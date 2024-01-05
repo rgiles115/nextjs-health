@@ -10,6 +10,7 @@ Chart.register(...registerables);
 interface Activity {
   date: string;
   distance: number;
+  average_watts: number;
   start_date: string;
 }
 
@@ -45,6 +46,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
     const filledActivities = dateSeries.map(date => ({
         date: format(parseISO(date), 'do MMM yyyy'),
         distance: activitiesDict[date] ? activitiesDict[date] / 1000 : 0, // Convert meters to kilometers
+        average_watts: activitiesDict[date] ? activitiesDict[date].average_watts : 0, // Add average_watts property
         start_date: format(parseISO(date), 'do MMM yyyy')
       }));
       
@@ -68,11 +70,19 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
           type: 'line',
           data: {
             labels: activities.map(a => a.date),
-            datasets: [{
-              label: 'Distance',
-              data: activities.map(a => a.distance),
-              pointRadius: 0
-            }]
+            datasets: [
+                {
+                  label: 'Distance',
+                  data: activities.map(a => a.distance),
+                  pointRadius: 0,
+                },
+                {
+                  label: 'Average Watts', // Label for average watts
+                  data: activities.map(a => a.average_watts), // Use the average_watts property
+                  pointRadius: 0,
+                },
+              ],
+              
           },
           options: {
             responsive: true,

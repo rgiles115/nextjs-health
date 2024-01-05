@@ -42,12 +42,19 @@ export default function Home() {
     const cookies = document.cookie;
     const parsedCookies = parse(cookies);
 
+    console.log('Parsed Cookies:', parsedCookies);
+
+
     if (parsedCookies.stravaData) {
       // Cookie exists, you can access it as parsedCookies.stravaData
       setIsStravaAuthenticated(true);
+      console.log('stravaData Cookie Found');
+
     } else {
       // Cookie doesn't exist
       setIsStravaAuthenticated(false);
+      console.log('stravaData Cookie Not Found');
+
     }
   }, []); // This useEffect runs once when the component mounts
 
@@ -75,11 +82,11 @@ export default function Home() {
       <div className="graph-container">
         <ReadinessChart startDate={startDate} endDate={endDate} />
       </div>
-      {isStravaAuthenticated && (
+
         <div className="graph-container">
         <ClientStravaActivitiesChart startDate={startDate} endDate={endDate} />
         </div>
-      )}
+      
     </div>
   );
 }
