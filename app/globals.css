@@ -76,6 +76,15 @@ body {
   padding: 20px;
 }
 
+#totalDistance {
+  margin-top: 10px;  /* Adjust the value as needed */
+  font-weight: bold;     /* Makes the text bold */
+  font-size: 1em;      /* Increases the font size, adjust as needed */
+  text-align: center;
+  /* Add any other styles you need */
+}
+
+
 .custom-datepicker {
   background: url('/caret-down-regular.svg') no-repeat right;
   background-size: 20px 20px; /* Adjust size as needed */

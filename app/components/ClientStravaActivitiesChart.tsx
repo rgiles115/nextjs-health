@@ -1,5 +1,3 @@
-// ClientStravaActivitiesChart.tsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
@@ -12,24 +10,24 @@ interface Activity {
   distance: number;
   average_watts: number;
   start_date: string;
-  moving_time: number; // Add moving_time property
+  moving_time: number;
 }
 
 declare global {
   interface Window {
-    myStravaChart: Chart | undefined; // Define the type here (Chart or undefined)
+    myStravaChart: Chart | undefined;
   }
 }
 
 const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> = ({ startDate, endDate }) => {
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [totalDistance, setTotalDistance] = useState<number>(0);
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
 
   const fetchActivities = async () => {
     const startTimestamp = startDate.getTime() / 1000;
     const endTimestamp = endDate.getTime() / 1000;
-
     const response = await fetch(`/api/getStravaActivities?start_date=${startTimestamp}&end_date=${endTimestamp}`);
     const data = await response.json();
 
@@ -37,18 +35,17 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
       format(day, 'yyyy-MM-dd')
     );
 
+    let totalDistanceTemp = 0;
+
     const activitiesDict = data.reduce(
-      (
-        acc: { [key: string]: { distance: number; moving_time: number; weighted_watts: number } },
-        activity: Activity
-      ) => {
+      (acc: { [key: string]: { distance: number; moving_time: number; weighted_watts: number } }, activity: Activity) => {
         const sortableDate = format(parseISO(activity.start_date), 'yyyy-MM-dd');
 
         if (acc[sortableDate]) {
           acc[sortableDate].distance += activity.distance;
           acc[sortableDate].moving_time += activity.moving_time;
           acc[sortableDate].weighted_watts +=
-            (activity.average_watts * activity.moving_time) / 3600; // Calculate weighted watts
+            (activity.average_watts * activity.moving_time) / 3600;
         } else {
           acc[sortableDate] = {
             distance: activity.distance,
@@ -58,9 +55,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
         }
 
         return acc;
-      },
-      {}
-    );
+      }, {});
 
     const filledActivities = dateSeries.map((day) => {
       const activitiesForDate = data.filter((activity: Activity) => {
@@ -69,25 +64,25 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
       });
 
       if (activitiesForDate.length === 0) {
-        // No activities for this date, create an entry with 0 values
         return {
           day: format(parseISO(day), 'do MMM yyyy'),
           distance: 0,
-          average_watts: 0, // Set to 0 for days with no activity
-          moving_time: 0, // Set to 0 for days with no activity
+          average_watts: 0,
+          moving_time: 0,
           start_date: format(parseISO(day), 'do MMM yyyy'),
         };
       }
 
       const totalDistance = activitiesForDate.reduce((acc: number, activity: Activity) => {
-        return acc + activity.distance / 1000; // Convert meters to kilometers
+        return acc + activity.distance / 1000;
       }, 0);
+
+      totalDistanceTemp += totalDistance;
 
       const totalMovingTime = activitiesForDate.reduce((acc: number, activity: Activity) => {
         return acc + activity.moving_time;
       }, 0);
 
-      // Calculate the weighted average watts
       const weightedAverageWatts = activitiesForDate.reduce((acc: number, activity: Activity) => {
         const activityPercentage = activity.moving_time / totalMovingTime;
         return acc + activity.average_watts * activityPercentage;
@@ -103,6 +98,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
     });
 
     setActivities(filledActivities);
+    setTotalDistance(totalDistanceTemp);
   };
 
   useEffect(() => {
@@ -128,8 +124,8 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
                 pointRadius: 0,
               },
               {
-                label: 'Average Watts', // Label for average watts
-                data: activities.map((a) => a.average_watts), // Use the average_watts property
+                label: 'Average Watts',
+                data: activities.map((a) => a.average_watts),
                 pointRadius: 0,
               },
             ],
@@ -169,18 +165,17 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
 
   useEffect(() => {
     const handleResize = () => {
-        if (chartInstanceRef.current) {
-          // Update the chart size to match the container size
-          const parent = chartRef.current?.parentElement;
-          if (parent) {
-            chartInstanceRef.current.resize(parent.clientWidth, parent.clientHeight);
-          }
-        }
-      };
-      
-
+      if (chartInstanceRef.current) {
+        // Trigger the chart's resize method to adapt to new container size
+        chartInstanceRef.current.resize();
+      }
+    };
+  
     window.addEventListener('resize', handleResize);
-
+  
+    // Initial call to handleResize to ensure proper sizing on load
+    handleResize();
+  
     return () => {
       window.removeEventListener('resize', handleResize);
     };
@@ -188,6 +183,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
 
   return (
     <div>
+      <div id="totalDistance">Total Distance: {totalDistance.toFixed(2)} km</div> {/* Display total distance */}
       <canvas ref={chartRef} />
     </div>
   );
