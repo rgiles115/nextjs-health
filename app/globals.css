@@ -29,7 +29,7 @@ body {
 
 #datePicker {
   margin-top: 10px;  /* Adjust the value as needed */
-  margin-left: 110px; /* Align with the left edge of the graph-container */
+  margin-left: 40px; /* Align with the left edge of the graph-container */
 }
 
 #authButton {
@@ -50,7 +50,7 @@ body {
     height: 100%;
     width: 100%;
     max-width: 80%; /* Optional: Maximum width */
-    margin-left: 100px;
+    margin-left: 40px;
     margin-top: 20px;  /* Adjust the value as needed */
     border: 1px solid #ddd;
     border-radius: 20px;
