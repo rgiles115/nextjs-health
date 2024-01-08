@@ -18,11 +18,11 @@ export default async function handler(
 
         // Prepare the request body for application/x-www-form-urlencoded
         const params = new URLSearchParams();
-        params.append('client_id', process.env.OURA_CLIENT_ID);
-        params.append('client_secret', process.env.OURA_CLIENT_SECRET);
+        params.append('client_id', process.env.OURA_CLIENT_ID!);
+        params.append('client_secret', process.env.OURA_CLIENT_SECRET!);
         params.append('code', code as string);
         params.append('grant_type', 'authorization_code');
-        params.append('redirect_uri', process.env.OURA_REDIRECT_URI); // Add your redirect URI here
+        params.append('redirect_uri', process.env.OURA_REDIRECT_URI!); // Add your redirect URI here
 
         // Exchange the code for an access token
         const response = await fetch('https://api.ouraring.com/oauth/token', {
