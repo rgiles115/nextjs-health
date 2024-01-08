@@ -69,7 +69,7 @@ export default function Home() {
         <link rel="stylesheet" href="/style.css" />
       </Head>
       <div id="pageTitle">Health Data</div>
-      <div id="authButton"><a href={getStravaAuthURL()}>Authenticate with Strava</a></div>
+      <a href={getStravaAuthURL()}><div id="authStravaButton"></div></a>
       <div id="authButton"><a href={getOuraAuthURL()}>Authenticate with Oura</a></div>
 
 
