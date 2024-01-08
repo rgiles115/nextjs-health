@@ -1,5 +1,8 @@
 // pages/api/getActivityData.js
 
+import Cookies from 'cookies';
+
+
 export default async function handler(req, res) {
     const { start_date, end_date } = req.query;
 
@@ -9,8 +12,19 @@ export default async function handler(req, res) {
         return;
     }
 
+    // Retrieve the access token from the cookie
+    const cookies = new Cookies(req, res);
+    const encodedOuraCookie = cookies.get('ouraData'); // Replace with your actual cookie name
+
+    if (!encodedOuraCookie) {
+        res.status(400).json({ error: 'Oura cookie not found' });
+        return;
+    }
+
+    const decodedOuraCookie = decodeURIComponent(encodedOuraCookie);
+    const ouraData = JSON.parse(decodedOuraCookie);
+    const token = ouraData.access_token;
     const ouraApiUrl = `https://api.ouraring.com/v2/usercollection/daily_activity?start_date=${start_date}&end_date=${end_date}`;
-    const token = process.env.OURA_API_BEARER_TOKEN;
 
     try {
         const response = await fetch(ouraApiUrl, {

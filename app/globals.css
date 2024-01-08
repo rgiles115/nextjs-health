@@ -23,7 +23,7 @@ body {
   margin-top: 10px;  /* Adjust the value as needed */
   font-weight: bold;     /* Makes the text bold */
   font-size: 1.5em;      /* Increases the font size, adjust as needed */
-  margin-left: 110px; /* Align with the left edge of the graph-container */
+  margin-left: 40px; /* Align with the left edge of the graph-container */
   /* Add any other styles you need */
 }
 
@@ -34,7 +34,14 @@ body {
 
 #authButton {
   margin-top: 10px;  /* Adjust the value as needed */
-  margin-left: 110px; /* Align with the left edge of the graph-container */
+  margin-left: 40px; /* Align with the left edge of the graph-container */
+  background-color: white;
+  color: black;
+  padding: 10px 20px;
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 250px;
 }
 
 .graph-container {

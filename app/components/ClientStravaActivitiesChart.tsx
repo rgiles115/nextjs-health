@@ -8,7 +8,7 @@ import { eachDayOfInterval, format, parseISO } from 'date-fns';
 Chart.register(...registerables);
 
 interface Activity {
-  date: string;
+  day: string;
   distance: number;
   average_watts: number;
   start_date: string;
@@ -33,8 +33,8 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
     const response = await fetch(`/api/getStravaActivities?start_date=${startTimestamp}&end_date=${endTimestamp}`);
     const data = await response.json();
 
-    const dateSeries = eachDayOfInterval({ start: startDate, end: endDate }).map((date) =>
-      format(date, 'yyyy-MM-dd')
+    const dateSeries = eachDayOfInterval({ start: startDate, end: endDate }).map((day) =>
+      format(day, 'yyyy-MM-dd')
     );
 
     const activitiesDict = data.reduce(
@@ -62,20 +62,20 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
       {}
     );
 
-    const filledActivities = dateSeries.map((date) => {
+    const filledActivities = dateSeries.map((day) => {
       const activitiesForDate = data.filter((activity: Activity) => {
         const sortableDate = format(parseISO(activity.start_date), 'yyyy-MM-dd');
-        return sortableDate === date;
+        return sortableDate === day;
       });
 
       if (activitiesForDate.length === 0) {
         // No activities for this date, create an entry with 0 values
         return {
-          date: format(parseISO(date), 'do MMM yyyy'),
+          day: format(parseISO(day), 'do MMM yyyy'),
           distance: 0,
           average_watts: 0, // Set to 0 for days with no activity
           moving_time: 0, // Set to 0 for days with no activity
-          start_date: format(parseISO(date), 'do MMM yyyy'),
+          start_date: format(parseISO(day), 'do MMM yyyy'),
         };
       }
 
@@ -94,11 +94,11 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
       }, 0);
 
       return {
-        date: format(parseISO(date), 'do MMM yyyy'),
+        day: format(parseISO(day), 'do MMM yyyy'),
         distance: totalDistance,
         average_watts: weightedAverageWatts,
         moving_time: totalMovingTime,
-        start_date: format(parseISO(date), 'do MMM yyyy'),
+        start_date: format(parseISO(day), 'do MMM yyyy'),
       };
     });
 
@@ -120,7 +120,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
         window.myStravaChart = new Chart(ctx, {
           type: 'line',
           data: {
-            labels: activities.map((a) => a.date),
+            labels: activities.map((a) => a.day),
             datasets: [
               {
                 label: 'Distance',
@@ -169,10 +169,15 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
 
   useEffect(() => {
     const handleResize = () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.resize();
-      }
-    };
+        if (chartInstanceRef.current) {
+          // Update the chart size to match the container size
+          const parent = chartRef.current?.parentElement;
+          if (parent) {
+            chartInstanceRef.current.resize(parent.clientWidth, parent.clientHeight);
+          }
+        }
+      };
+      
 
     window.addEventListener('resize', handleResize);
 
