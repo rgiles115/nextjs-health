@@ -27,6 +27,14 @@ body {
   /* Add any other styles you need */
 }
 
+#footer {
+  margin-top: 10px;  /* Adjust the value as needed */
+  font-weight: lighter;     /* Makes the text bold */
+  font-size: 0.8em;      /* Increases the font size, adjust as needed */
+  margin-left: 40px; /* Align with the left edge of the graph-container */
+  /* Add any other styles you need */
+}
+
 #datePicker {
   margin-top: 10px;  /* Adjust the value as needed */
   margin-left: 40px; /* Align with the left edge of the graph-container */

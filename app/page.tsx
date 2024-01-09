@@ -59,7 +59,14 @@ export default function Home() {
       });
   }, []);
 
-
+  function Footer() {
+    return (
+      <footer>
+        <p>Version: {process.env.APP_VERSION}</p>
+      </footer>
+    );
+  }
+  
 
   return (
     <div>
@@ -98,6 +105,8 @@ export default function Home() {
       </div>
       </div>
       )}
+
+      <div id="footer"><Footer /></div>
     </div>
   );
 }
