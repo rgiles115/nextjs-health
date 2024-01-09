@@ -11,6 +11,7 @@ interface Activity {
   average_watts: number;
   start_date: string;
   moving_time: number;
+  total_elevation_gain: number;
 }
 
 declare global {
@@ -22,6 +23,8 @@ declare global {
 const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> = ({ startDate, endDate }) => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [totalDistance, setTotalDistance] = useState<number>(0);
+  const [totalElevationGain, setTotalElevationGain] = useState<number>(0);
+
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
 
@@ -37,18 +40,23 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
 
     let totalDistanceTemp = 0;
 
+    // Reset the total elevation gain before fetching new activities
+    setTotalElevationGain(0);
+
     const activitiesDict = data.reduce(
-      (acc: { [key: string]: { distance: number; moving_time: number; weighted_watts: number } }, activity: Activity) => {
+      (acc: { [key: string]: { distance: number; total_elevation_gain: number; moving_time: number; weighted_watts: number } }, activity: Activity) => {
         const sortableDate = format(parseISO(activity.start_date), 'yyyy-MM-dd');
 
         if (acc[sortableDate]) {
           acc[sortableDate].distance += activity.distance;
+          acc[sortableDate].total_elevation_gain += activity.total_elevation_gain;
           acc[sortableDate].moving_time += activity.moving_time;
           acc[sortableDate].weighted_watts +=
             (activity.average_watts * activity.moving_time) / 3600;
         } else {
           acc[sortableDate] = {
             distance: activity.distance,
+            total_elevation_gain: activity.total_elevation_gain,
             moving_time: activity.moving_time,
             weighted_watts: (activity.average_watts * activity.moving_time) / 3600,
           };
@@ -67,6 +75,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
         return {
           day: format(parseISO(day), 'do MMM yyyy'),
           distance: 0,
+          total_elevation_gain: 0,
           average_watts: 0,
           moving_time: 0,
           start_date: format(parseISO(day), 'do MMM yyyy'),
@@ -78,6 +87,11 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
       }, 0);
 
       totalDistanceTemp += totalDistance;
+
+      const totalElevation = activitiesForDate.reduce((acc: number, activity: Activity) => acc + activity.total_elevation_gain, 0);
+
+      // Update the total elevation gain
+      setTotalElevationGain(prevElevation => prevElevation + totalElevation);
 
       const totalMovingTime = activitiesForDate.reduce((acc: number, activity: Activity) => {
         return acc + activity.moving_time;
@@ -91,6 +105,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
       return {
         day: format(parseISO(day), 'do MMM yyyy'),
         distance: totalDistance,
+        total_elevation_gain: totalElevation,
         average_watts: weightedAverageWatts,
         moving_time: totalMovingTime,
         start_date: format(parseISO(day), 'do MMM yyyy'),
@@ -126,6 +141,11 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
               {
                 label: 'Average Watts',
                 data: activities.map((a) => a.average_watts),
+                pointRadius: 0,
+              },
+              {
+                label: 'Elevation Gain',
+                data: activities.map((a) => a.total_elevation_gain),
                 pointRadius: 0,
               },
             ],
@@ -166,14 +186,12 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
   useEffect(() => {
     const handleResize = () => {
       if (chartInstanceRef.current) {
-        // Trigger the chart's resize method to adapt to new container size
         chartInstanceRef.current.resize();
       }
     };
   
     window.addEventListener('resize', handleResize);
   
-    // Initial call to handleResize to ensure proper sizing on load
     handleResize();
   
     return () => {
@@ -184,6 +202,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
   return (
     <div>
       <div id="totalDistance">Total Distance: {totalDistance.toFixed(2)} km</div> {/* Display total distance */}
+      <div id="totalElevationGain">Total Elevation Gain: {totalElevationGain} meters</div> {/* Display total elevation gain */}
       <canvas ref={chartRef} />
     </div>
   );

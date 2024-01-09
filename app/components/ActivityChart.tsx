@@ -83,9 +83,13 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ startDate, endDate }) => 
                                 grid: {
                                     display: false
                                 },
-                                
-                        }
-                    }   
+                                }
+                                },
+                                plugins: {
+                                    tooltip: {
+                                      enabled: true,
+                                    }
+                                  }
                     }
                 });
 

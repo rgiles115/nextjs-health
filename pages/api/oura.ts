@@ -14,8 +14,6 @@ export default async function handler(
     }
 
     try {
-        console.log("Code:", code);
-
         // Prepare the request body for application/x-www-form-urlencoded
         const params = new URLSearchParams();
         params.append('client_id', process.env.OURA_CLIENT_ID!);
@@ -34,7 +32,6 @@ export default async function handler(
         });
 
         const data = await response.json();
-        console.log("Response from Oura:", data);
 
         // Serialize the data and set it as a cookie
         const cookie = serialize('ouraData', JSON.stringify(data), {

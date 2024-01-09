@@ -35,7 +35,7 @@ export default async function handler(req, res) {
         }
 
         const activities = await response.json();
-
+        console.log("Strava Data:", activities);
         res.status(200).json(activities);
     } catch (error) {
         console.error('Error fetching Strava activity data:', error);
