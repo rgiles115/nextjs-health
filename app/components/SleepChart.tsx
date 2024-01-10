@@ -76,31 +76,32 @@ const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
                             {
                                 label: 'Total Sleep',
                                 data: sleepData.total,
-                                pointRadius: 0 // Set point radius to 0 to hide the dots
+                                pointRadius: 0, // Set point radius to 0 to hide the dots
+                                tension: 0.4,
                             },
                             {
                                 label: 'REM Sleep',
                                 data: sleepData.rem,
-                                pointRadius: 0 // Set point radius to 0 to hide the dots
-
+                                pointRadius: 0, // Set point radius to 0 to hide the dots
+                                tension: 0.4,
                             },
                             {
                                 label: 'Deep Sleep',
                                 data: sleepData.deep,
-                                pointRadius: 0 // Set point radius to 0 to hide the dots
-
+                                pointRadius: 0, // Set point radius to 0 to hide the dots
+                                tension: 0.4,
                             },
                             {
                                 label: 'Light Sleep',
                                 data: sleepData.light,
-                                pointRadius: 0 // Set point radius to 0 to hide the dots
-
+                                pointRadius: 0, // Set point radius to 0 to hide the dots
+                                tension: 0.4,
                             },
                             {
                                 label: 'Restfulness',
                                 data: sleepData.restfulness,
-                                pointRadius: 0 // Set point radius to 0 to hide the dots
-
+                                pointRadius: 0, // Set point radius to 0 to hide the dots
+                                tension: 0.4,
                             }
                         ]
                     },

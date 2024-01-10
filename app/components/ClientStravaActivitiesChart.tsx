@@ -138,19 +138,21 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
                 data: activities.map((a) => a.distance),
                 pointRadius: 0,
                 borderColor: '#5da6b4', // Pale Turquoise
+                tension: 0.4,
               },
               {
                 label: 'Average Watts',
                 data: activities.map((a) => a.average_watts),
                 pointRadius: 0,
                 borderColor: '#327388', // Teal Blue
+                tension: 0.4,
               },
               {
                 label: 'Elevation Gain',
                 data: activities.map((a) => a.total_elevation_gain),
                 pointRadius: 0,
                 borderColor: '#57a0ae', // Soft Cyan
-
+                tension: 0.4,
               },
             ],
           },
@@ -187,6 +189,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
     };
   }, [activities]);
 
+  
   useEffect(() => {
     const handleResize = () => {
       if (chartInstanceRef.current) {

@@ -112,6 +112,7 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ startDate, endDate }) => 
                             pointBackgroundColor: 'rgba(138, 43, 226, 1)',
                             borderWidth: 2,
                             pointRadius: 0, // Set point radius to 0 to hide the dots
+                            tension: 0.4,
                         }]
                     },
                     options: {
