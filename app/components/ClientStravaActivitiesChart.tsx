@@ -206,9 +206,9 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
   return (
     <div>
         <div id="totalTitle">Total Distance (km)</div>
-        <div id="totalDistance">{totalDistance.toFixed(2)}</div> {/* Display total distance */}
+        <div id="totalValue">{totalDistance.toFixed(2)}</div> {/* Display total distance */}
         <div id="totalTitle">Total Elevation Gain (m)</div>
-        <div id="totalElevationGain">{totalElevationGain}</div> {/* Display total elevation gain */}
+        <div id="totalValue">{totalElevationGain}</div> {/* Display total elevation gain */}
         <canvas ref={chartRef} />
     </div>
   );

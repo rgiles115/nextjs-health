@@ -2,6 +2,16 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
+Register your app with Strava and Oura, and copy the Auth details.
+
+Add these fields to you env file.
+STRAVA_CLIENT_ID
+STRAVA_CLIENT_SECRET
+STRAVA_REDIRECT_URI
+OURA_CLIENT_ID
+OURA_CLIENT_SECRET
+OURA_REDIRECT_URI
+
 First, run the development server:
 
 ```bash

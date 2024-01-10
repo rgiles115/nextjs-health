@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap');
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -90,9 +91,10 @@ body {
   text-align: center;
 }
 
-#totalDistance {
+#totalValue {
+  font-family: 'Roboto Mono', monospace;
   margin-top: 0px;  /* Adjust the value as needed */
-  font-weight: bold;     /* Makes the text bold */
+  font-weight: light;     /* Makes the text bold */
   font-size: 2em;      /* Increases the font size, adjust as needed */
   text-align: center;
   /* Add any other styles you need */

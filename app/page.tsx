@@ -19,8 +19,6 @@ const getStravaAuthURL = () => {
   const responseType = 'code';
   const approvalPrompt = 'auto';
   const scope = 'read,activity:read';
-
-
   return `${root}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&approval_prompt=${approvalPrompt}&scope=${scope}`;
 };
 
@@ -31,8 +29,6 @@ const getOuraAuthURL = () => {
   const responseType = 'code';
   const approvalPrompt = 'auto';
   const scope = 'read,activity:read';
-
-
   return `${root}?client_id=${clientId}&response_type=${responseType}&redirect_uri=${redirectUri}`;
 };
 
@@ -40,8 +36,9 @@ const getOuraAuthURL = () => {
 export default function Home() {
   // Calculate the dates
   const currentDate = new Date();
+  const firstDayOfThisYear = new Date(new Date().getFullYear(), 0, 1);
   const thirtyDaysAgo = new Date(currentDate.getTime() - (30 * 24 * 60 * 60 * 1000));
-  const [startDate, setStartDate] = useState(thirtyDaysAgo);
+  const [startDate, setStartDate] = useState(firstDayOfThisYear);
   const [endDate, setEndDate] = useState(currentDate);
   const [isStravaAuthed, setIsStravaAuthed] = useState(false);
   const [isOuraAuthed, setIsOuraAuthed] = useState(false);

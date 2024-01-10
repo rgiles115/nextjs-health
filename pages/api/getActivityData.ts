@@ -12,8 +12,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return;
     }
 
-    console.log("Start Date:", start_date);
-    console.log("End Date:", end_date);
+    // console.log("Start Date:", start_date);
+    // console.log("End Date:", end_date);
 
 
     // Retrieve the access token from the cookie
