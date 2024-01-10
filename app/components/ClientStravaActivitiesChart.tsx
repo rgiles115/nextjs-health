@@ -137,16 +137,20 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
                 label: 'Distance',
                 data: activities.map((a) => a.distance),
                 pointRadius: 0,
+                borderColor: '#5da6b4', // Pale Turquoise
               },
               {
                 label: 'Average Watts',
                 data: activities.map((a) => a.average_watts),
                 pointRadius: 0,
+                borderColor: '#327388', // Teal Blue
               },
               {
                 label: 'Elevation Gain',
                 data: activities.map((a) => a.total_elevation_gain),
                 pointRadius: 0,
+                borderColor: '#57a0ae', // Soft Cyan
+
               },
             ],
           },
@@ -201,9 +205,11 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
 
   return (
     <div>
-      <div id="totalDistance">Total Distance: {totalDistance.toFixed(2)} km</div> {/* Display total distance */}
-      <div id="totalElevationGain">Total Elevation Gain: {totalElevationGain} meters</div> {/* Display total elevation gain */}
-      <canvas ref={chartRef} />
+        <div id="totalTitle">Total Distance (km)</div>
+        <div id="totalDistance">{totalDistance.toFixed(2)}</div> {/* Display total distance */}
+        <div id="totalTitle">Total Elevation Gain (m)</div>
+        <div id="totalElevationGain">{totalElevationGain}</div> {/* Display total elevation gain */}
+        <canvas ref={chartRef} />
     </div>
   );
 };

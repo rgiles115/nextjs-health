@@ -84,14 +84,26 @@ body {
   padding: 20px;
 }
 
-#totalDistance {
+#totalTitle {
   margin-top: 10px;  /* Adjust the value as needed */
-  font-weight: bold;     /* Makes the text bold */
   font-size: 1em;      /* Increases the font size, adjust as needed */
+  text-align: center;
+}
+
+#totalDistance {
+  margin-top: 0px;  /* Adjust the value as needed */
+  font-weight: bold;     /* Makes the text bold */
+  font-size: 2em;      /* Increases the font size, adjust as needed */
   text-align: center;
   /* Add any other styles you need */
 }
 
+#totalElevationGain {
+  margin-top: 0px;  /* Adjust the value as needed */
+  font-weight: bold;     /* Makes the text bold */
+  font-size: 2em;      /* Increases the font size, adjust as needed */
+  text-align: center;
+}
 
 .custom-datepicker {
   background: url('/caret-down-regular.svg') no-repeat right;

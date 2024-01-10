@@ -5,17 +5,29 @@ import { format } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
 Chart.register(...registerables);
 
-interface SleepEntry {
-    day: string;
-    contributors: {
-        total_sleep: number;
-        rem_sleep: number;
-        deep_sleep: number;
-        restfulness: number,
-        // Additional fields if needed
-    };
-    score: number; // Assuming this represents light sleep
+interface SleepData {
+    data: SleepEntry[];
+    next_token: string | null;
 }
+
+interface SleepEntry {
+    id: string;
+    contributors: Contributors;
+    day: string;
+    score: number;
+    timestamp: string;
+}
+
+interface Contributors {
+    deep_sleep: number;
+    efficiency: number;
+    latency: number;
+    rem_sleep: number;
+    restfulness: number;
+    timing: number;
+    total_sleep: number;
+}
+
 
 interface SleepChartProps {
     startDate: Date;
@@ -34,7 +46,7 @@ const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
         fetch(`/api/getSleepData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`)
             .then(response => response.json())
             .then(data => {
-                const formattedDates = data.data.map((entry: SleepEntry) => format(new Date(entry.day), 'do MMM yyyy'));
+                const formattedDates = data.data.map((entry: SleepEntry) => format(new Date(entry.timestamp), 'do MMM yyyy'));
                 const total = data.data.map((entry: SleepEntry) => entry.contributors.total_sleep);
                 setSleepData({
                     dates: formattedDates,

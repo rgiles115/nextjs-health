@@ -7,10 +7,55 @@ import "react-datepicker/dist/react-datepicker.css";
 Chart.register(...registerables);
 
 
+interface ActivityData {
+    data: ActivityEntry[];
+    next_token: string | null;
+}
+
 interface ActivityEntry {
-    day: string;           // Assuming 'day' is a string
-    active_calories: number; // Assuming 'active_calories' is a number
-  }
+    id: string;
+    class_5_min: string;
+    score: number;
+    active_calories: number;
+    average_met_minutes: number;
+    contributors: ActivityContributors;
+    equivalent_walking_distance: number;
+    high_activity_met_minutes: number;
+    high_activity_time: number;
+    inactivity_alerts: number;
+    low_activity_met_minutes: number;
+    low_activity_time: number;
+    medium_activity_met_minutes: number;
+    medium_activity_time: number;
+    met: MetData;
+    meters_to_target: number;
+    non_wear_time: number;
+    resting_time: number;
+    sedentary_met_minutes: number;
+    sedentary_time: number;
+    steps: number;
+    target_calories: number;
+    target_meters: number;
+    total_calories: number;
+    day: string;
+    timestamp: string;
+}
+
+interface ActivityContributors {
+    meet_daily_targets: number;
+    move_every_hour: number;
+    recovery_time: number;
+    stay_active: number;
+    training_frequency: number;
+    training_volume: number;
+}
+
+interface MetData {
+    interval: number;
+    items: number[];
+    timestamp: string;
+}
+
 
   interface ActivityChartProps {
     startDate: Date;
@@ -32,7 +77,7 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ startDate, endDate }) => 
             .then(response => response.json())
             .then(data => {
                 const formattedDates = data.data.map((entry: ActivityEntry) => 
-                    format(new Date(entry.day), 'do MMM yyyy')
+                    format(new Date(entry.timestamp), 'do MMM yyyy')
                 );
                 const activeCalories = data.data.map((entry: ActivityEntry) => entry.active_calories);
             

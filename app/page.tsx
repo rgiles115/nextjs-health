@@ -46,6 +46,8 @@ export default function Home() {
   const [isStravaAuthed, setIsStravaAuthed] = useState(false);
   const [isOuraAuthed, setIsOuraAuthed] = useState(false);
   
+//  console.log("Start Date:", startDate);
+//  console.log("End Date:", endDate);
 
   useEffect(() => {
     fetch('/api/authStatus')
@@ -85,6 +87,14 @@ export default function Home() {
         <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker"/>
       </div>
 
+      {isStravaAuthed &&  (
+        <div>
+      <div className="graph-container">
+        <ClientStravaActivitiesChart startDate={startDate} endDate={endDate} />
+      </div>
+      </div>
+      )}
+
       {isOuraAuthed && (
         <div>
       <div className="graph-container">
@@ -97,13 +107,6 @@ export default function Home() {
         <ReadinessChart startDate={startDate} endDate={endDate} />
       </div>
         </div>
-      )}
-      {isStravaAuthed &&  (
-        <div>
-      <div className="graph-container">
-        <ClientStravaActivitiesChart startDate={startDate} endDate={endDate} />
-      </div>
-      </div>
       )}
 
       <div id="footer"><Footer /></div>

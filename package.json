@@ -1,6 +1,6 @@
 {
   "name": "nextjs",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@types/cookie": "^0.6.0",
+    "@types/cookies": "^0.7.10",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-datepicker": "^4.19.5",
