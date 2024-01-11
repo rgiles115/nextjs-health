@@ -3,6 +3,7 @@ import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import { format } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
+import Loading from './Loading'; // Import Loading component
 Chart.register(...registerables);
 
 interface SleepData {
@@ -38,8 +39,10 @@ const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
     const [sleepData, setSleepData] = useState({ dates: [], total: [], rem: [], deep: [], light: [], restfulness: [] });
     const chartRef = useRef<HTMLCanvasElement>(null);
     const chartInstanceRef = useRef<Chart | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
+        setIsLoading(true); // Start loading
         const formattedStartDate = startDate.toISOString().split('T')[0];
         const formattedEndDate = endDate.toISOString().split('T')[0];
 
@@ -56,8 +59,13 @@ const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
                     light: data.data.map((entry: SleepEntry) => entry.score),
                     restfulness: data.data.map((entry: SleepEntry) => entry.contributors.restfulness),
                 });
+                setIsLoading(false); // Stop loading after data is fetched
+
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                setIsLoading(false); // Stop loading in case of error
+            });
     }, [startDate, endDate]);
 
     useEffect(() => {
@@ -153,9 +161,16 @@ const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
 
     return (
         <div>
-            <canvas ref={chartRef} />
+            {isLoading ? (
+                <div><Loading /></div> // Replace with a spinner or loading component
+            ) : (
+                <div className="graph-container">
+                <canvas ref={chartRef} />
+                </div>
+            )}
         </div>
     );
+    
 };
 
 export default SleepChart;

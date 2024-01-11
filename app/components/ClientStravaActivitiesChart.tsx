@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import { eachDayOfInterval, format, parseISO } from 'date-fns';
+import Loading from './Loading'; // Import Loading component
 
 Chart.register(...registerables);
 
@@ -27,8 +28,11 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
 
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const fetchActivities = async () => {
+    setIsLoading(true); // Start loading
     const startTimestamp = startDate.getTime() / 1000;
     const endTimestamp = endDate.getTime() / 1000;
     const response = await fetch(`/api/getStravaActivities?start_date=${startTimestamp}&end_date=${endTimestamp}`);
@@ -114,6 +118,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
 
     setActivities(filledActivities);
     setTotalDistance(totalDistanceTemp);
+    setIsLoading(false); // Stop loading after data is fetched
   };
 
   useEffect(() => {
@@ -208,12 +213,21 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
 
   return (
     <div>
+    {isLoading ? (
+        <div><Loading /></div> // Replace with a spinner or loading component
+    ) : (
+      <div className="graph-container">
+      <div>
         <div id="totalTitle">Total Distance (km)</div>
         <div id="totalValue">{totalDistance.toFixed(2)}</div> {/* Display total distance */}
         <div id="totalTitle">Total Elevation Gain (m)</div>
         <div id="totalValue">{totalElevationGain}</div> {/* Display total elevation gain */}
         <canvas ref={chartRef} />
-    </div>
+        <div id="viewOnStrava"><a href="https://strava.com/athletes/">View on Strava</a></div>
+        </div>
+        </div>
+        )}
+        </div>
   );
 };
 

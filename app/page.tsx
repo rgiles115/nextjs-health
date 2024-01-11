@@ -8,6 +8,7 @@ import ClientStravaActivitiesChart from './components/ClientStravaActivitiesChar
 import React, { useState, useEffect } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import Footer from './components/Footer'; // Import Footer component
 
 
 
@@ -58,14 +59,7 @@ export default function Home() {
       });
   }, []);
 
-  function Footer() {
-    return (
-      <footer>
-        <p>Version: {process.env.APP_VERSION}</p>
-      </footer>
-    );
-  }
-  
+
 
   return (
     <div>
@@ -86,26 +80,25 @@ export default function Home() {
 
       {isStravaAuthed &&  (
         <div>
-      <div className="graph-container">
+      
         <ClientStravaActivitiesChart startDate={startDate} endDate={endDate} />
-      </div>
+      
       </div>
       )}
 
       {isOuraAuthed && (
         <div>
-      <div className="graph-container">
+      
         <ActivityChart startDate={startDate} endDate={endDate} />
-      </div>
-      <div className="graph-container">
+      
+
         <SleepChart startDate={startDate} endDate={endDate} />
-      </div>
-      <div className="graph-container">
+
+
         <ReadinessChart startDate={startDate} endDate={endDate} />
-      </div>
+
         </div>
       )}
-
       <div id="footer"><Footer /></div>
     </div>
   );

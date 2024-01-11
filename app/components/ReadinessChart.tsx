@@ -3,6 +3,8 @@ import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import { format } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
+import Loading from './Loading'; // Import Loading component
+
 Chart.register(...registerables);
 
 interface ReadinessEntry {
@@ -29,8 +31,11 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate }) =
     });
     const chartRef = useRef<HTMLCanvasElement>(null);
     const chartInstanceRef = useRef<Chart | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
+        setIsLoading(true); // Start loading
+
         const formattedStartDate = startDate.toISOString().split('T')[0];
         const formattedEndDate = endDate.toISOString().split('T')[0];
 
@@ -47,8 +52,13 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate }) =
                     hrvBalance: data.data.map((entry: ReadinessEntry) => entry.contributors.hrv_balance),
                     bodyTemperature: data.data.map((entry: ReadinessEntry) => entry.contributors.body_temperature)
                 });
+                setIsLoading(false); // Stop loading after data is fetched
+
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                setIsLoading(false); // Stop loading in case of error
+            });
     }, [startDate, endDate]);
 
     useEffect(() => {
@@ -138,9 +148,16 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate }) =
 
     return (
         <div>
-            <canvas ref={chartRef} />
+            {isLoading ? (
+                <div><Loading /></div> // Replace with a spinner or loading component
+            ) : (
+                <div className="graph-container">
+                <canvas ref={chartRef} />
+                </div>
+            )}
         </div>
     );
+    
 };
 
 export default ReadinessChart;

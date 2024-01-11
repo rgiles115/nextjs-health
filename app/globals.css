@@ -28,13 +28,25 @@ body {
   /* Add any other styles you need */
 }
 
-#footer {
-  margin-top: 10px;  /* Adjust the value as needed */
-  font-weight: lighter;     /* Makes the text bold */
-  font-size: 0.8em;      /* Increases the font size, adjust as needed */
-  margin-left: 40px; /* Align with the left edge of the graph-container */
-  /* Add any other styles you need */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  /* Add more styling as needed */
 }
+
+.footerImage {
+  margin-left: 40px;
+  width: 140px;
+}
+
+#footerVersion {
+  padding-right: 40px;
+  font-size: 0.8em;
+  font-weight: lighter;
+}
+
 
 #datePicker {
   margin-top: 10px;  /* Adjust the value as needed */
@@ -65,6 +77,22 @@ body {
   width: 193px;
   height: 48px;
 }
+
+#viewOnStrava {
+  display: flex;
+  justify-content: right;
+  padding-right: 20px;
+  font-size: 0.8em;
+  font-weight: lighter;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
 
 .graph-container {
     justify-content: center;
