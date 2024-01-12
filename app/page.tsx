@@ -9,8 +9,7 @@ import React, { useState, useEffect } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Footer from './components/Footer'; // Import Footer component
-
-
+import Script from 'next/script';
 
 
 const getStravaAuthURL = () => {
@@ -67,7 +66,7 @@ export default function Home() {
         <title>My Health Data</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="/style.css" />
-        <script src="https://kit.fontawesome.com/0d58ae3c8d.js" crossOrigin="anonymous"></script>
+        <Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
       </Head>
       <div id="pageTitle">My Health Data</div>
       <a href={getStravaAuthURL()}><div id="authStravaButton"></div></a>
