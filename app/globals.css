@@ -49,9 +49,46 @@ body {
 
 
 #datePicker {
-  margin-top: 10px;  /* Adjust the value as needed */
-  margin-left: 40px; /* Align with the left edge of the graph-container */
+  display: flex;
+  justify-content: center;
+  background: #fff;
+  border-radius: 15px;
+  border: 1px solid #ccc;
+  width: 500px;
+  margin: 30px;
 }
+
+.custom-datepicker {
+  border: none;
+  outline: none;
+  padding: 10px;
+  margin: 0px;
+  font-size: 16px;
+}
+
+/* Hide the second date picker's border to make them look like a single element */
+.custom-datepicker:nth-child(2) {
+  border-left: 1px solid #ccc;
+}
+
+/* Adjust the react-datepicker styles */
+.react-datepicker__input-container {
+  display: block;
+}
+
+/* Style the calendar icon and the dropdown icon */
+.react-datepicker__close-icon::after,
+.react-datepicker__triangle {
+  display: none;
+}
+
+/* Additional styles for the calendar to match your design if necessary */
+.react-datepicker-popper {
+  z-index: 10; /* Make sure it's above other content */
+}
+
+/* You may need to add more specific styles depending on your overall design needs */
+
 
 #authButton {
   margin-top: 10px;  /* Adjust the value as needed */
@@ -102,14 +139,48 @@ body {
 }
 
 .number-container {
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%; /* Adjust as needed */
-  width: 90%; /* Adjust for the number of items */
-  margin: 5px;
+  height: auto; /* Set to auto or a fixed height depending on your needs */
+  width: 90%; /* Adjust based on parent container */
+  margin: 5px ; 
   border: 1px solid #ddd;
   border-radius: 20px;
   overflow: hidden;
+  background: #fff; /* Assuming a white background */
+  padding: 10px; /* Adjust as needed */
+}
+
+.icon {
+  font-size: 3rem; /* Adjust icon size as needed */
+  margin-bottom: 10px; /* Space between icon and number */
+}
+
+.total-distance {
+  text-align: center;
+}
+
+.total-value {
+  font-size: 3rem; /* Large font size for the total value */
+  font-weight: bold; /* Making the total value bold */
+  color: #000; /* Color for the number */
+  margin-bottom: 5px; /* Space between value and title */
+}
+
+.total-title {
+  font-size: 1rem; /* Smaller font size for the title */
+  text-transform: uppercase; /* Capitalize the title */
+  color: #6c757d; /* A grey color for the title */
+  letter-spacing: 1px; /* More spacing between letters */
+}
+
+.divider {
+  height: 1px;
+  width: 40%; /* Length of the divider */
+  background-color: #ccc; /* Color of the divider */
+  margin-top: 15px; /* Space between title and divider */
 }
 
 .graph-container {
@@ -126,7 +197,13 @@ body {
 .graph-container canvas {
   width: auto; /* Ensure the canvas can grow */
   height: auto; /* Responsive height */
-  padding: 20px;
+  margin: 40px;
+}
+
+#fontAwesome {
+  margin: 20px;
+  font-size: 2em;
+  overflow: hidden;
 }
 
 #totalTitle {

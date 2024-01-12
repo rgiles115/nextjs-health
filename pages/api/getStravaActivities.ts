@@ -94,20 +94,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const stravaData: StravaData = JSON.parse(decodedStravaCookie);
     const accessToken = stravaData.access_token;
 
-    const stravaApiUrl = `https://www.strava.com/api/v3/athlete/activities?before=${end_date}&after=${start_date}`;
+    const perPage = 30; // Number of activities per page (default is 30)
+    let page = 1; // Start with page 1
+    const allActivities = [];
 
     try {
-        const response = await fetch(stravaApiUrl, {
-            headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
+        while (true) {
+            const stravaApiUrl = `https://www.strava.com/api/v3/athlete/activities?before=${end_date}&after=${start_date}&per_page=${perPage}&page=${page}`;
+            const response = await fetch(stravaApiUrl, {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            });
 
-        if (!response.ok) {
-            res.status(response.status).json({ error: `Error from Strava API: ${response.statusText}` });
-            return;
+            if (!response.ok) {
+                res.status(response.status).json({ error: `Error from Strava API: ${response.statusText}` });
+                return;
+            }
+
+            const activities: StravaActivity[] = await response.json();
+            if (activities.length === 0) {
+                // No more activities to fetch, break out of the loop
+                break;
+            }
+
+            allActivities.push(...activities);
+            page++;
         }
 
-        const activities: StravaActivity = await response.json();
-        res.status(200).json(activities);
+        res.status(200).json(allActivities);
     } catch (error) {
         console.error('Error fetching Strava activity data:', error);
         res.status(500).json({ error: 'Internal Server Error' });
