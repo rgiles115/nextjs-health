@@ -93,15 +93,31 @@ body {
   padding: 40px;
 }
 
+.parent-number-container {
+  display: flex;
+    flex-direction: row;
+    justify-content: center; /* Centers children horizontally */
+    width: 95%; /* Adjust as needed */
+    margin: 20px;
+}
+
+.number-container {
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* Adjust as needed */
+  width: 90%; /* Adjust for the number of items */
+  margin: 5px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  overflow: hidden;
+}
 
 .graph-container {
     justify-content: center;
     align-items: center;
     height: 100%;
-    width: 100%;
-    max-width: 80%; /* Optional: Maximum width */
-    margin-left: 40px;
-    margin-top: 20px;  /* Adjust the value as needed */
+    width: 95%;
+    margin: 20px;
     border: 1px solid #ddd;
     border-radius: 20px;
     overflow: hidden;
@@ -117,13 +133,14 @@ body {
   margin-top: 10px;  /* Adjust the value as needed */
   font-size: 1em;      /* Increases the font size, adjust as needed */
   text-align: center;
+  text-transform: uppercase;
 }
 
 #totalValue {
   font-family: 'Roboto Mono', monospace;
   margin-top: 0px;  /* Adjust the value as needed */
-  font-weight: light;     /* Makes the text bold */
-  font-size: 2em;      /* Increases the font size, adjust as needed */
+  font-weight: bold;     /* Makes the text bold */
+  font-size: 2.8em;      /* Increases the font size, adjust as needed */
   text-align: center;
   /* Add any other styles you need */
 }

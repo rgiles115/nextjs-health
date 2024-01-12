@@ -110,8 +110,8 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
 
       return {
         day: format(parseISO(day), 'do MMM yyyy'),
-        distance: totalDistance,
-        total_elevation_gain: totalElevation,
+        distance: totalDistance.toLocaleString('en-US'),
+        total_elevation_gain: totalElevation.toLocaleString('en-US'),
         average_watts: weightedAverageWatts,
         moving_time: totalMovingTime,
         start_date: format(parseISO(day), 'do MMM yyyy'),
@@ -218,18 +218,27 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
     {isLoading ? (
         <div><Loading /></div> // Replace with a spinner or loading component
     ) : (
-      <div className="graph-container">
       <div>
-        <div id="totalTitle">Total Distance (km)</div>
-        <div id="totalValue">{totalDistance.toFixed(2)}</div> {/* Display total distance */}
-        <div id="totalTitle">Total Elevation Gain (m)</div>
-        <div id="totalValue">{totalElevationGain}</div> {/* Display total elevation gain */}
-        <canvas ref={chartRef} />
-        <div id="viewOnStrava"><a href="https://strava.com/athletes/">View on Strava</a></div>
+        <div className="parent-number-container">
+      
+          <div className="number-container">
+            <div id="totalTitle">Total Distance</div>
+            <div id="totalValue">{totalDistance.toFixed(2)}</div> {/* Display total distance */}
+          </div>
+          <div className="number-container">
+            <div id="totalTitle">Total Elevation Gain</div>
+            <div id="totalValue">{totalElevationGain}</div> {/* Display total elevation gain */}
+
+          </div>
         </div>
+        <div className="graph-container">
+          <canvas ref={chartRef} />
+          <div id="viewOnStrava"><a href="https://strava.com/athletes/">View on Strava</a></div>
         </div>
+      </div>
+        
         )}
-        </div>
+      </div>
   );
 };
 
