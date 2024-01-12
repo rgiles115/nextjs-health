@@ -54,19 +54,19 @@ body {
   background: #fff;
   border-radius: 15px;
   border: 1px solid #ccc;
-  width: 400px;
+  width: 360px;
   margin: 30px;
 }
 
 .custom-datepicker {
   background: url('/caret-down-regular.svg') no-repeat right;
-  background-size: 10px 10px; /* Adjust size as needed */
+  background-size: 14px 14px; /* Adjust size as needed */
   border: none;
   outline: none;
   padding: 10px;
   margin-left: 5px;
   font-size: 16px;
-  width: 190px;
+  width: 170px;
 }
 
 /* Hide the second date picker's border to make them look like a single element */
