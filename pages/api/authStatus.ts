@@ -1,7 +1,13 @@
 // pages/api/authStatus.ts
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import cookie from 'cookie';
+import axios from 'axios';
+
+// Load environment variables
+const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID;
+const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
+const OURA_CLIENT_ID = process.env.OURA_CLIENT_ID;
+const OURA_CLIENT_SECRET = process.env.OURA_CLIENT_SECRET;
 
 interface StravaCookieData {
   token_type: string;
@@ -39,20 +45,50 @@ interface OuraCookieData {
   token_type: string;
   expires_in: number;
   refresh_token: string;
+  expires_at: number; // Add expires_at field to store the token's expiration timestamp
 }
 
+// Custom type for cookies
+interface CustomCookies {
+  stravaData?: string;
+  ouraData?: string;
+}
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Parse the cookies from the request
-  const cookies = cookie.parse(req.headers.cookie || '');
+  const cookies: CustomCookies = cookie.parse(req.headers.cookie || '');
 
   // Function to check if the Strava cookie is expired
   const isStravaExpired = (stravaCookie: string): boolean => {
     try {
       const stravaData: StravaCookieData = JSON.parse(stravaCookie);
-      return Date.now() >= (stravaData.expires_at * 1000); // Convert to milliseconds
+      return Date.now() >= stravaData.expires_at * 1000; // Convert to milliseconds
     } catch (e) {
       return true; // If there's an error parsing, assume expired
+    }
+  };
+
+  // Function to refresh the Strava token
+  const refreshStravaToken = async (refreshToken: string): Promise<string | null> => {
+    try {
+      const response = await axios.post(
+        'https://www.strava.com/api/v3/oauth/token', // Strava token refresh endpoint
+        {
+          client_id: STRAVA_CLIENT_ID,
+          client_secret: STRAVA_CLIENT_SECRET,
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken,
+        }
+      );
+
+      if (response.data && response.data.access_token) {
+        return response.data.access_token;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Error refreshing Strava token:', error);
+      return null;
     }
   };
 
@@ -61,16 +97,68 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
       const ouraData: OuraCookieData = JSON.parse(ouraCookie);
       // Assuming the time of cookie creation is not stored, we cannot accurately determine the expiration
-      // This is a limitation without additional data
       return false; // Unable to determine, returning false for now
     } catch (e) {
       return true; // If there's an error parsing, assume expired
     }
   };
 
-  // Check if Strava and Oura cookies are present and not expired
-  const isStravaAuthed = Boolean(cookies.stravaData) && !isStravaExpired(cookies.stravaData);
-  const isOuraAuthed = Boolean(cookies.ouraData) && !isOuraExpired(cookies.ouraData);
+  // Function to refresh the Oura token
+  const refreshOuraToken = async (refreshToken: string): Promise<string | null> => {
+    try {
+      const response = await axios.post(
+        'https://api.ouraring.com/oauth/token', // Oura token refresh endpoint
+        {
+          client_id: OURA_CLIENT_ID,
+          client_secret: OURA_CLIENT_SECRET,
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken,
+        }
+      );
+
+      if (response.data && response.data.access_token) {
+        return response.data.access_token;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Error refreshing Oura token:', error);
+      return null;
+    }
+  };
+
+  // Check if Strava cookie is present and not expired
+  const isStravaAuthed = Boolean(cookies.stravaData) && !isStravaExpired(cookies.stravaData ?? '');
+
+  // Refresh Strava token if it's expired
+  if (isStravaAuthed) {
+    const stravaData: StravaCookieData = JSON.parse(cookies.stravaData!);
+    const newAccessToken = await refreshStravaToken(stravaData.refresh_token);
+
+    if (newAccessToken) {
+      // Update the access token in the cookie
+      stravaData.access_token = newAccessToken;
+      res.setHeader('Set-Cookie', `stravaData=${JSON.stringify(stravaData)}`);
+    }
+  }
+
+  // Check if Oura cookie is present
+  const isOuraAuthed = Boolean(cookies.ouraData);
+
+  // Check if Oura token is expired
+  const isOuraExpiredValue = isOuraAuthed && isOuraExpired(cookies.ouraData ?? '');
+
+  // Refresh Oura token if it's expired
+  if (isOuraAuthed && isOuraExpiredValue) {
+    const ouraData: OuraCookieData = JSON.parse(cookies.ouraData!);
+    const newAccessToken = await refreshOuraToken(ouraData.refresh_token);
+
+    if (newAccessToken) {
+      // Update the access token and the expires_at timestamp in the cookie
+      ouraData.access_token = newAccessToken;
+      res.setHeader('Set-Cookie', `ouraData=${JSON.stringify(ouraData)}`);
+    }
+  }
 
   // Respond with the authentication status
   res.status(200).json({ isStravaAuthed, isOuraAuthed });
