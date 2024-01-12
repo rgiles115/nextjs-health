@@ -3,7 +3,9 @@ import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import { format } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
-import Loading from './Loading'; // Import Loading component
+import dynamic from 'next/dynamic';
+
+const Loading = dynamic(() => import('./Loading'), { ssr: false });
 Chart.register(...registerables);
 
 interface SleepData {

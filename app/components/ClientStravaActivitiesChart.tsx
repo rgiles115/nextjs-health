@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import { eachDayOfInterval, format, parseISO } from 'date-fns';
-import Loading from './Loading'; // Import Loading component
+import dynamic from 'next/dynamic';
+
+const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
 Chart.register(...registerables);
 
