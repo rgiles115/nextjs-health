@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import { eachDayOfInterval, format, parseISO } from 'date-fns';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMountain, faRoad  } from "@fortawesome/free-solid-svg-icons";
 import dynamic from 'next/dynamic';
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
@@ -144,21 +146,21 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
                 label: 'Distance',
                 data: activities.map((a) => a.distance),
                 pointRadius: 0,
-                borderColor: '#5da6b4', // Pale Turquoise
+                borderColor: '#219ebc', // Blue
                 tension: 0.4,
               },
               {
                 label: 'Average Watts',
                 data: activities.map((a) => a.average_watts),
                 pointRadius: 0,
-                borderColor: '#327388', // Teal Blue
+                borderColor: '#ffb703', // Yellow
                 tension: 0.4,
               },
               {
                 label: 'Elevation Gain',
                 data: activities.map((a) => a.total_elevation_gain),
                 pointRadius: 0,
-                borderColor: '#57a0ae', // Soft Cyan
+                borderColor: '#fb8500', // Orange
                 tension: 0.4,
               },
             ],
@@ -178,6 +180,11 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
                   display: false,
                 },
               },
+              y: {
+                grid: {
+                  display: false,
+                }
+              }
             },
             plugins: {
               tooltip: {
@@ -221,15 +228,22 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
       <div>
         <div className="parent-number-container">
       
-          <div className="number-container">
-            <div id="totalTitle">Total Distance</div>
-            <div id="totalValue">{totalDistance.toFixed(2)}</div> {/* Display total distance */}
+        <div className="number-container">
+          <FontAwesomeIcon icon={faRoad} className="icon" style={{ color: "#219ebc" }} />  
+          <div className="total-distance">
+            <div className="total-value">{totalDistance.toFixed(2)}</div>
+            <div className="total-title">TOTAL KILOMETERS</div>
           </div>
-          <div className="number-container">
-            <div id="totalTitle">Total Elevation Gain</div>
-            <div id="totalValue">{totalElevationGain}</div> {/* Display total elevation gain */}
-
+          <div className="divider"></div>
+        </div>
+        <div className="number-container">
+          <FontAwesomeIcon icon={faMountain} className="icon" style={{ color: "#fb8500" }} />  
+          <div className="total-distance">
+            <div className="total-value">{totalElevationGain}</div>
+            <div className="total-title">TOTAL ELEVATION</div>
           </div>
+          <div className="divider"></div>
+        </div>
         </div>
         <div className="graph-container">
           <canvas ref={chartRef} />

@@ -9,8 +9,7 @@ import React, { useState, useEffect } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Footer from './components/Footer'; // Import Footer component
-
-
+import Script from 'next/script';
 
 
 const getStravaAuthURL = () => {
@@ -64,13 +63,14 @@ export default function Home() {
   return (
     <div>
       <Head>
-        <title>Health Data</title>
+        <title>My Health Data</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="/style.css" />
       </Head>
-      <div id="pageTitle">Health Data</div>
+      <div id="pageTitle">My Health Data</div>
       <a href={getStravaAuthURL()}><div id="authStravaButton"></div></a>
       <div id="authButton"><a href={getOuraAuthURL()}>Authenticate with Oura</a></div>
+      <Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
 
 
       <div id="datePicker">
