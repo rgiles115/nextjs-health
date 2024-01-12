@@ -88,15 +88,9 @@ export default function Home() {
 
       {isOuraAuthed && (
         <div>
-      
         <ActivityChart startDate={startDate} endDate={endDate} />
-      
-
         <SleepChart startDate={startDate} endDate={endDate} />
-
-
         <ReadinessChart startDate={startDate} endDate={endDate} />
-
         </div>
       )}
       <div id="footer"><Footer /></div>

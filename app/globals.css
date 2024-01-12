@@ -50,20 +50,23 @@ body {
 
 #datePicker {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   background: #fff;
   border-radius: 15px;
   border: 1px solid #ccc;
-  width: 500px;
+  width: 400px;
   margin: 30px;
 }
 
 .custom-datepicker {
+  background: url('/caret-down-regular.svg') no-repeat right;
+  background-size: 10px 10px; /* Adjust size as needed */
   border: none;
   outline: none;
   padding: 10px;
-  margin: 0px;
+  margin-left: 5px;
   font-size: 16px;
+  width: 190px;
 }
 
 /* Hide the second date picker's border to make them look like a single element */
@@ -154,7 +157,7 @@ body {
 }
 
 .icon {
-  font-size: 3rem; /* Adjust icon size as needed */
+  font-size: 2.5rem; /* Adjust icon size as needed */
   margin-bottom: 10px; /* Space between icon and number */
 }
 
@@ -163,7 +166,7 @@ body {
 }
 
 .total-value {
-  font-size: 3rem; /* Large font size for the total value */
+  font-size: 2.5rem; /* Large font size for the total value */
   font-weight: bold; /* Making the total value bold */
   color: #000; /* Color for the number */
   margin-bottom: 5px; /* Space between value and title */
@@ -229,9 +232,4 @@ body {
   text-align: center;
 }
 
-.custom-datepicker {
-  background: url('/caret-down-regular.svg') no-repeat right;
-  background-size: 20px 20px; /* Adjust size as needed */
-  padding-right: 0px; /* Adjust padding to not overlap the text */
-  margin-right: 50px;
-}
+
