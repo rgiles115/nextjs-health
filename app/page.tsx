@@ -66,11 +66,11 @@ export default function Home() {
         <title>My Health Data</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="/style.css" />
-        <Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
       </Head>
       <div id="pageTitle">My Health Data</div>
       <a href={getStravaAuthURL()}><div id="authStravaButton"></div></a>
       <div id="authButton"><a href={getOuraAuthURL()}>Authenticate with Oura</a></div>
+      <Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
 
 
       <div id="datePicker">
