@@ -110,10 +110,11 @@ body {
   margin-top: 10px;  /* Adjust the value as needed */
   margin-left: 40px; /* Align with the left edge of the graph-container */
   object-fit: fill;
-  padding: 10px 20px;
+  padding: 10px 0px;
   border: 1px solid lightgrey;
   border-radius: 5px;
   cursor: pointer;
+  pointer-events: none;
   width: 193px;
   height: 48px;
 }

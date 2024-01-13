@@ -10,6 +10,8 @@ import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Footer from './components/Footer'; // Import Footer component
 import Script from 'next/script';
+import Link from 'next/link';
+
 
 
 const getStravaAuthURL = () => {
@@ -42,21 +44,35 @@ export default function Home() {
   const [endDate, setEndDate] = useState(currentDate);
   const [isStravaAuthed, setIsStravaAuthed] = useState(false);
   const [isOuraAuthed, setIsOuraAuthed] = useState(false);
+  const stravaAuthURL = getStravaAuthURL();
+
   
 //  console.log("Start Date:", startDate);
 //  console.log("End Date:", endDate);
 
-  useEffect(() => {
-    fetch('/api/authStatus')
-      .then(response => response.json())
-      .then(data => {
-        setIsStravaAuthed(data.isStravaAuthed);
-        setIsOuraAuthed(data.isOuraAuthed);
-      })
-      .catch(error => {
-        console.error('Error fetching auth status:', error);
-      });
-  }, []);
+useEffect(() => {
+  // Fetch Strava authentication status
+  fetch('/api/stravaAuthStatus')
+    .then(response => response.json())
+    .then(data => {
+      setIsStravaAuthed(data.isStravaAuthed);
+    })
+    .catch(error => {
+      console.error('Error fetching Strava auth status:', error);
+    });
+
+  // Fetch Oura authentication status
+  fetch('/api/ouraAuthStatus')
+    .then(response => response.json())
+    .then(data => {
+      console.log('Is Oura Authed:', data.isOuraAuthed);
+      setIsOuraAuthed(data.isOuraAuthed);
+      console.log('Is Oura Authed:', data.isOuraAuthed);
+    })
+    .catch(error => {
+      console.error('Error fetching Oura auth status:', error);
+    });
+}, []);
 
 
 

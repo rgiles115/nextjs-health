@@ -62,6 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const isStravaExpired = (stravaCookie: string): boolean => {
     try {
       const stravaData: StravaCookieData = JSON.parse(stravaCookie);
+      console.log("Strava Expires:", stravaData.expires_at * 1000);
       return Date.now() >= stravaData.expires_at * 1000; // Convert to milliseconds
     } catch (e) {
       return true; // If there's an error parsing, assume expired
@@ -96,6 +97,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const isOuraExpired = (ouraCookie: string): boolean => {
     try {
       const ouraData: OuraCookieData = JSON.parse(ouraCookie);
+      console.log("Oura Cookie:", JSON.parse(ouraCookie) );
       // Assuming the time of cookie creation is not stored, we cannot accurately determine the expiration
       return false; // Unable to determine, returning false for now
     } catch (e) {
@@ -132,6 +134,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Refresh Strava token if it's expired
   if (isStravaAuthed) {
+    console.log('Strava token is authenticated and not expired.');
     const stravaData: StravaCookieData = JSON.parse(cookies.stravaData!);
     const newAccessToken = await refreshStravaToken(stravaData.refresh_token);
 
@@ -139,7 +142,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Update the access token in the cookie
       stravaData.access_token = newAccessToken;
       res.setHeader('Set-Cookie', `stravaData=${JSON.stringify(stravaData)}`);
+      console.log('Strava token refreshed.');
+    } else {
+      console.log('Failed to refresh Strava token.');
     }
+  } else {
+    console.log('Strava token is either not present or expired.');
   }
 
   // Check if Oura cookie is present
@@ -150,6 +158,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Refresh Oura token if it's expired
   if (isOuraAuthed && isOuraExpiredValue) {
+    console.log('Oura token is authenticated and expired.');
     const ouraData: OuraCookieData = JSON.parse(cookies.ouraData!);
     const newAccessToken = await refreshOuraToken(ouraData.refresh_token);
 
@@ -157,7 +166,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Update the access token and the expires_at timestamp in the cookie
       ouraData.access_token = newAccessToken;
       res.setHeader('Set-Cookie', `ouraData=${JSON.stringify(ouraData)}`);
+      console.log('Oura token refreshed.');
+    } else {
+      console.log('Failed to refresh Oura token.');
     }
+  } else {
+    console.log('Oura token is either not present or expired.');
   }
 
   // Respond with the authentication status
