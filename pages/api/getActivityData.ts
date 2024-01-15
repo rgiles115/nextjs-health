@@ -82,6 +82,7 @@ interface OuraData {
     token_type: string;
     expires_in: number;
     refresh_token: string;
+    expires_at: number;
 }
 
 interface ActivityData {

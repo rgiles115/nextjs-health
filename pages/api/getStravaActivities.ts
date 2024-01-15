@@ -1,9 +1,37 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Cookies from 'cookies';
+import axios from 'axios';
 
 interface StravaData {
+    token_type: string;
+    expires_at: number;
+    expires_in: number;
+    refresh_token: string;
     access_token: string;
-}
+    athlete: {
+      id: number;
+      username: string;
+      resource_state: number;
+      firstname: string;
+      lastname: string;
+      bio: string;
+      city: string;
+      state: string;
+      country: string;
+      sex: string;
+      premium: boolean;
+      summit: boolean;
+      created_at: string;
+      updated_at: string;
+      badge_type_id: number;
+      weight: number;
+      profile_medium: string;
+      profile: string;
+      friend: null;
+      follower: null;
+    };
+  }
+  
 
 // Replace 'any' with a more detailed structure of Strava activities if known
 interface StravaActivity {
@@ -71,6 +99,44 @@ interface StravaActivity {
     suffer_score: number;
 }
 
+// Function to check if Strava token is expired
+const isStravaExpired = (stravaData: StravaData): boolean => {
+    return Date.now() >= stravaData.expires_at * 1000;
+};
+
+const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID;
+const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
+
+
+// Function to refresh Strava token
+const refreshStravaToken = async (stravaData: StravaData): Promise<StravaData | null> => {
+    try {
+        const response = await axios.post(
+            'https://www.strava.com/api/v3/oauth/token',
+            {
+                client_id: STRAVA_CLIENT_ID,
+                client_secret: STRAVA_CLIENT_SECRET,
+                grant_type: 'refresh_token',
+                refresh_token: stravaData.refresh_token,
+            }
+        );
+
+        if (response.data) {
+            return {
+                ...stravaData,
+                access_token: response.data.access_token,
+                expires_at: Math.floor(Date.now() / 1000) + response.data.expires_in,
+                expires_in: response.data.expires_in,
+                refresh_token: response.data.refresh_token
+            };
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error('Error refreshing Strava token:', error);
+        return null;
+    }
+};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { start_date, end_date } = req.query;
@@ -83,47 +149,57 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Retrieve the access token from the cookie
     const cookies = new Cookies(req, res);
-    const encodedStravaCookie = cookies.get('stravaData'); // Replace with your actual cookie name
+    const encodedStravaCookie = cookies.get('stravaData'); 
     
     if (!encodedStravaCookie) {
         res.status(400).json({ error: 'Strava cookie not found' });
         return;
     }
 
-    const decodedStravaCookie = decodeURIComponent(encodedStravaCookie);
-    const stravaData: StravaData = JSON.parse(decodedStravaCookie);
-    const accessToken = stravaData.access_token;
+    let stravaData = JSON.parse(decodeURIComponent(encodedStravaCookie));
 
-
-    const perPage = 30; // Number of activities per page (default is 30)
-    let page = 1; // Start with page 1
-    const allActivities = [];
-    console.log("Token:", accessToken);
-    try {
-        while (true) {
-            const stravaApiUrl = `https://www.strava.com/api/v3/athlete/activities?before=${end_date}&after=${start_date}&per_page=${perPage}&page=${page}`;
-            const response = await fetch(stravaApiUrl, {
-                headers: { 'Authorization': `Bearer ${accessToken}` }
-            });
-
-            if (!response.ok) {
-                res.status(response.status).json({ error: `Error from Strava API: ${response.statusText}` });
-                return;
+    // Check if the token is expired and refresh if necessary
+    if (isStravaExpired(stravaData)) {
+        const refreshedStravaData = await refreshStravaToken(stravaData);
+        if (refreshedStravaData) {
+            stravaData = refreshedStravaData;
+            res.setHeader('Set-Cookie', `stravaData=${encodeURIComponent(JSON.stringify(refreshedStravaData))}; HttpOnly; Secure`);
+        } else {
+            res.status(500).json({ error: 'Failed to refresh Strava token' });
+            return;
             }
-
-            const activities: StravaActivity[] = await response.json();
-            if (activities.length === 0) {
-                // No more activities to fetch, break out of the loop
-                break;
             }
+            const accessToken = stravaData.access_token;
 
-            allActivities.push(...activities);
-            page++;
+const perPage = 30; // Number of activities per page
+let page = 1;
+const allActivities = [];
+
+try {
+    while (true) {
+        const stravaApiUrl = `https://www.strava.com/api/v3/athlete/activities?before=${end_date}&after=${start_date}&per_page=${perPage}&page=${page}`;
+        const response = await fetch(stravaApiUrl, {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+
+        if (!response.ok) {
+            res.status(response.status).json({ error: `Error from Strava API: ${response.statusText}` });
+            return;
         }
 
-        res.status(200).json(allActivities);
-    } catch (error) {
-        console.error('Error fetching Strava activity data:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        const activities: StravaActivity[] = await response.json();
+        if (activities.length === 0) {
+            // No more activities to fetch
+            break;
+        }
+
+        allActivities.push(...activities);
+        page++;
     }
+
+    res.status(200).json(allActivities);
+} catch (error) {
+    console.error('Error fetching Strava activity data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+}
 }
