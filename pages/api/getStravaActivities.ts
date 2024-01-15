@@ -84,7 +84,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Retrieve the access token from the cookie
     const cookies = new Cookies(req, res);
     const encodedStravaCookie = cookies.get('stravaData'); // Replace with your actual cookie name
-
+    
     if (!encodedStravaCookie) {
         res.status(400).json({ error: 'Strava cookie not found' });
         return;
@@ -94,10 +94,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const stravaData: StravaData = JSON.parse(decodedStravaCookie);
     const accessToken = stravaData.access_token;
 
+
     const perPage = 30; // Number of activities per page (default is 30)
     let page = 1; // Start with page 1
     const allActivities = [];
-
+    console.log("Token:", accessToken);
     try {
         while (true) {
             const stravaApiUrl = `https://www.strava.com/api/v3/athlete/activities?before=${end_date}&after=${start_date}&per_page=${perPage}&page=${page}`;

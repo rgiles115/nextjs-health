@@ -22,8 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const currentTimestamp = Math.floor(Date.now() / 1000);
           
           // Debugging: Log the raw value of expires_at
-          console.log(`Raw expires_at value: ${ouraData.expires_at}`);
-      
+          // console.log(`Raw expires_at value: ${ouraData.expires_at}`);
           const expirationDate = new Date(ouraData.expires_at * 1000);
           console.log(`Oura token expires at: ${expirationDate.toString()}`);
           
