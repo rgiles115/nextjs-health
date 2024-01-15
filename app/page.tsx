@@ -55,6 +55,7 @@ useEffect(() => {
   fetch('/api/stravaAuthStatus')
     .then(response => response.json())
     .then(data => {
+      console.log('Is Strava Authed:', data.isStravaAuthed);
       setIsStravaAuthed(data.isStravaAuthed);
     })
     .catch(error => {
@@ -67,7 +68,6 @@ useEffect(() => {
     .then(data => {
       console.log('Is Oura Authed:', data.isOuraAuthed);
       setIsOuraAuthed(data.isOuraAuthed);
-      console.log('Is Oura Authed:', data.isOuraAuthed);
     })
     .catch(error => {
       console.error('Error fetching Oura auth status:', error);
