@@ -47,6 +47,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const isStravaExpired = (stravaCookie: string): boolean => {
       try {
         const stravaData: StravaCookieData = JSON.parse(stravaCookie);
+        console.log("Strava Cookie Expiry:", stravaData.expires_at * 1000)
+        console.log("Time now:", Date.now());
+        console.log("Difference:", Date.now() - (stravaData.expires_at * 1000) );
         return Date.now() >= stravaData.expires_at * 1000;
       } catch (e) {
         console.error('Error parsing Strava cookie:', e);
