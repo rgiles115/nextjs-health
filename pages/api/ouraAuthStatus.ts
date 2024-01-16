@@ -63,7 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
         return false;
     };
-
+    
     if (isOuraAuthed()) {
         console.log('Oura token is authenticated and not expired.');
     } else {
@@ -82,6 +82,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
         }
     }
-
+    
     res.status(200).json({ isOuraAuthed: isOuraAuthed() });
 }
