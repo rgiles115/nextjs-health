@@ -10,30 +10,9 @@ import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Footer from './components/Footer'; // Import Footer component
 import Script from 'next/script';
-import Link from 'next/link';
-
-
-
-const getStravaAuthURL = () => {
-  const root = 'http://www.strava.com/oauth/authorize';
-  const clientId = process.env.STRAVA_CLIENT_ID;
-  const redirectUri = process.env.STRAVA_REDIRECT_URI ? encodeURIComponent(process.env.STRAVA_REDIRECT_URI) : ''; // Specify the type and provide a default value
-  const responseType = 'code';
-  const approvalPrompt = 'auto';
-  const scope = 'read,activity:read';
-  return `${root}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&approval_prompt=${approvalPrompt}&scope=${scope}`;
-};
-
-const getOuraAuthURL = () => {
-  const root = 'https://cloud.ouraring.com/oauth/authorize';
-  const clientId = process.env.OURA_CLIENT_ID;
-  const redirectUri = process.env.OURA_REDIRECT_URI ? encodeURIComponent(process.env.OURA_REDIRECT_URI) : ''; // Specify the type and provide a default value
-  const responseType = 'code';
-  const approvalPrompt = 'auto';
-  const scope = 'read,activity:read';
-  return `${root}?client_id=${clientId}&response_type=${responseType}&redirect_uri=${redirectUri}`;
-};
-
+import SideMenu from './components/SideMenu'; // Import SideMenu component
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeartbeat } from '@fortawesome/free-solid-svg-icons';
 
 export default function Home() {
   // Calculate the dates
@@ -44,9 +23,7 @@ export default function Home() {
   const [endDate, setEndDate] = useState(currentDate);
   const [isStravaAuthed, setIsStravaAuthed] = useState(false);
   const [isOuraAuthed, setIsOuraAuthed] = useState(false);
-  const stravaAuthURL = getStravaAuthURL();
 
-  
 //  console.log("Start Date:", startDate);
 //  console.log("End Date:", endDate);
 
@@ -75,17 +52,18 @@ useEffect(() => {
 }, []);
 
 
-
   return (
     <div>
+      <SideMenu />
       <Head>
         <title>My Health Data</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="/style.css" />
       </Head>
-      <div id="pageTitle">My Health Data</div>
-      <a href={getStravaAuthURL()}><div id="authStravaButton"></div></a>
-      <div id="authButton"><a href={getOuraAuthURL()}>Authenticate with Oura</a></div>
+      <h1>
+        <FontAwesomeIcon icon={faHeartbeat} /> My Health Data
+      </h1>
+
       <Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
 
 

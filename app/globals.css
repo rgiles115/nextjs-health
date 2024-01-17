@@ -21,9 +21,9 @@ body {
 }
 
 #pageTitle {
-  margin-top: 10px;  /* Adjust the value as needed */
+  margin-top: 20px;  /* Adjust the value as needed */
   font-weight: bold;     /* Makes the text bold */
-  font-size: 1.5em;      /* Increases the font size, adjust as needed */
+  font-size: 2.0em;      /* Increases the font size, adjust as needed */
   margin-left: 40px; /* Align with the left edge of the graph-container */
   /* Add any other styles you need */
 }
@@ -90,35 +90,6 @@ body {
   z-index: 10; /* Make sure it's above other content */
 }
 
-/* You may need to add more specific styles depending on your overall design needs */
-
-
-#authButton {
-  margin-top: 10px;  /* Adjust the value as needed */
-  margin-left: 40px; /* Align with the left edge of the graph-container */
-  background-color: white;
-  color: black;
-  padding: 10px 20px;
-  border: 1px solid lightgrey;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 250px;
-}
-
-#authStravaButton {
-  background: url('/btn_strava_connectwith_light.svg') no-repeat;
-  margin-top: 10px;  /* Adjust the value as needed */
-  margin-left: 40px; /* Align with the left edge of the graph-container */
-  object-fit: fill;
-  padding: 10px 0px;
-  border: 1px solid lightgrey;
-  border-radius: 5px;
-  cursor: pointer;
-  pointer-events: none;
-  width: 193px;
-  height: 48px;
-}
-
 #viewOnStrava {
   display: flex;
   justify-content: right;
@@ -155,6 +126,21 @@ body {
   overflow: hidden;
   background: #fff; /* Assuming a white background */
   padding: 10px; /* Adjust as needed */
+}
+
+h1 {
+  display: flex;
+  align-items: center; /* Aligns the icon and text vertically */
+  gap: 10px; /* Adds space between the icon and the text */
+  font-size: 2em; /* Increases the font size of the title */
+  margin-top: 20px;  /* Adjust the value as needed */
+  font-weight: bold;     /* Makes the text bold */
+  margin-left: 40px; /* Align with the left edge of the graph-container */
+  /* Add any other styles you need */
+}
+
+h1 .fa-heartbeat {
+  font-size: 1.5em; /* Adjust the icon size */
 }
 
 .icon {

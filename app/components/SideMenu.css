@@ -1,0 +1,80 @@
+/* SideMenu.css */
+.menu-toggle-button {
+  position: fixed;
+  right: 0;
+  top: 20px;
+  z-index: 1001; /* Ensure it's above other elements */
+  cursor: pointer;
+  background-color: white; /* Changed to white */
+  color: black; /* Changed to black */
+  border: none;
+  padding: 10px 15px;
+  font-size: 20px;
+}
+
+.side-menu {
+  margin-top: 0px; /* Add top margin to the list */
+  position: fixed;
+  right: -281px; /* Start off the screen */
+  top: 0;
+  width: 280px; /* Width of the sidebar */
+  height: 100%;
+  background-color: white; /* Changed to white */
+  overflow-x: hidden;
+  transition: 0.3s; /* Smooth transition */
+  z-index: 1000; /* Ensure it's below the toggle button */
+  color: black; /* Changed to black */
+  border-left: 1px solid #ccc; /* Thin line on the left */
+  padding: 0 10px;
+}
+
+.side-menu.open {
+  right: 0; /* Move into view */
+}
+
+.menu-title {
+  text-align: center;
+  padding-top: 10px; /* Adjust top and bottom padding */
+  padding-bottom: 20px;
+  font-size: 18px;
+  color: black;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+  margin-top: 20px;
+  margin-bottom: 20px; /* Add bottom margin to push content down */
+}
+
+
+/* Rest of the CSS for the list items */
+.side-menu ul li a {
+  list-style-type: none;
+  padding: 0;
+  margin-bottom: 10px;
+  display: flex; /* Add flex display */
+  flex-direction: column; /* Align children vertically */
+  align-items: center; /* Center children horizontally */
+  width: 100%;
+}
+
+.auth-button {
+  display: inline-block; /* To make the <a> element behave like a button */
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+  cursor: pointer;
+  height: 48px;
+  line-height: 42px; /* Center text vertically */
+  text-align: center; /* Center text for the Oura button */
+  background-color: white; /* Optional: Background color for Oura button */
+  color: black; /* Text color for Oura button */
+  text-decoration: none; /* Remove underline from text */
+  margin: 10px auto;
+}
+
+#authStravaButton {
+  background: url('/btn_strava_connectwith_light.svg') no-repeat center center;
+  background-size: cover; /* Ensure the image covers the button */
+}
+
+#authOuraButton {
+  /* If you need any specific styles for the Oura button */
+}
