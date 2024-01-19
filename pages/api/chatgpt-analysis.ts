@@ -32,7 +32,7 @@ const sendMessageToOpenAI = async (params: AnalysisRequest) => {
   };
 
   try {
-    const response = await axios.post(url, requestData, { headers: headers });
+    const response = await axios.post(url, requestData, { headers: headers, timeout: 60000 });
     return response.data;
   } catch (error) {
     console.error('Error calling OpenAI API:', error);

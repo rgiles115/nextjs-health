@@ -2,7 +2,7 @@ This project is a Next.js web application, initially created with create-next-ap
 
 ## Getting Started
 
-# Prerequisites
+### Prerequisites
 
 Before running the application, you need to register your app with Strava and Oura to obtain authentication credentials. Additionally, an OpenAI API Key is required.
 
@@ -13,9 +13,10 @@ OpenAI API Key: Obtain an API key from [OpenAI](https://openai.com/product).
 Register your app with Strava and Oura, and copy the Auth details. You will also need an OpenAI
 API Key.
 
-# Environment Setup
+### Environment Setup
 
 Create a .env file in the root directory and add the following fields:
+```bash
 STRAVA_CLIENT_ID=your_strava_client_id
 STRAVA_CLIENT_SECRET=your_strava_client_secret
 STRAVA_REDIRECT_URI=your_strava_redirect_uri
@@ -23,8 +24,9 @@ OURA_CLIENT_ID=your_oura_client_id
 OURA_CLIENT_SECRET=your_oura_client_secret
 OURA_REDIRECT_URI=your_oura_redirect_uri
 OPENAI_SECRET=your_openai_api_key
+```
 
-# Running the Development Server
+### Running the Development Server
 
 To start the development server, run one of the following commands:
 

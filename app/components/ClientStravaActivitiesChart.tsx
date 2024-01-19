@@ -6,19 +6,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMountain, faRoad  } from "@fortawesome/free-solid-svg-icons";
 import dynamic from 'next/dynamic';
 import ChatGPTAnalysis from './ChatGPTAnalysis'; // Adjust the path as necessary
+import { Activity } from '../types/activityTypes';
 
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
 Chart.register(...registerables);
 
-interface Activity {
-  day: string;
-  distance: number;
-  average_watts: number;
-  start_date: string;
-  moving_time: number;
-  total_elevation_gain: number;
+interface ClientStravaActivitiesChartProps {
+  Activity: Activity[];
 }
 
 declare global {

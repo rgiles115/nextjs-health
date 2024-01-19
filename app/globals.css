@@ -226,7 +226,9 @@ h1 .fa-heartbeat {
 }
 
 .analyze-button {
-  display: inline-block; /* To make the <a> element behave like a button */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid lightgrey;
   border-radius: 5px;
   cursor: pointer;
@@ -238,6 +240,12 @@ h1 .fa-heartbeat {
   color: black; /* Text color for Oura button */
   text-decoration: none; /* Remove underline from text */
   margin: 10px auto;
+}
+
+.analyze-button img {
+  height: 20px; /* Adjust the size as needed */
+  width: auto;
+  margin-right: 8px; /* Adds some space between the icon and the text */
 }
 
 .analyze-button.disabled {

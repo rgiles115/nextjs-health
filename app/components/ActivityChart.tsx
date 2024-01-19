@@ -5,66 +5,13 @@ import 'chartjs-adapter-date-fns';
 import { format } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
 import dynamic from 'next/dynamic';
+import { ActivityData, ActivityEntry, ActivityContributors, MetData, ActivityChartProps } from '../types/ActivityInterfaces';
+
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
 Chart.register(...registerables);
 
-
-interface ActivityData {
-    data: ActivityEntry[];
-    next_token: string | null;
-}
-
-interface ActivityEntry {
-    id: string;
-    class_5_min: string;
-    score: number;
-    active_calories: number;
-    average_met_minutes: number;
-    contributors: ActivityContributors;
-    equivalent_walking_distance: number;
-    high_activity_met_minutes: number;
-    high_activity_time: number;
-    inactivity_alerts: number;
-    low_activity_met_minutes: number;
-    low_activity_time: number;
-    medium_activity_met_minutes: number;
-    medium_activity_time: number;
-    met: MetData;
-    meters_to_target: number;
-    non_wear_time: number;
-    resting_time: number;
-    sedentary_met_minutes: number;
-    sedentary_time: number;
-    steps: number;
-    target_calories: number;
-    target_meters: number;
-    total_calories: number;
-    day: string;
-    timestamp: string;
-}
-
-interface ActivityContributors {
-    meet_daily_targets: number;
-    move_every_hour: number;
-    recovery_time: number;
-    stay_active: number;
-    training_frequency: number;
-    training_volume: number;
-}
-
-interface MetData {
-    interval: number;
-    items: number[];
-    timestamp: string;
-}
-
-
-  interface ActivityChartProps {
-    startDate: Date;
-    endDate: Date;
-}
 
 const ActivityChart: React.FC<ActivityChartProps> = ({ startDate, endDate }) => {
 
