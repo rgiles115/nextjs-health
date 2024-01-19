@@ -18,8 +18,8 @@ export default function Home() {
   // Calculate the dates
   const currentDate = new Date();
   const firstDayOfThisYear = new Date(new Date().getFullYear(), 0, 1);
-  const thirtyDaysAgo = new Date(currentDate.getTime() - (30 * 24 * 60 * 60 * 1000));
-  const [startDate, setStartDate] = useState(firstDayOfThisYear);
+  const sevenDaysAgo = new Date(currentDate.getTime() - (7 * 24 * 60 * 60 * 1000));
+  const [startDate, setStartDate] = useState(sevenDaysAgo);
   const [endDate, setEndDate] = useState(currentDate);
   const [isStravaAuthed, setIsStravaAuthed] = useState(false);
   const [isOuraAuthed, setIsOuraAuthed] = useState(false);
@@ -61,7 +61,7 @@ useEffect(() => {
         <link rel="stylesheet" href="/style.css" />
       </Head>
       <h1>
-        <FontAwesomeIcon icon={faHeartbeat} /> My Health Data
+      <FontAwesomeIcon icon={faHeartbeat} width="32" /> My Health Data
       </h1>
 
       <Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />

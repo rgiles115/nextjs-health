@@ -4,6 +4,7 @@ import 'chartjs-adapter-date-fns';
 import { format } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
 import dynamic from 'next/dynamic';
+import ReadinessAnalysis from './ReadinessAnalysis';
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
@@ -157,6 +158,8 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate }) =
                 <canvas ref={chartRef} />
                 </div>
             )}
+                        <ReadinessAnalysis readinessData={readinessData} />
+
         </div>
     );
     

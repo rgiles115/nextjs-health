@@ -15,7 +15,6 @@
   }
 }
 
-
 body {
   font-family: Arial, sans-serif;
 }
@@ -219,4 +218,45 @@ h1 .fa-heartbeat {
   text-align: center;
 }
 
+.button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 2vh; /* Adjust the height as needed */
+}
 
+.analyze-button {
+  display: inline-block; /* To make the <a> element behave like a button */
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+  cursor: pointer;
+  height: 48px;
+  width: 140px;
+  line-height: 42px; /* Center text vertically */
+  text-align: center; /* Center text for the Oura button */
+  background-color: white; /* Optional: Background color for Oura button */
+  color: black; /* Text color for Oura button */
+  text-decoration: none; /* Remove underline from text */
+  margin: 10px auto;
+}
+
+.analyze-button.disabled {
+  /* Styles for disabled button, e.g., lower opacity, different color etc. */
+  pointer-events: none; /* Prevents clicking */
+  opacity: 0.6;
+}
+
+.loading-dots {
+  display: inline-block;
+  width: 1em; /* Adjust the width as needed */
+  text-align: left;
+}
+
+.analysis-container {
+  padding: 20px;
+  margin-top: 20px;
+  width: 95%;
+  margin: 20px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+}

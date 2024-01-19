@@ -5,6 +5,8 @@ import { eachDayOfInterval, format, parseISO } from 'date-fns';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMountain, faRoad  } from "@fortawesome/free-solid-svg-icons";
 import dynamic from 'next/dynamic';
+import ChatGPTAnalysis from './ChatGPTAnalysis'; // Adjust the path as necessary
+
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
@@ -249,7 +251,16 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
           <canvas ref={chartRef} />
           <div id="viewOnStrava"><a href="https://strava.com/athletes/">View on Strava</a></div>
         </div>
+
+        <div>
+
+            {/* ChatGPT Analysis Component */}
+            <ChatGPTAnalysis cyclingData={activities} />
+        </div>
+
       </div>
+
+      
         
         )}
       </div>
