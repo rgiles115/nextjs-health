@@ -1,13 +1,9 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
-
-module.exports = nextConfig
-
-module.exports = {
-    env: {
+const nextConfig = {
+  env: {
       APP_VERSION: require('./package.json').version,
-    },
-    rewrites() {
+  },
+  rewrites() {
       return [
           {
               source: '/api/chatgpt-analysis',
@@ -15,5 +11,7 @@ module.exports = {
           },
       ];
   },
-  };
-  
+  // ... any other configurations
+};
+
+module.exports = nextConfig;
