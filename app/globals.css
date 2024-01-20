@@ -275,7 +275,7 @@ h1 .fa-heartbeat {
   }
   .graph-container, .analysis-container {
     flex: 1;
-    max-height: 380px; /* Example maximum height */
+    max-height: 370px; /* Example maximum height */
     /* Add more styles as needed */
   }
 }

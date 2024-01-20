@@ -9,7 +9,7 @@ interface StravaAnalysisProps {
     stravaData: Activity[];
 }
 
-const ChatGPTAnalysis: React.FC<StravaAnalysisProps> = ({ stravaData }) => {
+const StravaAnalysis: React.FC<StravaAnalysisProps> = ({ stravaData }) => {
     const [analysis, setAnalysis] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [loadingDots, setLoadingDots] = useState('');
@@ -26,6 +26,7 @@ const ChatGPTAnalysis: React.FC<StravaAnalysisProps> = ({ stravaData }) => {
     const getAnalysis = async () => {
         setIsLoading(true);
         try {
+            console.log('Data Sent:', stravaData);
             // Update the API call to include the content and data
             const response = await axios.post('/api/chatgpt-analysis', { content: analysisPrompt, data: stravaData });
             
@@ -84,4 +85,4 @@ const ChatGPTAnalysis: React.FC<StravaAnalysisProps> = ({ stravaData }) => {
     );
 };
 
-export default ChatGPTAnalysis;
+export default StravaAnalysis;
