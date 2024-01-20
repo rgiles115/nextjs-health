@@ -19,6 +19,12 @@ body {
   font-family: Arial, sans-serif;
 }
 
+.header {
+  background-color: #85c7f2; /* Soft blue background */
+  text-align: center;
+  padding: 20px 0;
+}
+
 .footer {
   display: flex;
   justify-content: space-between;
@@ -46,7 +52,7 @@ body {
   border-radius: 15px;
   border: 1px solid #ccc;
   width: 360px;
-  margin-left: 4%;
+  margin-left: 20px;
   margin-top: 20px
 }
 
@@ -95,29 +101,6 @@ body {
   justify-content: center;
   align-items: center;
   padding: 40px;
-}
-
-.parent-number-container {
-  display: flex;
-    flex-direction: row;
-    justify-content: center; /* Centers children horizontally */
-    width: 95%; /* Adjust as needed */
-    margin: 3%;
-}
-
-.number-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: auto; /* Set to auto or a fixed height depending on your needs */
-  width: 90%; /* Adjust based on parent container */
-  margin: 5px ; 
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  overflow: hidden;
-  background: #fff; /* Assuming a white background */
-  padding: 10px; /* Adjust as needed */
 }
 
 h1 {
@@ -171,23 +154,6 @@ h1 .fa-heartbeat {
   margin-top: 15px; /* Space between title and divider */
 }
 
-.graph-container {
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    width: 95%;
-    margin: 3%;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    overflow: hidden;
-}
-
-.graph-container canvas {
-  width: auto; /* Ensure the canvas can grow */
-  height: auto; /* Responsive height */
-  margin: 40px;
-}
-
 #totalTitle {
   margin-top: 10px;  /* Adjust the value as needed */
   font-size: 1em;      /* Increases the font size, adjust as needed */
@@ -216,7 +182,7 @@ h1 .fa-heartbeat {
   justify-content: center;
   align-items: center;
   height: 2vh; /* Adjust the height as needed */
-  margin:30px;
+  margin-bottom: 40px;
 }
 
 .analyze-button {
@@ -254,11 +220,62 @@ h1 .fa-heartbeat {
   text-align: left;
 }
 
-.analysis-container {
-  padding: 20px;
-  margin-top: 20px;
-  width: 95%;
+.graph-container {
   margin: 20px;
   border: 1px solid #ddd;
   border-radius: 20px;
+}
+
+.graph-container canvas {
+  width: auto; /* Ensure the canvas can grow */
+  height: auto; /* Responsive height */
+  margin: 20px;
+}
+
+.analysis-container {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+}
+
+.parent-number-container {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.number-container {
+  flex: 1; /* This will ensure equal width */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: auto; /* Set to auto or a fixed height depending on your needs */
+  margin: 20px; 
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #fff; /* Assuming a white background */
+  padding-bottom: 10px; /* Adjust as needed */
+  padding-top: 10px;
+}
+
+/* Desktop View */
+@media (min-width: 768px) {
+  .content-container {
+    display: flex;
+    justify-content: space-between;
+  }
+  .graph-container, .analysis-container {
+    flex: 1;
+    /* Add more styles as needed */
+  }
+}
+
+/* Mobile View */
+@media (max-width: 767px) {
+  .content-container {
+    display: block;
+  }
 }

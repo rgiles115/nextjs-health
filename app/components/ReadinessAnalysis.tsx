@@ -61,11 +61,11 @@ const ReadinessAnalysis: React.FC<ReadinessAnalysisProps> = ({ readinessData }) 
                        }
                    }} 
                    className={`analyze-button ${isLoading ? 'disabled' : ''}`}>
-                    {isLoading ? <>Analysing<span className="loading-dots">{loadingDots}</span></> : <><img src="/sparkler.png" alt="Sparkles" />Analyise</>}
+                    {isLoading ? <>Analysing<span className="loading-dots">{loadingDots}</span></> : <><img src="/sparkler.png" alt="Sparkles" />Analyse</>}
                 </a>
             </div>
             {analysis && (
-                <div className="analysis-container">
+                <div>
                     <Typewriter
                         options={{
                             strings: analysis,

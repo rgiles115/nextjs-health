@@ -220,47 +220,42 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
 
   return (
     <div>
-    {isLoading ? (
+      {isLoading ? (
         <div><Loading /></div> // Replace with a spinner or loading component
-    ) : (
-      <div>
-        <div className="parent-number-container">
-      
-        <div className="number-container">
-          <FontAwesomeIcon icon={faRoad} className="icon" style={{ color: "#219ebc" }} />  
-          <div className="total-distance">
-            <div className="total-value">{totalDistance.toFixed(2)}</div>
-            <div className="total-title">TOTAL KILOMETERS</div>
-          </div>
-          <div className="divider"></div>
-        </div>
-        <div className="number-container">
-          <FontAwesomeIcon icon={faMountain} className="icon" style={{ color: "#fb8500" }} />  
-          <div className="total-distance">
-            <div className="total-value">{totalElevationGain}</div>
-            <div className="total-title">TOTAL ELEVATION</div>
-          </div>
-          <div className="divider"></div>
-        </div>
-        </div>
-        <div className="graph-container">
-          <canvas ref={chartRef} />
-          <div id="viewOnStrava"><a href="https://strava.com/athletes/">View on Strava</a></div>
-        </div>
-
+      ) : (
         <div>
-
-            {/* ChatGPT Analysis Component */}
-            <ChatGPTAnalysis cyclingData={activities} />
+          <div className="parent-number-container">
+            <div className="number-container">
+              <FontAwesomeIcon icon={faRoad} className="icon" style={{ color: "#219ebc" }} />  
+              <div className="total-distance">
+                <div className="total-value">{totalDistance.toFixed(2)}</div>
+                <div className="total-title">TOTAL KILOMETERS</div>
+              </div>
+              <div className="divider"></div>
+            </div>
+            <div className="number-container">
+              <FontAwesomeIcon icon={faMountain} className="icon" style={{ color: "#fb8500" }} />  
+              <div className="total-distance">
+                <div className="total-value">{totalElevationGain}</div>
+                <div className="total-title">TOTAL ELEVATION</div>
+              </div>
+              <div className="divider"></div>
+            </div>
+          </div>
+          <div className="content-container">
+            <div className="graph-container">
+              <canvas ref={chartRef} />
+              <div id="viewOnStrava"><a href="https://strava.com/athletes/">View on Strava</a></div>
+            </div>
+            <div className="analysis-container">
+              {/* ChatGPT Analysis Component */}
+              <ChatGPTAnalysis cyclingData={activities} />
+            </div>
+          </div>
+          </div>
+         )}
         </div>
-
-      </div>
-
-      
-        
-        )}
-      </div>
-  );
+);
 };
 
 export default ClientStravaActivitiesChart;

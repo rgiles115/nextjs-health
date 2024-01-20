@@ -124,9 +124,7 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ startDate, endDate }) => 
             {isLoading ? (
                 <div><Loading /></div>
             ) : (
-                <div className="graph-container">
                 <canvas ref={chartRef} />
-                </div>
             )}
         </div>
     );

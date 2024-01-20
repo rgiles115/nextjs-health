@@ -60,9 +60,11 @@ useEffect(() => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="/style.css" />
       </Head>
+      <div className="header">
       <h1>
       <FontAwesomeIcon icon={faHeartbeat} width="32" /> My Health Data
       </h1>
+      </div>
 
       <Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
 
@@ -74,17 +76,21 @@ useEffect(() => {
 
       {isStravaAuthed &&  (
         <div>
-      
-        <ClientStravaActivitiesChart startDate={startDate} endDate={endDate} />
-      
-      </div>
+          <ClientStravaActivitiesChart startDate={startDate} endDate={endDate} />
+        </div>
       )}
 
       {isOuraAuthed && (
         <div>
-        <ActivityChart startDate={startDate} endDate={endDate} />
-        <SleepChart startDate={startDate} endDate={endDate} />
-        <ReadinessChart startDate={startDate} endDate={endDate} />
+          <ReadinessChart startDate={startDate} endDate={endDate} />
+          <div className="content-container">
+                    <div className="graph-container">
+              <ActivityChart startDate={startDate} endDate={endDate} />
+            </div>
+            <div className="graph-container">
+              <SleepChart startDate={startDate} endDate={endDate} />
+            </div>
+          </div>
         </div>
       )}
       <div id="footer"><Footer /></div>

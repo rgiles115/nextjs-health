@@ -166,9 +166,7 @@ const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
             {isLoading ? (
                 <div><Loading /></div> // Replace with a spinner or loading component
             ) : (
-                <div className="graph-container">
                 <canvas ref={chartRef} />
-                </div>
             )}
         </div>
     );

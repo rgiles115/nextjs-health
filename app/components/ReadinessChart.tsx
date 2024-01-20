@@ -154,14 +154,18 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate }) =
             {isLoading ? (
                 <div><Loading /></div> // Replace with a spinner or loading component
             ) : (
-                <div className="graph-container">
-                <canvas ref={chartRef} />
+                <div className="content-container">
+                    <div className="graph-container">
+                        <canvas ref={chartRef} />
+                    </div>
+                    <div className="analysis-container">
+                        <ReadinessAnalysis readinessData={readinessData} />
+                    </div>
                 </div>
             )}
-                        <ReadinessAnalysis readinessData={readinessData} />
-
         </div>
     );
+    
     
 };
 
