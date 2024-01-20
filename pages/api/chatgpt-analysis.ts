@@ -1,23 +1,22 @@
+// Edge Function configuration
+export const config = {
+  runtime: 'edge',
+};
+
 import axios from 'axios';
 
 // Define a type for the function parameters
 type AnalysisRequest = {
   content: string;
-  data: any; // Use a more specific type if possible
+  data: any; // Consider using a more specific type if possible
 };
 
-/**
- * Sends a message to OpenAI API.
- * @param params - The parameters containing content and data for analysis.
- * @returns The response from the OpenAI API.
- */
+// Function to send a message to OpenAI API
 const sendMessageToOpenAI = async (params: AnalysisRequest) => {
   const { content, data } = params;
   const url = 'https://api.openai.com/v1/chat/completions';
   const OPENAPI_SECRET = process.env.OPENAPI_SECRET;
-  const headers = {
-    'Authorization': `Bearer ${OPENAPI_SECRET}`
-  };
+
   const requestData = {
     model: 'gpt-4',
     messages: [
@@ -31,15 +30,29 @@ const sendMessageToOpenAI = async (params: AnalysisRequest) => {
   };
 
   try {
-    const response = await axios.post(url, requestData, { headers: headers, timeout: 60000 });
-    return response.data;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAPI_SECRET}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
   } catch (error) {
     console.error('Error calling OpenAI API:', error);
     throw error;
   }
 };
 
-export async function middleware(req: Request) {
+
+// Edge Function handler
+export default async function handler(req: Request) {
   const body = await req.json();
   const { content, data } = body;
 
