@@ -3,7 +3,7 @@
   position: fixed;
   right: 0;
   top: 20px;
-  z-index: 1001; /* Ensure it's above other elements */
+  z-index: 2001; /* Ensure it's above other elements */
   cursor: pointer;
   background-color: white; /* Changed to white */
   color: black; /* Changed to black */
@@ -22,7 +22,7 @@
   background-color: white; /* Changed to white */
   overflow-x: hidden;
   transition: 0.3s; /* Smooth transition */
-  z-index: 1000; /* Ensure it's below the toggle button */
+  z-index: 2000; /* Ensure it's below the toggle button */
   color: black; /* Changed to black */
   border-left: 1px solid #ccc; /* Thin line on the left */
   padding: 0 10px;

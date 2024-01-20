@@ -20,9 +20,13 @@ body {
 }
 
 .header {
-  background-color: #85c7f2; /* Soft blue background */
+  background-color: #fff;
   text-align: center;
   padding: 20px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .footer {
@@ -237,6 +241,8 @@ h1 .fa-heartbeat {
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 20px;
+  overflow-y: auto; /* Add vertical scrolling if necessary */
+
 }
 
 .parent-number-container {
@@ -269,6 +275,7 @@ h1 .fa-heartbeat {
   }
   .graph-container, .analysis-container {
     flex: 1;
+    max-height: 380px; /* Example maximum height */
     /* Add more styles as needed */
   }
 }

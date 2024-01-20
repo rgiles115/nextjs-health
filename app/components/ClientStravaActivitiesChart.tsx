@@ -5,7 +5,7 @@ import { eachDayOfInterval, format, parseISO } from 'date-fns';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMountain, faRoad  } from "@fortawesome/free-solid-svg-icons";
 import dynamic from 'next/dynamic';
-import ChatGPTAnalysis from './ChatGPTAnalysis'; // Adjust the path as necessary
+import StravaAnalysis from './StravaAnalysis'; // Adjust the path as necessary
 import { Activity } from '../types/activityTypes';
 
 
@@ -24,6 +24,7 @@ declare global {
 }
 
 const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> = ({ startDate, endDate }) => {
+  const [originalStravaData, setOriginalStravaData] = useState([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [totalDistance, setTotalDistance] = useState<number>(0);
   const [totalElevationGain, setTotalElevationGain] = useState<number>(0);
@@ -39,6 +40,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
     const endTimestamp = endDate.getTime() / 1000;
     const response = await fetch(`/api/getStravaActivities?start_date=${startTimestamp}&end_date=${endTimestamp}`);
     const data = await response.json();
+    setOriginalStravaData(data);
 
     const dateSeries = eachDayOfInterval({ start: startDate, end: endDate }).map((day) =>
       format(day, 'yyyy-MM-dd')
@@ -249,7 +251,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
             </div>
             <div className="analysis-container">
               {/* ChatGPT Analysis Component */}
-              <ChatGPTAnalysis cyclingData={activities} />
+              <StravaAnalysis stravaData={originalStravaData} />
             </div>
           </div>
           </div>

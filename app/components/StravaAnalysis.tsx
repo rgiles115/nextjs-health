@@ -5,23 +5,29 @@ import { Activity } from '../types/activityTypes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 
-interface ChatGPTAnalysisProps {
-    cyclingData: Activity[];
+interface StravaAnalysisProps {
+    stravaData: Activity[];
 }
 
-const ChatGPTAnalysis: React.FC<ChatGPTAnalysisProps> = ({ cyclingData }) => {
+const ChatGPTAnalysis: React.FC<StravaAnalysisProps> = ({ stravaData }) => {
     const [analysis, setAnalysis] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [loadingDots, setLoadingDots] = useState('');
 
     // Define the analysis prompt
-    const analysisPrompt = `Analyse the following Strava cycling data from a professional cycling coach's perspective. Do not summarize. Provide detailed and informed recommendations for improving performance, focusing on aspects such as training intensity, volume, rest, and potential areas of improvement. The data includes daily metrics like distance covered, total elevation gain, average watts, and moving time. Keep the response very short.`;
+    const analysisPrompt = `Analyse the following Strava cycling data for an amatuer
+    cyclist, and provide recommendations from the point of view of a cycling coach.
+    Do not summarize the data itself, but provide informed recommendations for
+    improving performance. Focus on aspects such as training intensity, volume, rest,
+    and potential areas of improvement.
+    The data includes a range of metrics for each activity like distance,
+    elevation gain, max watts, average watts, and moving time. Keep the response very short.`;
 
     const getAnalysis = async () => {
         setIsLoading(true);
         try {
             // Update the API call to include the content and data
-            const response = await axios.post('/api/chatgpt-analysis', { content: analysisPrompt, data: cyclingData });
+            const response = await axios.post('/api/chatgpt-analysis', { content: analysisPrompt, data: stravaData });
             
             // Handle the response
             if (response.data.choices && response.data.choices.length > 0) {
