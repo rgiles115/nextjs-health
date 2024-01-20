@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import './SideMenu.css'; // Import the CSS for styling the side menu
+import Hamburger from 'hamburger-react';
+
 
 // Function to construct the Strava authentication URL
 const getStravaAuthURL = (): string => {
@@ -40,31 +42,32 @@ const SideMenu: React.FC = () => {
     const ouraAuthURL = getOuraAuthURL();
 
     return (
-        <>
-            {/* Button to toggle the menu */}
-            <button onClick={toggleMenu} className="menu-toggle-button">
-                ☰
-            </button>
-            {/* Side menu container */}
-            <div className={`side-menu ${isOpen ? 'open' : ''}`}>
-                {/* Title for the menu */}
-                <div className="menu-title">Connect</div>
-                {/* List of menu items */}
-                <ul>
-                    {/* Strava authentication link */}
-                    <li>
-                        <a href={stravaAuthURL} className="auth-button" id="authStravaButton"></a>
-                    </li>
-                    {/* Oura authentication link */}
-                    <li>
-                        <a href={ouraAuthURL} className="auth-button" id="authOuraButton">
-                            Authenticate with Oura
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </>
-    );
+      <>
+          {/* Hamburger menu toggle button */}
+          <div className='menu-toggle-button'>
+          <Hamburger toggled={isOpen} toggle={setIsOpen} />
+          </div>
+
+          {/* Side menu container */}
+          <div className={`side-menu ${isOpen ? 'open' : ''}`}>
+              {/* Title for the menu */}
+              <div className="menu-title">Connect</div>
+              {/* List of menu items */}
+              <ul>
+                  {/* Strava authentication link */}
+                  <li>
+                      <a href={stravaAuthURL} className="auth-button" id="authStravaButton"></a>
+                  </li>
+                  {/* Oura authentication link */}
+                  <li>
+                      <a href={ouraAuthURL} className="auth-button" id="authOuraButton">
+                          Authenticate with Oura
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </>
+  );
 };
 
 export default SideMenu;

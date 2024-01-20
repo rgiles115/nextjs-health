@@ -1,16 +1,18 @@
 /* SideMenu.css */
+/* Style for the menu toggle button container */
 .menu-toggle-button {
   position: fixed;
-  right: 0;
-  top: 20px;
-  z-index: 2001; /* Ensure it's above other elements */
+  top: 40px; /* Adjust as needed */
+  right: 40px; /* Adjust as needed */
+  z-index: 3000; /* Higher than other elements */
   cursor: pointer;
-  background-color: white; /* Changed to white */
-  color: black; /* Changed to black */
-  border: none;
-  padding: 10px 15px;
-  font-size: 20px;
+  width: 40px; /* Sufficient to contain the icon */
+  height: 40px; /* Sufficient to contain the icon */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
 
 .side-menu {
   margin-top: 0px; /* Add top margin to the list */
@@ -25,7 +27,7 @@
   z-index: 2000; /* Ensure it's below the toggle button */
   color: black; /* Changed to black */
   border-left: 1px solid #ccc; /* Thin line on the left */
-  padding: 0 10px;
+  padding: 0 20px;
 }
 
 .side-menu.open {
@@ -38,9 +40,8 @@
   padding-bottom: 20px;
   font-size: 18px;
   color: black;
-  background-color: #fff;
   border-bottom: 1px solid #ddd;
-  margin-top: 20px;
+  margin-top: 40px;
   margin-bottom: 20px; /* Add bottom margin to push content down */
 }
 
