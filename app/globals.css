@@ -19,14 +19,6 @@ body {
   font-family: Arial, sans-serif;
 }
 
-#pageTitle {
-  margin-top: 20px;  /* Adjust the value as needed */
-  font-weight: bold;     /* Makes the text bold */
-  font-size: 2.0em;      /* Increases the font size, adjust as needed */
-  margin-left: 40px; /* Align with the left edge of the graph-container */
-  /* Add any other styles you need */
-}
-
 .footer {
   display: flex;
   justify-content: space-between;
@@ -36,7 +28,7 @@ body {
 }
 
 .footerImage {
-  margin-left: 40px;
+  margin-left: 5%;
   width: 140px;
 }
 
@@ -54,7 +46,8 @@ body {
   border-radius: 15px;
   border: 1px solid #ccc;
   width: 360px;
-  margin: 30px;
+  margin-left: 4%;
+  margin-top: 20px
 }
 
 .custom-datepicker {
@@ -109,7 +102,7 @@ body {
     flex-direction: row;
     justify-content: center; /* Centers children horizontally */
     width: 95%; /* Adjust as needed */
-    margin: 20px;
+    margin: 3%;
 }
 
 .number-container {
@@ -134,12 +127,18 @@ h1 {
   font-size: 2em; /* Increases the font size of the title */
   margin-top: 20px;  /* Adjust the value as needed */
   font-weight: bold;     /* Makes the text bold */
-  margin-left: 40px; /* Align with the left edge of the graph-container */
+  margin-left: 5%; /* Align with the left edge of the graph-container */
   /* Add any other styles you need */
 }
 
 h1 .fa-heartbeat {
   font-size: 1.5em; /* Adjust the icon size */
+}
+
+#fontAwesome {
+  margin: 20px;
+  font-size: 2em;
+  overflow: hidden;
 }
 
 .icon {
@@ -177,7 +176,7 @@ h1 .fa-heartbeat {
     align-items: center;
     height: 100%;
     width: 95%;
-    margin: 20px;
+    margin: 3%;
     border: 1px solid #ddd;
     border-radius: 20px;
     overflow: hidden;
@@ -187,12 +186,6 @@ h1 .fa-heartbeat {
   width: auto; /* Ensure the canvas can grow */
   height: auto; /* Responsive height */
   margin: 40px;
-}
-
-#fontAwesome {
-  margin: 20px;
-  font-size: 2em;
-  overflow: hidden;
 }
 
 #totalTitle {
@@ -223,6 +216,7 @@ h1 .fa-heartbeat {
   justify-content: center;
   align-items: center;
   height: 2vh; /* Adjust the height as needed */
+  margin:30px;
 }
 
 .analyze-button {
