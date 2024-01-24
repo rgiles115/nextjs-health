@@ -7,42 +7,23 @@ import { faMountain, faRoad  } from "@fortawesome/free-solid-svg-icons";
 import dynamic from 'next/dynamic';
 import StravaAnalysis from './StravaAnalysis'; // Adjust the path as necessary
 import { Activity } from '../types/activityTypes';
-
+import useFetchStravaActivities from './useFetchStravaActivities'; // Adjust the path as necessary
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
 Chart.register(...registerables);
 
-interface ClientStravaActivitiesChartProps {
-  Activity: Activity[];
-}
-
-declare global {
-  interface Window {
-    myStravaChart: Chart | undefined;
-  }
-}
-
 const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> = ({ startDate, endDate }) => {
-  const [originalStravaData, setOriginalStravaData] = useState([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [totalDistance, setTotalDistance] = useState<number>(0);
   const [totalElevationGain, setTotalElevationGain] = useState<number>(0);
-
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const { data: originalStravaData, isLoading } = useFetchStravaActivities(startDate, endDate);
 
-
-  const fetchActivities = async () => {
-    setIsLoading(true); // Start loading
-    const startTimestamp = startDate.getTime() / 1000;
-    const endTimestamp = endDate.getTime() / 1000;
-    const response = await fetch(`/api/getStravaActivities?start_date=${startTimestamp}&end_date=${endTimestamp}`);
-    const data = await response.json();
-    setOriginalStravaData(data);
-
-    const dateSeries = eachDayOfInterval({ start: startDate, end: endDate }).map((day) =>
+  const processStravaData = (stravaData: Activity[]) => {
+    const dateSeries = eachDayOfInterval({ start: startDate, end: endDate }).map(day =>
       format(day, 'yyyy-MM-dd')
     );
 
@@ -51,7 +32,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
     // Reset the total elevation gain before fetching new activities
     setTotalElevationGain(0);
 
-    const activitiesDict = data.reduce(
+    const activitiesDict = stravaData.reduce(
       (acc: { [key: string]: { distance: number; total_elevation_gain: number; moving_time: number; weighted_watts: number } }, activity: Activity) => {
         const sortableDate = format(parseISO(activity.start_date), 'yyyy-MM-dd');
 
@@ -74,7 +55,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
       }, {});
 
     const filledActivities = dateSeries.map((day) => {
-      const activitiesForDate = data.filter((activity: Activity) => {
+      const activitiesForDate = stravaData.filter((activity: Activity) => {
         const sortableDate = format(parseISO(activity.start_date), 'yyyy-MM-dd');
         return sortableDate === day;
       });
@@ -121,13 +102,15 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
     });
 
     setActivities(filledActivities);
+    console.log('filledActivities:', JSON.stringify(filledActivities));
     setTotalDistance(totalDistanceTemp);
-    setIsLoading(false); // Stop loading after data is fetched
-  };
+  }
 
   useEffect(() => {
-    fetchActivities();
-  }, [startDate, endDate]);
+    if (originalStravaData) {
+      processStravaData(originalStravaData);
+    }
+  }, [originalStravaData]);
 
   useEffect(() => {
     if (activities.length > 0 && chartRef.current) {
@@ -223,7 +206,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
   return (
     <div>
       {isLoading ? (
-        <div><Loading /></div> // Replace with a spinner or loading component
+        <div><Loading /></div>
       ) : (
         <div>
           <div className="parent-number-container">
@@ -250,14 +233,13 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
               <div id="viewOnStrava"><a href="https://strava.com/athletes/">View on Strava</a></div>
             </div>
             <div className="analysis-container">
-              {/* ChatGPT Analysis Component */}
               <StravaAnalysis stravaData={originalStravaData} />
             </div>
           </div>
-          </div>
-         )}
         </div>
-);
+      )}
+    </div>
+  );
 };
 
 export default ClientStravaActivitiesChart;
