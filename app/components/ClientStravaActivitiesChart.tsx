@@ -7,20 +7,31 @@ import { faMountain, faRoad  } from "@fortawesome/free-solid-svg-icons";
 import dynamic from 'next/dynamic';
 import StravaAnalysis from './StravaAnalysis'; // Adjust the path as necessary
 import { Activity } from '../types/activityTypes';
-import useFetchStravaActivities from './useFetchStravaActivities'; // Adjust the path as necessary
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
 Chart.register(...registerables);
 
-const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> = ({ startDate, endDate }) => {
+interface ClientStravaActivitiesChartProps {
+  startDate: Date;
+  endDate: Date;
+  stravaData: Activity[] | null; // Allow stravaData to be null
+  isLoading: boolean;
+}
+
+const ClientStravaActivitiesChart: React.FC<ClientStravaActivitiesChartProps> = ({ startDate, endDate, stravaData, isLoading }) => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [totalDistance, setTotalDistance] = useState<number>(0);
   const [totalElevationGain, setTotalElevationGain] = useState<number>(0);
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
   
-  const { data: originalStravaData, isLoading } = useFetchStravaActivities(startDate, endDate);
+  // Use the passed stravaData directly instead of fetching it
+  useEffect(() => {
+    if (stravaData) {
+      processStravaData(stravaData);
+    }
+  }, [stravaData]);
 
   const processStravaData = (stravaData: Activity[]) => {
     const dateSeries = eachDayOfInterval({ start: startDate, end: endDate }).map(day =>
@@ -93,8 +104,8 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
 
       return {
         day: format(parseISO(day), 'do MMM yyyy'),
-        distance: totalDistance.toString(), // Convert to string
-        total_elevation_gain: totalElevation.toString(), // Convert to string
+        distance: totalDistance, // Convert to string
+        total_elevation_gain: totalElevation, // Convert to string
         average_watts: weightedAverageWatts,
         moving_time: totalMovingTime,
         start_date: format(parseISO(day), 'do MMM yyyy'),
@@ -107,10 +118,10 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
   }
 
   useEffect(() => {
-    if (originalStravaData) {
-      processStravaData(originalStravaData);
+    if (stravaData) {
+      processStravaData(stravaData);
     }
-  }, [originalStravaData]);
+  }, [stravaData]);
 
   useEffect(() => {
     if (activities.length > 0 && chartRef.current) {
@@ -233,7 +244,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
               <div id="viewOnStrava"><a href="https://strava.com/athletes/">View on Strava</a></div>
             </div>
             <div className="analysis-container">
-              <StravaAnalysis stravaData={originalStravaData} />
+            <StravaAnalysis stravaData={stravaData || []} />
             </div>
           </div>
         </div>

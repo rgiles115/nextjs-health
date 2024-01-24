@@ -6,9 +6,8 @@ import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeartbeat } from '@fortawesome/free-solid-svg-icons';
-import { fetchStravaActivities } from '../app/utils/stravaUtils';
+import useFetchStravaActivities from './components/useFetchStravaActivities';
 import { StravaActivity } from '../app/types/StravaInterface';
-// Import your components
 import ActivityChart from './components/ActivityChart';
 import SleepChart from './components/SleepChart';
 import ReadinessChart from './components/ReadinessChart';
@@ -27,12 +26,18 @@ export default function Home() {
   const [isStravaAuthed, setIsStravaAuthed] = useState(false);
   const [isOuraAuthed, setIsOuraAuthed] = useState(false);
   const [stravaData, setStravaData] = useState<StravaActivity[] | null>(null);
+  const { data: stravaActivities, isLoading: isStravaLoading } = useFetchStravaActivities(startDate, endDate);
 
-  const getCookie = (name) => {
+  const getCookie = (name: string): string | undefined => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
+    if (parts.length === 2) {
+      const cookiePart = parts.pop();
+      return cookiePart ? cookiePart.split(';').shift() : undefined;
+    }
+    return undefined;
   };
+  
 
   useEffect(() => {
     // Fetch Strava authentication status
@@ -56,30 +61,7 @@ export default function Home() {
       });
   }, []);
 
-  useEffect(() => {
-    if (isStravaAuthed) {
-      const loadStravaData = async () => {
-        try {
-          const stravaDataCookie = getCookie('stravaData');
-          const stravaData = stravaDataCookie ? JSON.parse(stravaDataCookie) : null;
-          const accessToken = stravaData ? stravaData.access_token : null;
-          console.log('Cookie', stravaDataCookie );
 
-          if (!accessToken) {
-            console.error('Access token is not available');
-            return;
-          }
-
-          const activities = await fetchStravaActivities(accessToken, startDate.toISOString(), endDate.toISOString());
-          setStravaData(activities);
-        } catch (error) {
-          console.error('Error fetching Strava data:', error);
-        }
-      };
-
-      loadStravaData();
-    }
-  }, [isStravaAuthed, startDate, endDate]);
 
   return (
     <div>
@@ -104,7 +86,12 @@ export default function Home() {
 
       {isStravaAuthed && (
         <div>
-          <ClientStravaActivitiesChart stravaData={stravaData} startDate={startDate} endDate={endDate} />
+            <ClientStravaActivitiesChart 
+            startDate={startDate} 
+            endDate={endDate} 
+            stravaData={stravaActivities} 
+            isLoading={isStravaLoading} 
+          />
         </div>
       )}
 
