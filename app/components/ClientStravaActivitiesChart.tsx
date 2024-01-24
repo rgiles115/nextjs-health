@@ -93,8 +93,8 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
 
       return {
         day: format(parseISO(day), 'do MMM yyyy'),
-        distance: totalDistance.toLocaleString('en-US'),
-        total_elevation_gain: totalElevation.toLocaleString('en-US'),
+        distance: totalDistance.toString(), // Convert to string
+        total_elevation_gain: totalElevation.toString(), // Convert to string
         average_watts: weightedAverageWatts,
         moving_time: totalMovingTime,
         start_date: format(parseISO(day), 'do MMM yyyy'),
@@ -102,7 +102,7 @@ const ClientStravaActivitiesChart: React.FC<{ startDate: Date; endDate: Date }> 
     });
 
     setActivities(filledActivities);
-    console.log('filledActivities:', JSON.stringify(filledActivities));
+    // console.log('filledActivities:', JSON.stringify(filledActivities));
     setTotalDistance(totalDistanceTemp);
   }
 
