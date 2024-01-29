@@ -10,12 +10,23 @@ const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
 Chart.register(...registerables);
 
+interface ReadinessChartProps {
+    startDate: Date;
+    endDate: Date;
+    readinessData: {
+        dates: string[];
+        restingHeartRate: number[];
+        hrvBalance: number[];
+        bodyTemperature: number[];
+    } | null;
+}
+
 interface ReadinessEntry {
     day: string;
     contributors: {
-    resting_heart_rate: number;
-    hrv_balance: number;
-    body_temperature: number; // Ensure these match the actual API response fields
+        resting_heart_rate: number;
+        hrv_balance: number;
+        body_temperature: number; // Ensure these match the actual API response fields
     };
 }
 
@@ -24,48 +35,19 @@ interface ReadinessChartProps {
     endDate: Date;
 }
 
-const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate }) => {
+const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, readinessData }) => {
     // Update state to include new data points
-    const [readinessData, setReadinessData] = useState({
-        dates: [],
-        restingHeartRate: [],
-        hrvBalance: [],
-        bodyTemperature: []
-    });
     const chartRef = useRef<HTMLCanvasElement>(null);
     const chartInstanceRef = useRef<Chart | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        setIsLoading(true); // Start loading
-
-        const formattedStartDate = startDate.toISOString().split('T')[0];
-        const formattedEndDate = endDate.toISOString().split('T')[0];
-
-        fetch(`/api/getReadinessData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`)
-            .then(response => response.json())
-            .then(data => {
-                // Map over your data to create the chart datasets
-                const formattedDates = data.data.map((entry: ReadinessEntry) =>
-                    format(new Date(entry.day), 'do MMM yyyy')
-                );
-                setReadinessData({
-                    dates: formattedDates,
-                    restingHeartRate: data.data.map((entry: ReadinessEntry) => entry.contributors.resting_heart_rate),
-                    hrvBalance: data.data.map((entry: ReadinessEntry) => entry.contributors.hrv_balance),
-                    bodyTemperature: data.data.map((entry: ReadinessEntry) => entry.contributors.body_temperature)
-                });
-                setIsLoading(false); // Stop loading after data is fetched
-
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                setIsLoading(false); // Stop loading in case of error
-            });
-    }, [startDate, endDate]);
-
-    useEffect(() => {
+        if (!readinessData) {
+            // If readinessData is null, do not proceed
+            return;
+        }
         if (readinessData.dates.length > 0 && chartRef.current) {
+            console.log("Readiness:", readinessData);
             const ctx = chartRef.current.getContext('2d');
             if (ctx) {
                 if (chartInstanceRef.current) {
@@ -117,13 +99,13 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate }) =
                                 grid: {
                                     display: false
                                 },
-                                }
-                                },
-                                plugins: {
-                                    tooltip: {
-                                      enabled: true,
-                                    }
-                                  }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                enabled: true,
+                            }
+                        }
                     }
                 });
             }
@@ -141,9 +123,9 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate }) =
                 chartInstanceRef.current.resize();
             }
         };
-    
+
         window.addEventListener('resize', handleResize);
-    
+
         return () => {
             window.removeEventListener('resize', handleResize);
         };
@@ -154,19 +136,14 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate }) =
             {isLoading ? (
                 <div><Loading /></div> // Replace with a spinner or loading component
             ) : (
-                <div className="content-container">
-                    <div className="graph-container">
-                        <canvas ref={chartRef} />
-                    </div>
-                    <div className="analysis-container">
-                        <ReadinessAnalysis readinessData={readinessData} />
-                    </div>
+                <div className="graph-container">
+                    <canvas ref={chartRef} />
                 </div>
             )}
         </div>
     );
-    
-    
+
+
 };
 
 export default ReadinessChart;

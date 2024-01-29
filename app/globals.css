@@ -182,11 +182,12 @@ h1 .fa-heartbeat {
 }
 
 .button-container {
+  text-align: center; /* Center the button */
   display: flex;
   justify-content: center;
   align-items: center;
   height: 2vh; /* Adjust the height as needed */
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 
 .analyze-button {
@@ -226,7 +227,6 @@ h1 .fa-heartbeat {
 
 .graph-container {
   margin: 20px;
-  border: 1px solid #ddd;
   border-radius: 20px;
 }
 
@@ -237,12 +237,77 @@ h1 .fa-heartbeat {
 }
 
 .analysis-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column; /* Stack button and analysis box vertically */
+  justify-content: space-between; /* This will put space between button and analysis box */
   margin: 20px;
   padding: 20px;
-  border: 1px solid #ddd;
   border-radius: 20px;
   overflow-y: auto; /* Add vertical scrolling if necessary */
+  max-width: 50%;
+}
 
+.strava-analysis-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px; /* Space before Oura graphs */
+  margin-right: 20px;
+  align-items: stretch; /* This will make children stretch to fill the container height */
+
+}
+
+.strava-chart {
+  flex: 1;
+  margin: 20px; /* Adjust as needed */
+  border: 1px solid #ddd;
+  border-radius: 20px;
+}
+
+.analysis-container {
+  flex: 1;
+  margin: 20px; /* Adjust as needed */
+  border: 1px solid red;
+  border-radius: 20px;
+}
+
+.analysis-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px; /* Space between chart and analysis section */
+  padding-top: 20px;
+  
+}
+
+.StravaAnalysis {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* Stretch items to fill the container */
+  border: 1px solid #ddd;
+  margin-bottom: 20px;
+  border-radius: 20px;
+  overflow: auto;
+  padding: 20px;
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: 240px; /* Limit the height to the parent's height */
+  overflow: auto; /* This will add a scrollbar when content overflows */
+}
+
+.ReadinessAnalysis {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* Stretch items to fill the container */
+  border: 1px solid #ddd;
+  margin-bottom: 20px;
+  border-radius: 20px;
+  overflow: auto;
+  padding: 20px;
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: 240px; /* Limit the height to the parent's height */
+  overflow: auto; /* This will add a scrollbar when content overflows */
 }
 
 .parent-number-container {
@@ -285,4 +350,12 @@ h1 .fa-heartbeat {
   .content-container {
     display: block;
   }
+  .strava-analysis-container {
+    flex-direction: column;
+  }
+  .strava-chart, .analysis-container {
+    margin-right: 0;
+    margin-bottom: 0px; /* Add some space between the chart and the analysis container */
+  }
 }
+

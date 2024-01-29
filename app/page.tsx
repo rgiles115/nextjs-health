@@ -11,10 +11,16 @@ import { StravaActivity } from '../app/types/StravaInterface';
 import ActivityChart from './components/ActivityChart';
 import SleepChart from './components/SleepChart';
 import ReadinessChart from './components/ReadinessChart';
-import ClientStravaActivitiesChart from './components/ClientStravaActivitiesChart';
+import StravaAnalysis from './components/StravaAnalysis';
 import Footer from './components/Footer';
 import Script from 'next/script';
 import SideMenu from './components/SideMenu';
+import axios from 'axios';
+import StravaChart from './components/StravaChart'; // Adjust the path as necessary
+import useProcessStravaData from './components/useProcessStravaData'; // Adjust the path as necessary
+import useFetchOuraData from './components/useFetchOuraData'; // Adjust the path as necessary
+import ReadinessAnalysis from './components/ReadinessAnalysis';
+
 
 export default function Home() {
   // State declarations
@@ -25,8 +31,21 @@ export default function Home() {
   const [endDate, setEndDate] = useState(currentDate);
   const [isStravaAuthed, setIsStravaAuthed] = useState(false);
   const [isOuraAuthed, setIsOuraAuthed] = useState(false);
-  const [stravaData, setStravaData] = useState<StravaActivity[] | null>(null);
+  const [stravaData, setStravaData] = useState<StravaActivity[]>([]);
   const { data: stravaActivities, isLoading: isStravaLoading } = useFetchStravaActivities(startDate, endDate);
+  const [analysis, setAnalysis] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingDots, setLoadingDots] = useState('');
+  const { processedData, totalDistance, totalElevationGain } = useProcessStravaData(stravaActivities, startDate, endDate);
+  const { data: readinessData, loading: readinessLoading, error: readinessError } = useFetchOuraData(startDate, endDate);
+  const [stravaAnalysisResult, setStravaAnalysisResult] = useState('');
+  const [ouraAnalysisResult, setOuraAnalysisResult] = useState('');
+  const [isStravaAnalysisLoading, setIsStravaAnalysisLoading] = useState(false);
+  const [isOuraAnalysisLoading, setIsOuraAnalysisLoading] = useState(false);
+  const [stravaLoadingDots, setStravaLoadingDots] = useState('');
+  const [ouraLoadingDots, setOuraLoadingDots] = useState('');
+
+
 
   const getCookie = (name: string): string | undefined => {
     const value = `; ${document.cookie}`;
@@ -37,7 +56,113 @@ export default function Home() {
     }
     return undefined;
   };
-  
+
+  const stravaAnalysisPrompt = `Analyse the following Strava cycling data for an amatuer
+  cyclist, and provide recommendations from the point of view of a cycling coach.
+  Do not summarize the data itself, but provide informed recommendations for
+  improving performance. Focus on aspects such as training intensity, volume, rest,
+  and potential areas of improvement.
+  The data includes a range of metrics for each activity like distance,
+  elevation gain, max watts, average watts, and moving time. Keep the response very short.`;
+
+  const ouraAnalysisPrompt = `Analyse the following data from an Oura ring. These are
+  Oura scores for HRV, resting heart rate and body temperature. They are not actual HRV,
+  heart rate, and body temperature readings. Please use is like a professional exercise
+  coach would use this type of information.  Keep the response very short.`;
+
+
+  // Function for Strava Data Analysis
+  const getStravaAnalysis = async () => {
+    setIsStravaAnalysisLoading(true);
+
+    if (!stravaActivities) {
+      console.error('Strava activities data is null or undefined');
+      setIsStravaAnalysisLoading(false);
+      return;
+    }
+
+    const simplifiedStravaActivities = stravaActivities.map(activity => ({
+      name: activity.name,
+      distance: activity.distance,
+      moving_time: activity.moving_time,
+      elapsed_time: activity.elapsed_time,
+      total_elevation_gain: activity.total_elevation_gain,
+      type: activity.type,
+      id: activity.id,
+      start_date: activity.start_date,
+      start_date_local: activity.start_date_local,
+      timezone: activity.timezone,
+      utc_offset: activity.utc_offset,
+      average_speed: activity.average_speed,
+      max_speed: activity.max_speed,
+      average_cadence: activity.average_cadence,
+      average_watts: activity.average_watts,
+      max_watts: activity.max_watts,
+      weighted_average_watts: activity.weighted_average_watts,
+      kilojoules: activity.kilojoules,
+      average_heartrate: activity.average_heartrate,
+      max_heartrate: activity.max_heartrate
+    }));
+
+    try {
+      setIsStravaAnalysisLoading(true);
+      const response = await axios.post('/api/chatgpt-analysis', { content: stravaAnalysisPrompt, data: simplifiedStravaActivities });
+      // Handle the response
+      if (response.data.choices && response.data.choices.length > 0) {
+        setStravaAnalysisResult(response.data.choices[0].message.content);
+      } else {
+        setStravaAnalysisResult('No analysis available.');
+      }
+    } catch (error) {
+      console.error('Error in getStravaAnalysis:', error);
+      setStravaAnalysisResult('Error fetching analysis.');
+    }
+    setIsStravaAnalysisLoading(false);
+  };
+
+  // Function for Oura Readiness Data Analysis
+  const getOuraAnalysis = async () => {
+    setIsOuraAnalysisLoading(true);
+    try {
+      const response = await axios.post('/api/chatgpt-analysis', { content: ouraAnalysisPrompt, data: readinessData });
+      // Handle the response for Oura
+      if (response.data.choices && response.data.choices.length > 0) {
+        setOuraAnalysisResult(response.data.choices[0].message.content);
+      } else {
+        setOuraAnalysisResult('No analysis available.');
+      }
+    } catch (error) {
+      console.error('Error in getOuraAnalysis:', error);
+      setOuraAnalysisResult('Error fetching analysis.');
+    }
+    setIsOuraAnalysisLoading(false);
+  };
+
+  useEffect(() => {
+    let interval: number | undefined;
+    if (isStravaAnalysisLoading) {
+      interval = window.setInterval(() => {
+        setStravaLoadingDots(dots => dots.length < 3 ? dots + '.' : '');
+      }, 500);
+    }
+    return () => {
+      if (interval !== undefined) clearInterval(interval);
+    };
+  }, [isStravaAnalysisLoading]);
+
+
+  useEffect(() => {
+    let interval: number | undefined;
+    if (isOuraAnalysisLoading) {
+      interval = window.setInterval(() => {
+        setOuraLoadingDots(dots => dots.length < 3 ? dots + '.' : '');
+      }, 500);
+    }
+    return () => {
+      if (interval !== undefined) clearInterval(interval);
+    };
+  }, [isOuraAnalysisLoading]);
+
 
   useEffect(() => {
     // Fetch Strava authentication status
@@ -80,35 +205,76 @@ export default function Home() {
       <Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
 
       <div id="datePicker">
-        <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker"/>
-        <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker"/>
+        <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
+        <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
       </div>
-
       {isStravaAuthed && (
-        <div>
-            <ClientStravaActivitiesChart 
-            startDate={startDate} 
-            endDate={endDate} 
-            stravaData={stravaActivities} 
-            isLoading={isStravaLoading} 
-          />
+        <div className="strava-analysis-container">
+          <div className="strava-chart">
+            <StravaChart
+              processedData={processedData}
+              isLoading={isStravaLoading}
+            />
+          </div>
+
+          <div className="analysis-section">
+            <div className="button-container">
+              <a href="#"
+                onClick={(e) => {
+                  if (!isStravaAnalysisLoading) {
+                    e.preventDefault();
+                    getStravaAnalysis();
+                  }
+                }}
+                className={`analyze-button ${isStravaAnalysisLoading ? 'disabled' : ''}`}>
+                {isStravaAnalysisLoading ? <>Analysing<span className="loading-dots">{stravaLoadingDots}</span></> : <><img src="/sparkler.png" alt="Sparkles" />Analyse</>}
+              </a>
+            </div>
+            <StravaAnalysis
+              stravaData={stravaActivities}
+              analysis={stravaAnalysisResult}
+              isLoading={isStravaAnalysisLoading}
+              loadingDots={loadingDots}
+            />
+          </div>
         </div>
       )}
-
       {isOuraAuthed && (
         <div>
-          <ReadinessChart startDate={startDate} endDate={endDate} />
-          <div className="content-container">
-            <div className="graph-container">
+          <div className="strava-analysis-container">
+            <div className="strava-chart">
+              <ReadinessChart startDate={startDate} endDate={endDate} readinessData={readinessData} />
+            </div>
+            <div className="analysis-section">
+              <div className="button-container">
+                <a href="#" onClick={(e) => { if (!isOuraAnalysisLoading) { e.preventDefault(); getOuraAnalysis(); } }}
+                  className={`analyze-button ${isOuraAnalysisLoading ? 'disabled' : ''}`}>
+                  {isOuraAnalysisLoading ? <>Analysing<span className="loading-dots">{ouraLoadingDots}</span></> : <><img src="/sparkler.png" alt="Sparkles" />Analyse</>}
+                </a>
+              </div>
+              <ReadinessAnalysis
+                readinessData={readinessData}
+                analysis={ouraAnalysisResult}
+                isLoading={isOuraAnalysisLoading}
+                loadingDots={loadingDots}
+              />
+            </div>
+          </div>
+
+
+          <div className="strava-analysis-container">
+            <div className="strava-chart">
               <ActivityChart startDate={startDate} endDate={endDate} />
             </div>
-            <div className="graph-container">
+            <div className="strava-chart">
               <SleepChart startDate={startDate} endDate={endDate} />
             </div>
           </div>
         </div>
+
       )}
       <div id="footer"><Footer /></div>
     </div>
   );
+
 }

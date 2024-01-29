@@ -129,13 +129,13 @@ const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
                                 grid: {
                                     display: false
                                 },
-                                }
-                                },
-                                plugins: {
-                                    tooltip: {
-                                      enabled: true,
-                                    }
-                                  }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                enabled: true,
+                            }
+                        }
                     }
                 });
             }
@@ -153,9 +153,9 @@ const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
                 chartInstanceRef.current.resize();
             }
         };
-    
+
         window.addEventListener('resize', handleResize);
-    
+
         return () => {
             window.removeEventListener('resize', handleResize);
         };
@@ -166,11 +166,13 @@ const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
             {isLoading ? (
                 <div><Loading /></div> // Replace with a spinner or loading component
             ) : (
-                <canvas ref={chartRef} />
+                <div className="graph-container">
+                    <canvas ref={chartRef} />
+                </div>
             )}
         </div>
     );
-    
+
 };
 
 export default SleepChart;
