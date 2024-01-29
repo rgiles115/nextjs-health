@@ -46,9 +46,6 @@ export default function Home() {
   const [stravaLoadingDots, setStravaLoadingDots] = useState('');
   const [ouraLoadingDots, setOuraLoadingDots] = useState('');
 
-
-
-
   const getCookie = (name: string): string | undefined => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -61,9 +58,6 @@ export default function Home() {
 
   const stravaAnalysisPrompt = `Analyse the following Strava cycling data for an amatuer
   cyclist, and provide recommendations from the point of view of a cycling coach.
-  Do not summarize the data itself, but provide informed recommendations for
-  improving performance. Focus on aspects such as training intensity, volume, rest,
-  and potential areas of improvement.
   The data includes a range of metrics for each activity like distance,
   elevation gain, max watts, average watts, and moving time. Keep the response very short.`;
 
