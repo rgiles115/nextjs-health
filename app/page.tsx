@@ -20,6 +20,7 @@ import StravaChart from './components/StravaChart'; // Adjust the path as necess
 import useProcessStravaData from './components/useProcessStravaData'; // Adjust the path as necessary
 import useFetchOuraData from './components/useFetchOuraData'; // Adjust the path as necessary
 import ReadinessAnalysis from './components/ReadinessAnalysis';
+import NumberContainers from './components/NumberContainers';
 
 
 export default function Home() {
@@ -44,6 +45,7 @@ export default function Home() {
   const [isOuraAnalysisLoading, setIsOuraAnalysisLoading] = useState(false);
   const [stravaLoadingDots, setStravaLoadingDots] = useState('');
   const [ouraLoadingDots, setOuraLoadingDots] = useState('');
+
 
 
 
@@ -73,14 +75,26 @@ export default function Home() {
 
   // Function for Strava Data Analysis
   const getStravaAnalysis = async () => {
+    if (!isStravaAuthed) {
+      console.error('Not authenticated for Strava.');
+      return;
+    }
+
+    if (!Array.isArray(stravaActivities) || stravaActivities.length === 0) {
+      console.error('Strava activities data is not available.');
+      return;
+    }
+
     setIsStravaAnalysisLoading(true);
 
-    if (!stravaActivities) {
-      console.error('Strava activities data is null or undefined');
+    // Check if stravaActivities is an array and contains data
+    if (!Array.isArray(stravaActivities) || stravaActivities.length === 0) {
+      console.error('Strava activities data is null, undefined, or not an array');
       setIsStravaAnalysisLoading(false);
       return;
     }
 
+    // Simplify the stravaActivities data
     const simplifiedStravaActivities = stravaActivities.map(activity => ({
       name: activity.name,
       distance: activity.distance,
@@ -105,8 +119,12 @@ export default function Home() {
     }));
 
     try {
-      setIsStravaAnalysisLoading(true);
-      const response = await axios.post('/api/chatgpt-analysis', { content: stravaAnalysisPrompt, data: simplifiedStravaActivities });
+      // Make the API call
+      const response = await axios.post('/api/chatgpt-analysis', {
+        content: stravaAnalysisPrompt,
+        data: simplifiedStravaActivities
+      });
+
       // Handle the response
       if (response.data.choices && response.data.choices.length > 0) {
         setStravaAnalysisResult(response.data.choices[0].message.content);
@@ -117,12 +135,32 @@ export default function Home() {
       console.error('Error in getStravaAnalysis:', error);
       setStravaAnalysisResult('Error fetching analysis.');
     }
+
+    // Reset loading state
     setIsStravaAnalysisLoading(false);
   };
 
+
   // Function for Oura Readiness Data Analysis
   const getOuraAnalysis = async () => {
+    if (!isOuraAuthed) {
+      console.error('Not authenticated for Oura.');
+      return;
+    }
+
+    if (!readinessData) {
+      console.error('Readiness data is not available.');
+      return;
+    }
+
     setIsOuraAnalysisLoading(true);
+
+    // Assuming readinessData is the data used for Oura analysis
+    if (!readinessData) {
+      console.error('Readiness data is null or undefined');
+      setIsOuraAnalysisLoading(false);
+      return;
+    }
     try {
       const response = await axios.post('/api/chatgpt-analysis', { content: ouraAnalysisPrompt, data: readinessData });
       // Handle the response for Oura
@@ -208,38 +246,44 @@ export default function Home() {
         <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
         <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
       </div>
-      {isStravaAuthed && (
-        <div className="strava-analysis-container">
-          <div className="strava-chart">
-            <StravaChart
-              processedData={processedData}
-              isLoading={isStravaLoading}
-            />
-          </div>
-
-          <div className="analysis-section">
-            <div className="button-container">
-              <a href="#"
-                onClick={(e) => {
-                  if (!isStravaAnalysisLoading) {
-                    e.preventDefault();
-                    getStravaAnalysis();
-                  }
-                }}
-                className={`analyze-button ${isStravaAnalysisLoading ? 'disabled' : ''}`}>
-                {isStravaAnalysisLoading ? <>Analysing<span className="loading-dots">{stravaLoadingDots}</span></> : <><img src="/sparkler.png" alt="Sparkles" />Analyse</>}
-              </a>
+      {isStravaAuthed && stravaData && (
+        <div>
+          <NumberContainers
+            totalDistance={totalDistance}
+            totalElevationGain={totalElevationGain}
+          />
+          <div className="strava-analysis-container">
+            <div className="strava-chart">
+              <StravaChart
+                processedData={processedData}
+                isLoading={isStravaLoading}
+              />
             </div>
-            <StravaAnalysis
-              stravaData={stravaActivities}
-              analysis={stravaAnalysisResult}
-              isLoading={isStravaAnalysisLoading}
-              loadingDots={loadingDots}
-            />
+
+            <div className="analysis-section">
+              <div className="button-container">
+                <a href="#"
+                  onClick={(e) => {
+                    if (!isStravaAnalysisLoading) {
+                      e.preventDefault();
+                      getStravaAnalysis();
+                    }
+                  }}
+                  className={`analyze-button ${isStravaAnalysisLoading ? 'disabled' : ''}`}>
+                  {isStravaAnalysisLoading ? <>Analysing<span className="loading-dots">{stravaLoadingDots}</span></> : <><img src="/sparkler.png" alt="Sparkles" />Analyse</>}
+                </a>
+              </div>
+              <StravaAnalysis
+                stravaData={stravaActivities}
+                analysis={stravaAnalysisResult}
+                isLoading={isStravaAnalysisLoading}
+                loadingDots={loadingDots}
+              />
+            </div>
           </div>
         </div>
       )}
-      {isOuraAuthed && (
+      {isOuraAuthed && readinessData && (
         <div>
           <div className="strava-analysis-container">
             <div className="strava-chart">

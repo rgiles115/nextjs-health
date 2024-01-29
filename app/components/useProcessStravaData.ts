@@ -5,12 +5,12 @@ import { Activity } from '../types/activityTypes';
 import { StravaActivity } from '../types/StravaInterface';
 
 const useProcessStravaData = (stravaData: StravaActivity[] | null, startDate: Date, endDate: Date): { processedData: Activity[], totalDistance: number, totalElevationGain: number } => {
-    const [processedData, setProcessedData] = useState<Activity[]>([]);
+  const [processedData, setProcessedData] = useState<Activity[]>([]);
     const [totalDistance, setTotalDistance] = useState<number>(0);
     const [totalElevationGain, setTotalElevationGain] = useState<number>(0);
   
     useEffect(() => {
-      if (stravaData) {
+      if (Array.isArray(stravaData) && stravaData.length > 0) {
         let totalDistanceTemp = 0;
         let elevationGainTemp = 0;
         const dateSeries = eachDayOfInterval({ start: startDate, end: endDate }).map(day =>

@@ -262,6 +262,7 @@ h1 .fa-heartbeat {
   margin: 20px; /* Adjust as needed */
   border: 1px solid #ddd;
   border-radius: 20px;
+  max-height: 400px; /* Limit the height to the parent's height */
 }
 
 .analysis-container {
@@ -291,7 +292,7 @@ h1 .fa-heartbeat {
   overflow: auto;
   padding: 20px;
   overflow-y: auto; /* Enable vertical scrolling */
-  max-height: 240px; /* Limit the height to the parent's height */
+  max-height: 400px; /* Limit the height to the parent's height */
   overflow: auto; /* This will add a scrollbar when content overflows */
 }
 
@@ -306,7 +307,7 @@ h1 .fa-heartbeat {
   overflow: auto;
   padding: 20px;
   overflow-y: auto; /* Enable vertical scrolling */
-  max-height: 240px; /* Limit the height to the parent's height */
+  max-height: 400px; /* Limit the height to the parent's height */
   overflow: auto; /* This will add a scrollbar when content overflows */
 }
 
