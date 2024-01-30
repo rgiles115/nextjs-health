@@ -26,7 +26,6 @@ import NumberContainers from './components/NumberContainers';
 export default function Home() {
   // State declarations
   const currentDate = new Date();
-  const firstDayOfThisYear = new Date(new Date().getFullYear(), 0, 1);
   const sevenDaysAgo = new Date(currentDate.getTime() - (7 * 24 * 60 * 60 * 1000));
   const [startDate, setStartDate] = useState(sevenDaysAgo);
   const [endDate, setEndDate] = useState(currentDate);
@@ -236,7 +235,7 @@ export default function Home() {
 
       <Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
 
-      {(isStravaAuthed) || (isOuraAuthed) && (
+      {(isStravaAuthed || isOuraAuthed) && (
       <div id="datePicker">
         <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
         <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />

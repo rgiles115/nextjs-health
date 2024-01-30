@@ -278,7 +278,6 @@ h1 .fa-heartbeat {
   margin-bottom: 20px; /* Space before Oura graphs */
   margin-right: 20px;
   align-items: stretch; /* This will make children stretch to fill the container height */
-
 }
 
 .strava-chart {
@@ -289,12 +288,7 @@ h1 .fa-heartbeat {
   max-height: 400px; /* Limit the height to the parent's height */
 }
 
-.analysis-container {
-  flex: 1;
-  margin: 20px; /* Adjust as needed */
-  border: 1px solid red;
-  border-radius: 20px;
-}
+
 
 .analysis-section {
   flex: 1;
@@ -316,7 +310,8 @@ h1 .fa-heartbeat {
   overflow: auto;
   padding: 20px;
   overflow-y: auto; /* Enable vertical scrolling */
-  max-height: 400px; /* Limit the height to the parent's height */
+  overflow-x: hidden;
+  height: 240px; /* Limit the height to the parent's height */
   overflow: auto; /* This will add a scrollbar when content overflows */
 }
 
@@ -331,7 +326,8 @@ h1 .fa-heartbeat {
   overflow: auto;
   padding: 20px;
   overflow-y: auto; /* Enable vertical scrolling */
-  max-height: 400px; /* Limit the height to the parent's height */
+  overflow-x: hidden;
+  height: 240px; /* Limit the height to the parent's height */
   overflow: auto; /* This will add a scrollbar when content overflows */
 }
 
