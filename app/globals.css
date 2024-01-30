@@ -133,6 +133,30 @@ h1 .fa-heartbeat {
   margin-bottom: 10px; /* Space between icon and number */
 }
 
+.empty-state-container {
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  justify-content: center; /* Vertically centers children in the container */
+  align-items: center; /* Horizontally centers children in the container */
+  height: 20vh; /* Adjust as needed */
+  width: 60vw; /* Adjust as needed */
+  text-align: center; /* Centers text of all child elements */
+}
+
+.empty-state-message-header {
+  font-size: 1.8em;
+  font-weight: lighter;
+  /* Any other styles you need */
+}
+
+.empty-state-message {
+  font-size: 1.4em;
+  font-weight: lighter;
+  /* Any other styles you need */
+}
+
 .total-distance {
   text-align: center;
 }

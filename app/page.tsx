@@ -236,10 +236,25 @@ export default function Home() {
 
       <Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
 
+      {(isStravaAuthed) || (isOuraAuthed) && (
       <div id="datePicker">
         <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
         <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
       </div>
+      )}
+
+      {/* Empty state message */}
+      {!isStravaAuthed && !isOuraAuthed && (
+        <div className="empty-state-container">
+          <div className="empty-state-message-header">
+            <p>My Health Data works when you connect to your exercise and health data.</p>
+          </div>
+          <div className="empty-state-message">
+            <p>It only stores this in your browser, so it remains secure and private.
+              Please authenticate with Strava and/or Oura in the menu at the top right to start.</p>
+          </div>
+        </div>
+      )}
       {isStravaAuthed && stravaData && (
         <div>
           <NumberContainers
