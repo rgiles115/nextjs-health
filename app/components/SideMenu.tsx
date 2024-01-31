@@ -61,7 +61,7 @@ const SideMenu: React.FC = () => {
           {/* Oura authentication link */}
           <li>
             <a href={ouraAuthURL} className="auth-button" id="authOuraButton">
-              Authenticate with Oura
+              Connect with Oura
             </a>
           </li>
         </ul>

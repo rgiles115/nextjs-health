@@ -1,6 +1,8 @@
 import React from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMountain, faRoad } from "@fortawesome/free-solid-svg-icons";
+import dynamic from 'next/dynamic';
+
 
 interface NumberContainersProps {
     totalDistance: number;

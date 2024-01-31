@@ -220,7 +220,7 @@ export default function Home() {
 
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <SideMenu />
       <Head>
         <title>My Health Data</title>
@@ -236,10 +236,10 @@ export default function Home() {
       <Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
 
       {(isStravaAuthed || isOuraAuthed) && (
-      <div id="datePicker">
-        <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
-        <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
-      </div>
+        <div id="datePicker">
+          <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
+          <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
+        </div>
       )}
 
       {/* Empty state message */}
@@ -250,7 +250,7 @@ export default function Home() {
           </div>
           <div className="empty-state-message">
             <p>It only stores this in your browser, so it remains secure and private.
-              Please authenticate with Strava and/or Oura in the menu at the top right to start.</p>
+              To get started, please connect Strava or Oura in the menu at the top right.</p>
           </div>
         </div>
       )}
