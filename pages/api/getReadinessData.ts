@@ -22,6 +22,7 @@ interface ReadinessEntry {
     temperature_deviation: number;
     temperature_trend_deviation: number | null;
     timestamp: string;
+    sleepData?: any; // Add this line
 }
 
 interface Contributors {
@@ -58,24 +59,52 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const ouraApiUrl = `https://api.ouraring.com/v2/usercollection/daily_readiness?start_date=${start_date}&end_date=${end_date}`;
 
     try {
-        const response = await fetch(ouraApiUrl, {
+        const readinessResponse = await fetch(ouraApiUrl, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
-        if (!response.ok) {
-            res.status(response.status).json({ error: `Error from Oura API: ${response.statusText}` });
+        if (!readinessResponse.ok) {
+            res.status(readinessResponse.status).json({ error: `Error from Oura API: ${readinessResponse.statusText}` });
             return;
         }
 
-        const data: ReadinessData = await response.json();
+        const readinessData: ReadinessData = await readinessResponse.json();
+        
+        // Fetch individual sleep data for each readiness entry
+        for (const entry of readinessData.data) {
+            const sleepData = await fetchSleepData(entry.id, token);
+            entry.sleepData = sleepData;
+        }
 
-        res.status(200).json(processReadinessData(data));
+        res.status(200).json(processReadinessData(readinessData));
     } catch (error) {
-        console.error('Error fetching readiness data:', error);
+        // console.error('Error fetching readiness data:', error);
         res.status(500).json({ error: 'Internal Server Error' });
         return;
     }
 }
+
+// Function to fetch individual sleep data
+async function fetchSleepData(sleepId: string, token: string) {
+    const sleepApiUrl = `https://api.ouraring.com/v2/usercollection/sleep/${sleepId}`; // Ensure this is the correct endpoint
+    try {
+        const response = await fetch(sleepApiUrl, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+            // console.error(`Error fetching sleep data for ID ${sleepId}: Status ${response.status}`);
+            const responseBody = await response.text(); // Get the response body as text
+            // console.error(`Response body: ${responseBody}`); // Log the response body
+            return null;
+        }
+        return await response.json();
+    } catch (error) {
+        // console.error(`Error fetching sleep data for ID ${sleepId}:`, error);
+        return null;
+    }
+}
+
 
 function processReadinessData(data: ReadinessData): ReadinessData {
     data.data.forEach((entry: ReadinessEntry) => {

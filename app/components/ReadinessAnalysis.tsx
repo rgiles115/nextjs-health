@@ -27,7 +27,7 @@ interface ReadinessEntry {
 const ReadinessAnalysis: React.FC<ReadinessAnalysisProps> = ({ readinessData, analysis, isLoading, loadingDots }) => {
 
     return (
-        <div className="ReadinessAnalysis">
+        <div className="flex-grow flex flex-col items-stretch border border-gray-200 mb-5 rounded-lg overflow-auto py-5 px-5 h-[240px]">
             {analysis && (
                 <Typewriter
                     options={{

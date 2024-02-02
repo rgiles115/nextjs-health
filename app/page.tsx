@@ -11,6 +11,7 @@ import { StravaActivity } from '../app/types/StravaInterface';
 import ActivityChart from './components/ActivityChart';
 import SleepChart from './components/SleepChart';
 import ReadinessChart from './components/ReadinessChart';
+import HRVChart from './components/HRVChart';
 import StravaAnalysis from './components/StravaAnalysis';
 import Footer from './components/Footer';
 import Script from 'next/script';
@@ -21,6 +22,8 @@ import useProcessStravaData from './components/useProcessStravaData'; // Adjust 
 import useFetchOuraData from './components/useFetchOuraData'; // Adjust the path as necessary
 import ReadinessAnalysis from './components/ReadinessAnalysis';
 import NumberContainers from './components/NumberContainers';
+import useFetchHrvData from './components/useFetchHrvData'; // Adjust the path as necessary
+import HRVAnalysis from './components/HRVAnalysis';
 
 
 export default function Home() {
@@ -32,18 +35,29 @@ export default function Home() {
   const [isStravaAuthed, setIsStravaAuthed] = useState(false);
   const [isOuraAuthed, setIsOuraAuthed] = useState(false);
   const [stravaData, setStravaData] = useState<StravaActivity[]>([]);
-  const { data: stravaActivities, isLoading: isStravaLoading } = useFetchStravaActivities(startDate, endDate);
   const [analysis, setAnalysis] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingDots, setLoadingDots] = useState('');
+
+    // Use custom hooks for fetching data, which manage their own loading states
+// Assuming your custom hooks return { data, loading, error }
+const { data: stravaActivities, isLoading: isStravaLoading } = useFetchStravaActivities(startDate, endDate);
+const { data: readinessData, isLoading: isReadinessLoading } = useFetchOuraData(startDate, endDate);
+const { data: hrvData, isLoading: isHrvLoading } = useFetchHrvData(startDate, endDate);
+
+
+
   const { processedData, totalDistance, totalElevationGain } = useProcessStravaData(stravaActivities, startDate, endDate);
-  const { data: readinessData, loading: readinessLoading, error: readinessError } = useFetchOuraData(startDate, endDate);
   const [stravaAnalysisResult, setStravaAnalysisResult] = useState('');
   const [ouraAnalysisResult, setOuraAnalysisResult] = useState('');
+  const [hrvAnalysisResult, setHrvAnalysisResult] = useState('');
   const [isStravaAnalysisLoading, setIsStravaAnalysisLoading] = useState(false);
   const [isOuraAnalysisLoading, setIsOuraAnalysisLoading] = useState(false);
   const [stravaLoadingDots, setStravaLoadingDots] = useState('');
   const [ouraLoadingDots, setOuraLoadingDots] = useState('');
+
+  
+
 
   const getCookie = (name: string): string | undefined => {
     const value = `; ${document.cookie}`;
@@ -65,7 +79,12 @@ export default function Home() {
   heart rate, and body temperature readings. Please use is like a professional exercise
   coach would use this type of information.  Keep the response very short.`;
 
+  const hrvAnalysisPrompt = `Analyse the following HRV data and provide insights. The data includes
+  average heart rate variability (HRV) readings over time. Please provide a concise and
+  professional analysis.`;
 
+
+  
   // Function for Strava Data Analysis
   const getStravaAnalysis = async () => {
     if (!isStravaAuthed) {
@@ -169,6 +188,39 @@ export default function Home() {
     setIsOuraAnalysisLoading(false);
   };
 
+  const getHrvAnalysis = async () => {
+    if (!isOuraAuthed) {
+      console.error('Not authenticated for Oura.');
+      return;
+    }
+
+    if (!hrvData) {
+      console.error('HRV data is not available.');
+      return;
+    }
+
+    setIsOuraAnalysisLoading(true); // Reuse the Oura loading state or create a new one for HRV
+
+    try {
+      const response = await axios.post('/api/chatgpt-analysis', {
+        content: hrvAnalysisPrompt,
+        data: hrvData
+      });
+
+      if (response.data.choices && response.data.choices.length > 0) {
+        setHrvAnalysisResult(response.data.choices[0].message.content); // You may want to use a separate state for HRV analysis result
+      } else {
+        setHrvAnalysisResult('No analysis available.');
+      }
+    } catch (error) {
+      console.error('Error in getHrvAnalysis:', error);
+      setHrvAnalysisResult('Error fetching analysis.');
+    }
+
+    setIsOuraAnalysisLoading(false); // Or set the HRV loading state to false
+  };
+
+
   useEffect(() => {
     let interval: number | undefined;
     if (isStravaAnalysisLoading) {
@@ -260,15 +312,17 @@ export default function Home() {
             totalDistance={totalDistance}
             totalElevationGain={totalElevationGain}
           />
-          <div className="strava-analysis-container">
-            <div className="strava-chart">
+          <h2 className="text-2xl font-semibold mb-2 px-5">Strava Overview</h2>
+
+          <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
+            <div className="flex-1 m-5 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
               <StravaChart
                 processedData={processedData}
                 isLoading={isStravaLoading}
               />
             </div>
 
-            <div className="analysis-section">
+            <div className="p-4 w-full md:w-1/2">
               <div className="button-container">
                 <a href="#"
                   onClick={(e) => {
@@ -291,13 +345,14 @@ export default function Home() {
           </div>
         </div>
       )}
-      {isOuraAuthed && readinessData && (
+      {isOuraAuthed && readinessData && hrvData && (
         <div>
-          <div className="strava-analysis-container">
-            <div className="strava-chart">
-              <ReadinessChart startDate={startDate} endDate={endDate} readinessData={readinessData} />
+          <h2 className="text-2xl font-semibold mb-2 px-5">Oura Readiness</h2>
+          <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
+            <div className="flex-1 m-5 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
+            <ReadinessChart readinessData={readinessData} isLoading={isReadinessLoading} startDate={startDate} endDate={endDate} />
             </div>
-            <div className="analysis-section">
+            <div className="p-4 w-full md:w-1/2">
               <div className="button-container">
                 <a href="#" onClick={(e) => { if (!isOuraAnalysisLoading) { e.preventDefault(); getOuraAnalysis(); } }}
                   className={`analyze-button ${isOuraAnalysisLoading ? 'disabled' : ''}`}>
@@ -313,17 +368,46 @@ export default function Home() {
             </div>
           </div>
 
+          <h2 className="text-2xl font-semibold mb-2 px-5">Oura HRV</h2>
 
-          <div className="strava-analysis-container">
-            <div className="strava-chart">
-              <ActivityChart startDate={startDate} endDate={endDate} />
+          <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
+            <div className="flex-1 m-5 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
+            <HRVChart hrvData={hrvData} isLoading={isHrvLoading} />
             </div>
-            <div className="strava-chart">
-              <SleepChart startDate={startDate} endDate={endDate} />
+            <div className="p-4 w-full md:w-1/2">
+              <div className="button-container">
+                <a href="#" onClick={(e) => { if (!isOuraAnalysisLoading) { e.preventDefault(); getHrvAnalysis(); } }}
+                  className={`analyze-button ${isOuraAnalysisLoading ? 'disabled' : ''}`}>
+                  {isOuraAnalysisLoading ? <>Analysing<span className="loading-dots">{ouraLoadingDots}</span></> : <><img src="/sparkler.png" alt="Sparkles" />Analyse</>}
+                </a>
+              </div>
+              <div className="analysis-result">
+                <HRVAnalysis
+                  hrvData={hrvData}
+                  analysis={hrvAnalysisResult}
+                  isLoading={isOuraAnalysisLoading}
+                  loadingDots={loadingDots}
+                />
+              </div>
             </div>
           </div>
-        </div>
 
+          <h2 className="text-2xl font-semibold mb-2 px-5">Oura Activity & Sleep</h2>
+
+          <div className="flex flex-wrap -m-4 px-2.5">
+            <div className="w-full md:w-1/2 p-4">
+              <div className="m-1 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
+                <ActivityChart startDate={startDate} endDate={endDate} />
+              </div>
+            </div>
+            <div className="w-full md:w-1/2 p-4">
+              <div className="m-1 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
+                <SleepChart startDate={startDate} endDate={endDate} />
+              </div>
+            </div>
+          </div>
+
+        </div>
       )}
       <div id="footer"><Footer /></div>
     </div>

@@ -48,7 +48,7 @@ const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
         const formattedStartDate = startDate.toISOString().split('T')[0];
         const formattedEndDate = endDate.toISOString().split('T')[0];
 
-        fetch(`/api/getSleepData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`)
+        fetch(`/api/getDailySleepData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`)
             .then(response => response.json())
             .then(data => {
                 const formattedDates = data.data.map((entry: SleepEntry) => format(new Date(entry.timestamp), 'do MMM yyyy'));

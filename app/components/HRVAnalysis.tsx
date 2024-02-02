@@ -1,19 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Typewriter from 'typewriter-effect';
-import { StravaActivity } from '../types/StravaInterface';
 
-interface StravaAnalysisProps {
-    stravaData: StravaActivity[] | null;
+interface HRVData {
+    dates: string[];
+    hrv: number[];
+}
+
+interface HRVAnalysisProps {
+    hrvData: HRVData | null;
     analysis: string;
     isLoading: boolean;
     loadingDots: string;
 }
 
-const StravaAnalysis: React.FC<StravaAnalysisProps> = ({ stravaData, analysis, isLoading, loadingDots }) => {
 
+const HRVAnalysis: React.FC<HRVAnalysisProps> = ({ hrvData, analysis, isLoading, loadingDots }) => {
     return (
         <div className="flex-grow flex flex-col items-stretch border border-gray-200 mb-5 rounded-lg overflow-auto py-5 px-5 h-[240px]">
-            {analysis && (
+            {isLoading ? <div>Loading{loadingDots}</div> : analysis && (
                 <Typewriter
                     options={{
                         strings: analysis,
@@ -27,4 +31,4 @@ const StravaAnalysis: React.FC<StravaAnalysisProps> = ({ stravaData, analysis, i
     );
 };
 
-export default StravaAnalysis;
+export default HRVAnalysis;

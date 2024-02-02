@@ -3,10 +3,11 @@ import { format } from 'date-fns'; // Ensure date-fns is installed and imported 
 
 const useFetchOuraData = (startDate, endDate) => {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    setLoading(true);
     const fetchData = async () => {
       try {
         const formattedStartDate = startDate.toISOString().split('T')[0];
@@ -40,7 +41,7 @@ const useFetchOuraData = (startDate, endDate) => {
     fetchData();
   }, [startDate, endDate]); // Dependency array includes startDate and endDate
 
-  return { data, loading, error };
+  return { data, isLoading, error };
 };
 
 export default useFetchOuraData;

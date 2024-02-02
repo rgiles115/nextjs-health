@@ -6,8 +6,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import dynamic from 'next/dynamic';
 import ReadinessAnalysis from './ReadinessAnalysis';
 
-const Loading = dynamic(() => import('./Loading'), { ssr: false });
-
 Chart.register(...registerables);
 
 interface ReadinessChartProps {
@@ -19,6 +17,7 @@ interface ReadinessChartProps {
         hrvBalance: number[];
         bodyTemperature: number[];
     } | null;
+    isLoading: boolean;
 }
 
 interface ReadinessEntry {
@@ -30,16 +29,13 @@ interface ReadinessEntry {
     };
 }
 
-interface ReadinessChartProps {
-    startDate: Date;
-    endDate: Date;
-}
+const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, readinessData, isLoading }) => {
+    const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
-const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, readinessData }) => {
     // Update state to include new data points
     const chartRef = useRef<HTMLCanvasElement>(null);
     const chartInstanceRef = useRef<Chart | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
+    
 
     useEffect(() => {
         if (!readinessData) {
@@ -47,7 +43,7 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
             return;
         }
         if (readinessData.dates.length > 0 && chartRef.current) {
-            console.log("Readiness:", readinessData);
+            console.log(isLoading)
             const ctx = chartRef.current.getContext('2d');
             if (ctx) {
                 if (chartInstanceRef.current) {
@@ -134,7 +130,7 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
     return (
         <div>
             {isLoading ? (
-                <div><Loading /></div> // Replace with a spinner or loading component
+                <Loading /> // Use the Loading component when isLoading is true
             ) : (
                 <div className="graph-container">
                     <canvas ref={chartRef} />
