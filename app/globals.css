@@ -19,15 +19,10 @@ body {
   font-family: Arial, sans-serif;
 }
 
-.header {
-  background-color: #fff;
-  text-align: center;
-  padding: 20px 0;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.dynamic-font-size {
+  font-size: clamp(1.5rem, 5vw, 2.5rem); /* Adjust values as needed */
 }
+
 
 .footer {
   display: flex;
@@ -49,16 +44,7 @@ body {
 }
 
 
-#datePicker {
-  display: flex;
-  justify-content: left;
-  background: #fff;
-  border-radius: 15px;
-  border: 1px solid #ccc;
-  width: 360px;
-  margin-left: 20px;
-  margin-top: 20px
-}
+
 
 .custom-datepicker {
   background: url('/caret-down-regular.svg') no-repeat right;
@@ -133,47 +119,7 @@ h1 .fa-heartbeat {
   margin-bottom: 10px; /* Space between icon and number */
 }
 
-.empty-state-container {
-  margin-left: auto;
-  margin-right: auto;
-  display: flex;
-  flex-direction: column; /* Stack children vertically */
-  justify-content: center; /* Vertically centers children in the container */
-  align-items: center; /* Horizontally centers children in the container */
-  height: 20vh; /* Adjust as needed */
-  width: 60vw; /* Adjust as needed */
-  text-align: center; /* Centers text of all child elements */
-}
 
-.empty-state-message-header {
-  font-size: 1.8em;
-  font-weight: lighter;
-  /* Any other styles you need */
-}
-
-.empty-state-message {
-  font-size: 1.4em;
-  font-weight: lighter;
-  /* Any other styles you need */
-}
-
-.total-distance {
-  text-align: center;
-}
-
-.total-value {
-  font-size: 2.5rem; /* Large font size for the total value */
-  font-weight: bold; /* Making the total value bold */
-  color: #000; /* Color for the number */
-  margin-bottom: 5px; /* Space between value and title */
-}
-
-.total-title {
-  font-size: 1rem; /* Smaller font size for the title */
-  text-transform: uppercase; /* Capitalize the title */
-  color: #6c757d; /* A grey color for the title */
-  letter-spacing: 1px; /* More spacing between letters */
-}
 
 .divider {
   height: 1px;
@@ -182,28 +128,6 @@ h1 .fa-heartbeat {
   margin-top: 15px; /* Space between title and divider */
 }
 
-#totalTitle {
-  margin-top: 10px;  /* Adjust the value as needed */
-  font-size: 1em;      /* Increases the font size, adjust as needed */
-  text-align: center;
-  text-transform: uppercase;
-}
-
-#totalValue {
-  font-family: 'Roboto Mono', monospace;
-  margin-top: 0px;  /* Adjust the value as needed */
-  font-weight: bold;     /* Makes the text bold */
-  font-size: 2.8em;      /* Increases the font size, adjust as needed */
-  text-align: center;
-  /* Add any other styles you need */
-}
-
-#totalElevationGain {
-  margin-top: 0px;  /* Adjust the value as needed */
-  font-weight: bold;     /* Makes the text bold */
-  font-size: 2em;      /* Increases the font size, adjust as needed */
-  text-align: center;
-}
 
 .button-container {
   text-align: center; /* Center the button */

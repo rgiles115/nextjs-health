@@ -39,11 +39,11 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingDots, setLoadingDots] = useState('');
 
-    // Use custom hooks for fetching data, which manage their own loading states
-// Assuming your custom hooks return { data, loading, error }
-const { data: stravaActivities, isLoading: isStravaLoading } = useFetchStravaActivities(startDate, endDate);
-const { data: readinessData, isLoading: isReadinessLoading } = useFetchOuraData(startDate, endDate);
-const { data: hrvData, isLoading: isHrvLoading } = useFetchHrvData(startDate, endDate);
+  // Use custom hooks for fetching data, which manage their own loading states
+  // Assuming your custom hooks return { data, loading, error }
+  const { data: stravaActivities, isLoading: isStravaLoading } = useFetchStravaActivities(startDate, endDate);
+  const { data: readinessData, isLoading: isReadinessLoading } = useFetchOuraData(startDate, endDate);
+  const { data: hrvData, isLoading: isHrvLoading } = useFetchHrvData(startDate, endDate);
 
 
 
@@ -56,7 +56,7 @@ const { data: hrvData, isLoading: isHrvLoading } = useFetchHrvData(startDate, en
   const [stravaLoadingDots, setStravaLoadingDots] = useState('');
   const [ouraLoadingDots, setOuraLoadingDots] = useState('');
 
-  
+
 
 
   const getCookie = (name: string): string | undefined => {
@@ -84,7 +84,7 @@ const { data: hrvData, isLoading: isHrvLoading } = useFetchHrvData(startDate, en
   professional analysis.`;
 
 
-  
+
   // Function for Strava Data Analysis
   const getStravaAnalysis = async () => {
     if (!isStravaAuthed) {
@@ -279,7 +279,8 @@ const { data: hrvData, isLoading: isHrvLoading } = useFetchHrvData(startDate, en
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="/style.css" />
       </Head>
-      <div className="header">
+      <div className="flex flex-col min-h-screen">
+      <div className="bg-white text-center py-5 sticky top-0 z-50 shadow-md">
         <h1>
           <FontAwesomeIcon icon={faHeartbeat} width="32" /> My Health Data
         </h1>
@@ -288,7 +289,7 @@ const { data: hrvData, isLoading: isHrvLoading } = useFetchHrvData(startDate, en
       <Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
 
       {(isStravaAuthed || isOuraAuthed) && (
-        <div id="datePicker">
+        <div id="datePicker" className="flex justify-start bg-white border border-gray-300 rounded-xl w-96 ml-5 mt-5">
           <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
           <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
         </div>
@@ -296,15 +297,17 @@ const { data: hrvData, isLoading: isHrvLoading } = useFetchHrvData(startDate, en
 
       {/* Empty state message */}
       {!isStravaAuthed && !isOuraAuthed && (
-        <div className="empty-state-container">
-          <div className="empty-state-message-header">
+          <main className="flex-1 pt-16 pb-16">
+        <div className="mx-auto flex flex-col justify-center items-center h-[20vh] w-[60vw] text-center">
+          <div className="empty-state-message-header text-[1.8em] font-light">
             <p>My Health Data works when you connect to your exercise and health data.</p>
           </div>
-          <div className="empty-state-message">
+          <div className="empty-state-message text-[1.4em] font-light">
             <p>It only stores this in your browser, so it remains secure and private.
               To get started, please connect Strava or Oura in the menu at the top right.</p>
           </div>
         </div>
+        </main>
       )}
       {isStravaAuthed && stravaData && (
         <div>
@@ -350,7 +353,7 @@ const { data: hrvData, isLoading: isHrvLoading } = useFetchHrvData(startDate, en
           <h2 className="text-2xl font-semibold mb-2 px-5">Oura Readiness</h2>
           <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
             <div className="flex-1 m-5 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
-            <ReadinessChart readinessData={readinessData} isLoading={isReadinessLoading} startDate={startDate} endDate={endDate} />
+              <ReadinessChart readinessData={readinessData} isLoading={isReadinessLoading} startDate={startDate} endDate={endDate} />
             </div>
             <div className="p-4 w-full md:w-1/2">
               <div className="button-container">
@@ -372,7 +375,7 @@ const { data: hrvData, isLoading: isHrvLoading } = useFetchHrvData(startDate, en
 
           <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
             <div className="flex-1 m-5 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
-            <HRVChart hrvData={hrvData} isLoading={isHrvLoading} />
+              <HRVChart hrvData={hrvData} isLoading={isHrvLoading} />
             </div>
             <div className="p-4 w-full md:w-1/2">
               <div className="button-container">
@@ -410,6 +413,7 @@ const { data: hrvData, isLoading: isHrvLoading } = useFetchHrvData(startDate, en
         </div>
       )}
       <div id="footer"><Footer /></div>
+    </div>
     </div>
   );
 

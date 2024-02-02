@@ -17,6 +17,13 @@ type AnalysisRequest = {
   data: any; // Consider using a more specific type if possible
 };
 
+// Function to estimate the number of tokens in a string
+function estimateTokenCount(text: string): number {
+  // Rough approximation: average English word length + 1 space as a delimiter
+  const averageWordLength = 5 + 1; 
+  return Math.ceil(text.length / averageWordLength);
+}
+
 // Function to send a message to OpenAI API
 const sendMessageToOpenAI = async (params: AnalysisRequest) => {
   const { content, data } = params;
@@ -63,19 +70,27 @@ const sendMessageToOpenAI = async (params: AnalysisRequest) => {
 
 // Edge Function handler
 export default async function handler(req: Request) {
-  // Parsing the JSON body from the request
   const body = await req.json();
   const { content, data } = body;
 
+  // Convert content and data to a string as it will be sent to the API
+  const combinedText = `${content} ${JSON.stringify(data)}`;
+  const estimatedTokens = estimateTokenCount(combinedText);
+
+  // Check if the estimated token count exceeds the limit (e.g., 4096 tokens for GPT-4)
+  if (estimatedTokens > 4096) { // Adjust the limit based on your model's specific limits
+    return new Response(JSON.stringify({ message: "Input data is too large." }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   try {
-    // Calling the sendMessageToOpenAI function with the request body
     const apiResponse = await sendMessageToOpenAI({ content, data });
-    // Sending the API response back to the client
     return new Response(JSON.stringify(apiResponse), {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
-    // Sending an error response in case of any issues
     return new Response(JSON.stringify({ message: "An error occurred while processing your request." }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

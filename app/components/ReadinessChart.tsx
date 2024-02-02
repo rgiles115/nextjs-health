@@ -43,7 +43,6 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
             return;
         }
         if (readinessData.dates.length > 0 && chartRef.current) {
-            console.log(isLoading)
             const ctx = chartRef.current.getContext('2d');
             if (ctx) {
                 if (chartInstanceRef.current) {
