@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import dynamic from 'next/dynamic';
@@ -8,13 +8,13 @@ const Loading = dynamic(() => import('./Loading'), { ssr: false });
 Chart.register(...registerables);
 
 interface HRVData {
-    dates: string[];
-    hrv: number[];
+    date: string; // The date of the HRV reading, in a suitable format for your application
+    averageHRV: number; // The average HRV value for that date
 }
 
 interface HRVChartProps {
-    hrvData: HRVData;
-    isLoading: boolean; // Added isLoading prop
+    hrvData: HRVData[];
+    isLoading: boolean; // Ensure this accepts a boolean
 }
 
 const HRVChart: React.FC<HRVChartProps> = ({ hrvData, isLoading }) => {
@@ -22,7 +22,7 @@ const HRVChart: React.FC<HRVChartProps> = ({ hrvData, isLoading }) => {
     const chartInstanceRef = useRef<Chart | null>(null);
 
     useEffect(() => {
-        if (!isLoading && hrvData && hrvData.dates.length > 0 && chartRef.current) {
+        if (!isLoading && hrvData && hrvData.length > 0 && chartRef.current) {
             const ctx = chartRef.current.getContext('2d');
             if (ctx) {
                 if (chartInstanceRef.current) {
@@ -32,11 +32,11 @@ const HRVChart: React.FC<HRVChartProps> = ({ hrvData, isLoading }) => {
                 chartInstanceRef.current = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: hrvData.dates,
+                        labels: hrvData.map(data => data.date), // Map dates for labels
                         datasets: [
                             {
                                 label: 'Average HRV',
-                                data: hrvData.hrv,
+                                data: hrvData.map(data => data.averageHRV), // Map averageHRV for data
                                 borderColor: 'rgb(75, 192, 192)',
                                 tension: 0.4,
                             }
@@ -47,18 +47,23 @@ const HRVChart: React.FC<HRVChartProps> = ({ hrvData, isLoading }) => {
                         maintainAspectRatio: true,
                         scales: {
                             x: {
-                                ticks: {
-                                    autoSkip: true,
-                                    maxRotation: 0,
-                                    minRotation: 0,
-                                    maxTicksLimit: 10
+                                type: 'time',
+                                time: {
+                                    unit: 'day',
+                                    tooltipFormat: 'do MMM yyyy', // Updated format
+                                    // If your dates are not in 'do MMM yyyy' format and need parsing, specify parser here
                                 },
-                                grid: {
-                                    display: false
-                                },
+                                title: {
+                                    display: true,
+                                    text: 'Date',
+                                }
                             },
                             y: {
-                                beginAtZero: true, // Adjust as needed
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Average HRV',
+                                }
                             }
                         },
                         plugins: {
@@ -67,6 +72,7 @@ const HRVChart: React.FC<HRVChartProps> = ({ hrvData, isLoading }) => {
                             }
                         }
                     }
+                    
                 });
             }
         }

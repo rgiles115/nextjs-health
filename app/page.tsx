@@ -24,7 +24,14 @@ import ReadinessAnalysis from './components/ReadinessAnalysis';
 import NumberContainers from './components/NumberContainers';
 import useFetchHrvData from './components/useFetchHrvData'; // Adjust the path as necessary
 import HRVAnalysis from './components/HRVAnalysis';
+import useProcessStravaAndHRVData from './components/useProcessStravaAndHRVData';
+import { parseISO, format, isValid } from 'date-fns';
 
+
+interface HRVData {
+  date: string;
+  averageHRV: number;
+}
 
 export default function Home() {
   // State declarations
@@ -45,9 +52,7 @@ export default function Home() {
   const { data: readinessData, isLoading: isReadinessLoading } = useFetchOuraData(startDate, endDate);
   const { data: hrvData, isLoading: isHrvLoading } = useFetchHrvData(startDate, endDate);
 
-
-
-  const { processedData, totalDistance, totalElevationGain } = useProcessStravaData(stravaActivities, startDate, endDate);
+  const { processedData, totalDistance, totalElevationGain, averageWatts } = useProcessStravaData(stravaActivities, startDate, endDate);
   const [stravaAnalysisResult, setStravaAnalysisResult] = useState('');
   const [ouraAnalysisResult, setOuraAnalysisResult] = useState('');
   const [hrvAnalysisResult, setHrvAnalysisResult] = useState('');
@@ -55,8 +60,9 @@ export default function Home() {
   const [isOuraAnalysisLoading, setIsOuraAnalysisLoading] = useState(false);
   const [stravaLoadingDots, setStravaLoadingDots] = useState('');
   const [ouraLoadingDots, setOuraLoadingDots] = useState('');
+  const [isAuthCheckLoading, setIsAuthCheckLoading] = useState(true);
 
-
+  const processedResults = useProcessStravaAndHRVData(processedData, hrvData);
 
 
   const getCookie = (name: string): string | undefined => {
@@ -82,6 +88,30 @@ export default function Home() {
   const hrvAnalysisPrompt = `Analyse the following HRV data and provide insights. The data includes
   average heart rate variability (HRV) readings over time. Please provide a concise and
   professional analysis.`;
+
+  useEffect(() => {
+    setIsAuthCheckLoading(true);
+    // Fetch Strava authentication status
+    fetch('/api/stravaAuthStatus')
+      .then(response => response.json())
+      .then(data => {
+        setIsStravaAuthed(data.isStravaAuthed);
+      })
+      .catch(error => {
+        console.error('Error fetching Strava auth status:', error);
+      });
+
+    // Fetch Oura authentication status
+    fetch('/api/ouraAuthStatus')
+      .then(response => response.json())
+      .then(data => {
+        setIsOuraAuthed(data.isOuraAuthed);
+      })
+      .catch(error => {
+        console.error('Error fetching Oura auth status:', error);
+      });
+    setIsAuthCheckLoading(false);
+  }, []);
 
 
 
@@ -247,30 +277,6 @@ export default function Home() {
   }, [isOuraAnalysisLoading]);
 
 
-  useEffect(() => {
-    // Fetch Strava authentication status
-    fetch('/api/stravaAuthStatus')
-      .then(response => response.json())
-      .then(data => {
-        setIsStravaAuthed(data.isStravaAuthed);
-      })
-      .catch(error => {
-        console.error('Error fetching Strava auth status:', error);
-      });
-
-    // Fetch Oura authentication status
-    fetch('/api/ouraAuthStatus')
-      .then(response => response.json())
-      .then(data => {
-        setIsOuraAuthed(data.isOuraAuthed);
-      })
-      .catch(error => {
-        console.error('Error fetching Oura auth status:', error);
-      });
-  }, []);
-
-
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <SideMenu />
@@ -280,140 +286,127 @@ export default function Home() {
         <link rel="stylesheet" href="/style.css" />
       </Head>
       <div className="flex flex-col min-h-screen">
-      <div className="bg-white text-center py-5 sticky top-0 z-50 shadow-md">
-        <h1>
-          <FontAwesomeIcon icon={faHeartbeat} width="32" /> My Health Data
-        </h1>
-      </div>
-
-      <Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
-
-      {(isStravaAuthed || isOuraAuthed) && (
-        <div id="datePicker" className="flex justify-start bg-white border border-gray-300 rounded-xl w-96 ml-5 mt-5">
-          <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
-          <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
+        <div className="bg-white dark:bg-gray-800 text-black dark:text-white text-center py-5 sticky top-0 z-50 shadow-md">
+          <h1>
+            <FontAwesomeIcon icon={faHeartbeat} width="32" /> My Health Data
+          </h1>
         </div>
-      )}
 
-      {/* Empty state message */}
-      {!isStravaAuthed && !isOuraAuthed && (
-          <main className="flex-1 pt-24 pb-16">
-        <div className="mx-auto flex flex-col justify-center items-center h-[20vh] w-[60vw] text-center">
-          <div className="empty-state-message-header text-[1.8em] font-light">
-            <p>My Health Data works when you connect to your exercise and health data.</p>
+        < Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
+
+        {(isAuthCheckLoading) && (
+
+          <div className="flex justify-center items-center min-h-screen">
+            <div>Loading...</div>
           </div>
-          <div className="empty-state-message text-[1.4em] font-light">
-            <p>It only stores this in your browser, so it remains secure and private.
-              To get started, please connect Strava or Oura in the menu at the top right.</p>
-          </div>
-        </div>
-        </main>
-      )}
-      {isStravaAuthed && stravaData && (
-        <div>
-          <NumberContainers
-            totalDistance={totalDistance}
-            totalElevationGain={totalElevationGain}
-          />
-          <h2 className="text-2xl font-semibold mb-2 px-5">Strava Overview</h2>
+        )}
 
-          <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
-            <div className="flex-1 m-5 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
-              <StravaChart
-                processedData={processedData}
-                isLoading={isStravaLoading}
-              />
-            </div>
-
-            <div className="p-4 w-full md:w-1/2">
-              <div className="button-container">
-                <a href="#"
-                  onClick={(e) => {
-                    if (!isStravaAnalysisLoading) {
-                      e.preventDefault();
-                      getStravaAnalysis();
-                    }
-                  }}
-                  className={`analyze-button ${isStravaAnalysisLoading ? 'disabled' : ''}`}>
-                  {isStravaAnalysisLoading ? <>Analysing<span className="loading-dots">{stravaLoadingDots}</span></> : <><img src="/sparkler.png" alt="Sparkles" />Analyse</>}
-                </a>
+        {/* Empty state message */}
+        { !isStravaAuthed && !isOuraAuthed && (
+          <main className="flex-1 pt-28 pb-16">
+            <div className="mx-auto flex flex-col justify-center items-center h-[20vh] w-[60vw] text-center">
+              <div className="empty-state-message-header text-[1.8em] font-light dark:text-gray-200">
+                <p>My Health Data works when you connect to your exercise and health data.</p>
               </div>
-              <StravaAnalysis
-                stravaData={stravaActivities}
-                analysis={stravaAnalysisResult}
-                isLoading={isStravaAnalysisLoading}
-                loadingDots={loadingDots}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-      {isOuraAuthed && readinessData && hrvData && (
-        <div>
-          <h2 className="text-2xl font-semibold mb-2 px-5">Oura Readiness</h2>
-          <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
-            <div className="flex-1 m-5 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
-              <ReadinessChart readinessData={readinessData} isLoading={isReadinessLoading} startDate={startDate} endDate={endDate} />
-            </div>
-            <div className="p-4 w-full md:w-1/2">
-              <div className="button-container">
-                <a href="#" onClick={(e) => { if (!isOuraAnalysisLoading) { e.preventDefault(); getOuraAnalysis(); } }}
-                  className={`analyze-button ${isOuraAnalysisLoading ? 'disabled' : ''}`}>
-                  {isOuraAnalysisLoading ? <>Analysing<span className="loading-dots">{ouraLoadingDots}</span></> : <><img src="/sparkler.png" alt="Sparkles" />Analyse</>}
-                </a>
+              <div className="empty-state-message text-[1.4em] font-light dark:text-gray-400">
+                <p>It only stores this in your browser, so it remains secure and private. To get started, please connect Strava or Oura in the menu at the top right.</p>
               </div>
-              <ReadinessAnalysis
-                readinessData={readinessData}
-                analysis={ouraAnalysisResult}
-                isLoading={isOuraAnalysisLoading}
-                loadingDots={loadingDots}
-              />
             </div>
+          </main>
+        )}
+
+
+
+        {(isStravaAuthed || isOuraAuthed) && (
+          <div id="datePicker" className="flex justify-start bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl w-96 ml-5 mt-5">
+            <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
+            <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
           </div>
+        )}
 
-          <h2 className="text-2xl font-semibold mb-2 px-5">Oura HRV</h2>
 
-          <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
-            <div className="flex-1 m-5 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
-              <HRVChart hrvData={hrvData} isLoading={isHrvLoading} />
-            </div>
-            <div className="p-4 w-full md:w-1/2">
-              <div className="button-container">
-                <a href="#" onClick={(e) => { if (!isOuraAnalysisLoading) { e.preventDefault(); getHrvAnalysis(); } }}
-                  className={`analyze-button ${isOuraAnalysisLoading ? 'disabled' : ''}`}>
-                  {isOuraAnalysisLoading ? <>Analysing<span className="loading-dots">{ouraLoadingDots}</span></> : <><img src="/sparkler.png" alt="Sparkles" />Analyse</>}
-                </a>
+        {isStravaAuthed && stravaData && (
+          <div>
+            <NumberContainers
+              totalDistance={totalDistance}
+              totalElevationGain={totalElevationGain}
+            />
+            <h2 className="text-2xl font-semibold mb-2 px-5">Strava Overview</h2>
+
+            <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
+              <div className="flex-1 m-5 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
+                <StravaChart
+                  processedData={processedResults}
+                  isLoading={isStravaLoading}
+                />
               </div>
-              <div className="analysis-result">
-                <HRVAnalysis
-                  hrvData={hrvData}
-                  analysis={hrvAnalysisResult}
-                  isLoading={isOuraAnalysisLoading}
+
+              <div className="p-4 w-full md:w-1/2">
+                <div className="button-container">
+                  <a href="#"
+                    onClick={(e) => {
+                      if (!isStravaAnalysisLoading) {
+                        e.preventDefault();
+                        getStravaAnalysis();
+                      }
+                    }}
+                    className={`analyze-button ${isStravaAnalysisLoading ? 'disabled' : ''}`}>
+                    {isStravaAnalysisLoading ? <>Analysing<span className="loading-dots">{stravaLoadingDots}</span></> : <><img src="/sparkler.png" alt="Sparkles" />Analyse</>}
+                  </a>
+                </div>
+                <StravaAnalysis
+                  stravaData={stravaActivities}
+                  analysis={stravaAnalysisResult}
+                  isLoading={isStravaAnalysisLoading}
                   loadingDots={loadingDots}
                 />
               </div>
             </div>
           </div>
-
-          <h2 className="text-2xl font-semibold mb-2 px-5">Oura Activity & Sleep</h2>
-
-          <div className="flex flex-wrap -m-4 px-2.5">
-            <div className="w-full md:w-1/2 p-4">
-              <div className="m-1 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
-                <ActivityChart startDate={startDate} endDate={endDate} />
+        )}
+        {isOuraAuthed && readinessData && hrvData && (
+          <div>
+            <h2 className="text-2xl font-semibold mb-2 px-5">Oura Readiness</h2>
+            <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
+              <div className="flex-1 m-5 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
+                <ReadinessChart readinessData={readinessData} isLoading={isReadinessLoading} startDate={startDate} endDate={endDate} />
+              </div>
+              <div className="p-4 w-full md:w-1/2">
+                <div className="button-container">
+                  <a href="#" onClick={(e) => { if (!isOuraAnalysisLoading) { e.preventDefault(); getOuraAnalysis(); } }}
+                    className={`analyze-button ${isOuraAnalysisLoading ? 'disabled' : ''}`}>
+                    {isOuraAnalysisLoading ? <>Analysing<span className="loading-dots">{ouraLoadingDots}</span></> : <><img src="/sparkler.png" alt="Sparkles" />Analyse</>}
+                  </a>
+                </div>
+                <ReadinessAnalysis
+                  readinessData={readinessData}
+                  analysis={ouraAnalysisResult}
+                  isLoading={isOuraAnalysisLoading}
+                  loadingDots={loadingDots}
+                />
               </div>
             </div>
-            <div className="w-full md:w-1/2 p-4">
-              <div className="m-1 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
-                <SleepChart startDate={startDate} endDate={endDate} />
+
+
+            <h2 className="text-2xl font-semibold mb-2 px-5">Oura Activity & Sleep</h2>
+
+            <div className="flex flex-wrap -m-4 px-2.5">
+              <div className="w-full md:w-1/2 p-4">
+                <div className="m-1 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
+                  <ActivityChart startDate={startDate} endDate={endDate} />
+                </div>
+              </div>
+              <div className="w-full md:w-1/2 p-4">
+                <div className="m-1 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
+                  <SleepChart startDate={startDate} endDate={endDate} />
+                </div>
               </div>
             </div>
+
           </div>
-
-        </div>
-      )}
-      <div id="footer"><Footer /></div>
-    </div>
+        )}
+        <div id="footer"><Footer /></div>
+      </div>
     </div>
   );
 

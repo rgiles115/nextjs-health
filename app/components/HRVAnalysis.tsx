@@ -2,8 +2,8 @@ import React from 'react';
 import Typewriter from 'typewriter-effect';
 
 interface HRVData {
-    dates: string[];
-    hrv: number[];
+    date: string; // The date of the HRV reading, in a suitable format for your application
+    averageHRV: number; // The average HRV value for that date
 }
 
 interface HRVAnalysisProps {

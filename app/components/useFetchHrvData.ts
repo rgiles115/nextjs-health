@@ -1,53 +1,57 @@
-// useFetchHrvData.ts
 import { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 interface SleepEntry {
     average_hrv: number | null;
-    day: string;
-    // Add other fields from SleepEntry as necessary
+    day: string; // Assuming 'day' is already in an acceptable format for parseISO
 }
 
 interface HRVData {
-    dates: string[];
-    hrv: number[];
+    date: string; // Using ISO date format 'yyyy-MM-dd'
+    averageHRV: number;
 }
 
-const useFetchHrvData = (startDate: Date, endDate: Date) => {
-    const [data, setData] = useState<HRVData | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+interface UseFetchHrvDataReturn {
+    data: HRVData[] | null;
+    isLoading: boolean;
+    error: Error | null;
+}
+
+const useFetchHrvData = (startDate: Date, endDate: Date): UseFetchHrvDataReturn => {
+    const [data, setData] = useState<HRVData[] | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
-        setIsLoading(true);
-        const formattedStartDate = startDate.toISOString().split('T')[0];
-        const formattedEndDate = endDate.toISOString().split('T')[0];
+        const fetchHRVData = async () => {
+            setIsLoading(true);
+            const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+            const formattedEndDate = format(endDate, 'yyyy-MM-dd');
 
-        fetch(`/api/getSleepData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`)
-            .then(response => response.json())
-            .then((data: { data: SleepEntry[] }) => {
-                const groupedData = data.data
+            try {
+                // Replace the URL with your actual endpoint that accepts startDate and endDate as query parameters
+                const response = await fetch(`/api/getSleepData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const { data } = await response.json();
+
+                const transformedData = data
                     .filter((entry: SleepEntry) => entry.average_hrv !== null)
-                    .reduce((acc: { [key: string]: number[] }, entry: SleepEntry) => {
-                        const dayFormatted = format(new Date(entry.day), 'do MMM yyyy');
-                        acc[dayFormatted] = acc[dayFormatted] || [];
-                        acc[dayFormatted].push(entry.average_hrv as number);
-                        return acc;
-                    }, {});
+                    .map((entry: SleepEntry) => ({
+                        date: format(parseISO(entry.day), 'yyyy-MM-dd'), // Ensure the date is in ISO format
+                        averageHRV: entry.average_hrv as number,
+                    }));
 
-                const formattedDates = Object.keys(groupedData);
-                const hrvAverages = formattedDates.map((dayFormatted: string) => {
-                    const hrvValues = groupedData[dayFormatted];
-                    return hrvValues.reduce((a: number, b: number) => a + b, 0) / hrvValues.length;
-                });
+                setData(transformedData);
+            } catch (err) {
+                setError(err as Error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-                setData({ dates: formattedDates, hrv: hrvAverages });
-                setIsLoading(false);
-            })
-            .catch((err: Error) => {
-                setError(err);
-                setIsLoading(false);
-            });
+        fetchHRVData();
     }, [startDate, endDate]);
 
     return { data, isLoading, error };

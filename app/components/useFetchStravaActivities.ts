@@ -15,13 +15,14 @@ const useFetchStravaActivities = (startDate: Date, endDate: Date) => {
       const response = await fetch(`/api/getStravaActivities?start_date=${startTimestamp}&end_date=${endTimestamp}`);
       const result = await response.json() as StravaActivity[]; // Assuming the response is always an array of StravaActivity
       setData(result);
+      console.log('Strava Result:', result);
       setIsLoading(false);
     };
 
     fetchData();
   }, [startDate, endDate]);
-
   // The return type is inferred correctly here
+  console.log('Strava Activities:', JSON.stringify(data));
   return { data, isLoading };
 };
 
