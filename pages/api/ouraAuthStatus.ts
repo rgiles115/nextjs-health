@@ -95,7 +95,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 if (refreshedData) {
                     // Update the cookie with the refreshed token data
                     res.setHeader('Set-Cookie', `ouraData=${JSON.stringify(refreshedData)}; HttpOnly; Secure`);
-                    console.log('Oura token refreshed.');
+                    // console.log('Oura token refreshed.');
                 } else {
                     console.log('Failed to refresh Oura token.');
                 }

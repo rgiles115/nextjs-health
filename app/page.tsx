@@ -286,7 +286,7 @@ export default function Home() {
         <link rel="stylesheet" href="/style.css" />
       </Head>
       <div className="flex flex-col min-h-screen">
-        <div className="bg-white dark:bg-gray-800 text-black dark:text-white text-center py-5 sticky top-0 z-50 shadow-md">
+        <div className="bg-white text-black text-center py-5 sticky top-0 z-50 shadow-md">
           <h1>
             <FontAwesomeIcon icon={faHeartbeat} width="32" /> My Health Data
           </h1>
@@ -318,7 +318,7 @@ export default function Home() {
 
 
         {(isStravaAuthed || isOuraAuthed) && (
-          <div id="datePicker" className="flex justify-start bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl w-96 ml-5 mt-5">
+          <div id="datePicker" className="flex justify-start bg-white border border-gray-300 rounded-xl w-96 ml-5 mt-5">
             <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
             <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
           </div>
@@ -364,7 +364,7 @@ export default function Home() {
             </div>
           </div>
         )}
-        {isOuraAuthed && readinessData && hrvData && (
+        {isOuraAuthed && (
           <div>
             <h2 className="text-2xl font-semibold mb-2 px-5">Oura Readiness</h2>
             <div className="flex flex-wrap -m-4 px-2.5 py-2.5">

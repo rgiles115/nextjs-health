@@ -116,6 +116,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
             chartInstanceRef.current?.destroy();
         };
     }, [processedData, isLoading]); // Depend on processedData and isLoading to re-run the effect
+    console.log('Rendering Strava Chart');
 
     // Render the component
     return (

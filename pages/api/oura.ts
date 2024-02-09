@@ -14,7 +14,7 @@ export default async function handler(
     }
 
     try {
-      console.log('Adding Oura cookie.');
+      // console.log('Adding Oura cookie.');
 
       // Prepare the request body for application/x-www-form-urlencoded
       const params = new URLSearchParams();

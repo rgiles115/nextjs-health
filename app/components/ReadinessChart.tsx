@@ -5,6 +5,8 @@ import { format } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
 import dynamic from 'next/dynamic';
 import ReadinessAnalysis from './ReadinessAnalysis';
+import isEqual from 'lodash/isEqual'; // Import isEqual from lodash for deep comparison
+
 
 Chart.register(...registerables);
 
@@ -141,4 +143,12 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
 
 };
 
-export default ReadinessChart;
+// Custom comparison function for React.memo with explicit types
+const areEqual = (prevProps: ReadinessChartProps, nextProps: ReadinessChartProps) => {
+    // Perform a deep comparison between prevProps and nextProps
+    return isEqual(prevProps, nextProps);
+};
+
+const MemoizedReadinessChart = React.memo(ReadinessChart, areEqual);
+
+export default MemoizedReadinessChart;

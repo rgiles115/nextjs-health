@@ -4,6 +4,8 @@ import 'chartjs-adapter-date-fns';
 import { format } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
 import dynamic from 'next/dynamic';
+import isEqual from 'lodash/isEqual';
+
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 Chart.register(...registerables);
@@ -35,7 +37,14 @@ interface Contributors {
 interface SleepChartProps {
     startDate: Date;
     endDate: Date;
-}
+    sleepData?: { // Make sleepData optional
+      dates: string[];
+      totalSleep: number[];
+      // Add other fields as necessary
+    } | null;
+    isLoading?: boolean; // Make isLoading optional
+  }
+
 
 const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
     const [sleepData, setSleepData] = useState({ dates: [], total: [], rem: [], deep: [], light: [], restfulness: [] });
@@ -164,7 +173,7 @@ const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
     return (
         <div>
             {isLoading ? (
-                <div><Loading /></div> // Replace with a spinner or loading component
+                <Loading />  // Replace with a spinner or loading component
             ) : (
                 <div className="graph-container">
                     <canvas ref={chartRef} />
@@ -175,4 +184,11 @@ const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
 
 };
 
-export default SleepChart;
+// Custom comparison function for React.memo with explicit types
+const areEqual = (prevProps: SleepChartProps, nextProps: SleepChartProps) => {
+    return isEqual(prevProps, nextProps);
+};
+
+const MemoizedSleepChart = React.memo(SleepChart, areEqual);
+
+export default MemoizedSleepChart;
