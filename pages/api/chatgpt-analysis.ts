@@ -30,6 +30,8 @@ const sendMessageToOpenAI = async (params: AnalysisRequest) => {
   const url = 'https://api.openai.com/v1/chat/completions';
   const OPENAPI_SECRET = process.env.OPENAPI_SECRET;
 
+  console.log('Data:', data);
+
   // Setting up the request payload for the OpenAI API
   const requestData = {
     model: 'gpt-4', // Specifies the model to use (GPT-4 in this case)
@@ -79,7 +81,9 @@ export default async function handler(req: Request) {
 
   // Check if the estimated token count exceeds the limit (e.g., 4096 tokens for GPT-4)
   if (estimatedTokens > 4096) { // Adjust the limit based on your model's specific limits
-    return new Response(JSON.stringify({ message: "Input data is too large." }), {
+    const errorMessage = "The amount of data to analyse is too large. Reduce the date window and please try again.";
+    console.error(errorMessage); // Log the specific error message for server-side visibility
+    return new Response(JSON.stringify({ message: errorMessage }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -91,6 +95,7 @@ export default async function handler(req: Request) {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
+    console.error('Error processing the request:', error);
     return new Response(JSON.stringify({ message: "An error occurred while processing your request." }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

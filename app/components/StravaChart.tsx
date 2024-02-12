@@ -90,7 +90,17 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                         datasets,
                     },
                     options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
                         scales: {
+                            x: {
+                                ticks: {
+                                    autoSkip: true,
+                                    maxRotation: 0,
+                                    minRotation: 0,
+                                    maxTicksLimit: 10
+                                }
+                            },
                             y: { // Configure the primary Y axis
                                 position: 'left',
                             },
@@ -124,8 +134,8 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
             {isLoading ? (
                 <Loading /> // Show loading component if data is still loading
             ) : (
-                <div style={{ height: '300px', width: '100%' }}>
-                    <canvas ref={chartRef} /> 
+                <div className="graph-container">
+                    <canvas ref={chartRef} />
                 </div>
             )}
         </div>
