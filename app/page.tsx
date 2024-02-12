@@ -308,7 +308,7 @@ const getOuraAnalysis = async () => {
 
         {/* Empty state message */}
         {!isStravaAuthed && !isOuraAuthed && (
-          <main className="flex-1 pt-28 pb-16">
+          <main className="flex-1 pt-32 pb-16 md:pt-28">
             <div className="mx-auto flex flex-col justify-center items-center h-[20vh] w-[60vw] text-center">
               <div className="empty-state-message-header text-[1.8em] font-light dark:text-gray-200">
                 <p>My Health Data works when you connect to your exercise and health data.</p>
