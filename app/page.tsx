@@ -69,7 +69,7 @@ export default function Home() {
   const [loadingDots, setLoadingDots] = useState('');
 
   // Using custom hooks for fetching data from APIs
-  const { data: stravaActivities, isLoading: isStravaLoading } = useFetchStravaActivities(startDate, endDate);
+  const { activities: stravaActivities, ytdRideTotals, isLoading: isStravaLoading } = useFetchStravaActivities(startDate, endDate);
   const { data: readinessData, isLoading: isReadinessLoading } = useFetchOuraData(startDate, endDate);
   const { data: hrvData, isLoading: isHrvLoading } = useFetchHrvData(startDate, endDate);
 
@@ -348,10 +348,17 @@ export default function Home() {
         {isStravaAuthed && stravaData && (
           <div>
             {athleteProfile && (
-              <div className="flex justify-center items-center mt-5">
-                <div className="flex items-center space-x-4">
-                  <img src={athleteProfile.profile_medium} alt="Profile" className="h-16 w-16 rounded-full border-2 border-gray-300" />
+              <div className="flex justify-center items-center mt-5 ml-5">
+                <img src={athleteProfile.profile_medium} alt="Profile" className="h-16 w-16 rounded-full border-2 border-gray-300" />
+                <div className="ml-4">
                   <h2 className="text-xl font-semibold">{athleteProfile.firstname} {athleteProfile.lastname}</h2>
+                  {ytdRideTotals && (
+                    <div>
+                      <p>Distance: {(ytdRideTotals.distance / 1000).toFixed(2).toLocaleString()} km</p>
+                      <p>Time: {Math.floor(ytdRideTotals.moving_time / 3600)}h {Math.floor((ytdRideTotals.moving_time % 3600) / 60)}m</p>
+                      <p>Elevation Gain: {ytdRideTotals.elevation_gain.toLocaleString()} meters</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

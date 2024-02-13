@@ -94,3 +94,11 @@ export interface StravaActivity {
     has_kudoed: boolean;
     suffer_score: number;
 }
+
+export interface YtdRideTotals {
+    distance: number; // in meters
+    moving_time: number; // in seconds
+    elevation_gain: number; // in meters
+    // Add any other relevant fields
+  }
+  

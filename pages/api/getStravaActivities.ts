@@ -141,16 +141,14 @@ const refreshStravaToken = async (stravaData: StravaData): Promise<StravaData | 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { start_date, end_date } = req.query;
 
-    // Check if start and end dates are provided
     if (!start_date || !end_date) {
         res.status(400).json({ error: 'Start and end dates are required' });
         return;
     }
 
-    // Retrieve the access token from the cookie
     const cookies = new Cookies(req, res);
-    const encodedStravaCookie = cookies.get('stravaData'); 
-    
+    const encodedStravaCookie = cookies.get('stravaData');
+
     if (!encodedStravaCookie) {
         res.status(400).json({ error: 'Strava cookie not found' });
         return;
@@ -158,7 +156,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     let stravaData = JSON.parse(decodeURIComponent(encodedStravaCookie));
 
-    // Check if the token is expired and refresh if necessary
     if (isStravaExpired(stravaData)) {
         const refreshedStravaData = await refreshStravaToken(stravaData);
         if (refreshedStravaData) {
@@ -167,39 +164,48 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         } else {
             res.status(500).json({ error: 'Failed to refresh Strava token' });
             return;
-            }
-            }
-            const accessToken = stravaData.access_token;
+        }
+    }
 
-const perPage = 30; // Number of activities per page
-let page = 1;
-const allActivities = [];
+    const accessToken = stravaData.access_token;
+    const allActivities = [];
+    let page = 1;
+    const perPage = 30;
 
-try {
-    while (true) {
-        const stravaApiUrl = `https://www.strava.com/api/v3/athlete/activities?before=${end_date}&after=${start_date}&per_page=${perPage}&page=${page}`;
-        const response = await fetch(stravaApiUrl, {
+    try {
+        while (true) {
+            const activitiesResponse = await axios.get(`https://www.strava.com/api/v3/athlete/activities?before=${end_date}&after=${start_date}&per_page=${perPage}&page=${page}`, {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            });
+
+            if (activitiesResponse.status !== 200) {
+                break; // Exit loop if there's an error or no more activities
+            }
+
+            const activities = activitiesResponse.data;
+            if (activities.length === 0) {
+                break; // No more activities to fetch
+            }
+
+            allActivities.push(...activities);
+            page++;
+        }
+
+        // Fetch YTD ride totals
+        const statsResponse = await axios.get(`https://www.strava.com/api/v3/athletes/${stravaData.athlete.id}/stats`, {
             headers: { 'Authorization': `Bearer ${accessToken}` }
         });
 
-        if (!response.ok) {
-            res.status(response.status).json({ error: `Error from Strava API: ${response.statusText}` });
-            return;
-        }
+        const ytdRideTotals = statsResponse.data.ytd_ride_totals;
 
-        const activities: StravaActivity[] = await response.json();
-        if (activities.length === 0) {
-            // No more activities to fetch
-            break;
-        }
+        // Include YTD ride totals in the response
+        res.status(200).json({
+            activities: allActivities,
+            ytdRideTotals: ytdRideTotals
+        });
 
-        allActivities.push(...activities);
-        page++;
+    } catch (error) {
+        console.error('Error fetching Strava activity data:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-
-    res.status(200).json(allActivities);
-} catch (error) {
-    console.error('Error fetching Strava activity data:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-}
 }

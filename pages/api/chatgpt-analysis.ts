@@ -30,18 +30,16 @@ const sendMessageToOpenAI = async (params: AnalysisRequest) => {
   const url = 'https://api.openai.com/v1/chat/completions';
   const OPENAPI_SECRET = process.env.OPENAPI_SECRET;
 
-  console.log('Data:', data);
-
   // Setting up the request payload for the OpenAI API
   const requestData = {
-    model: 'gpt-4', // Specifies the model to use (GPT-4 in this case)
+    model: 'gpt-4-turbo-preview', // Specifies the model to use
     messages: [
       { 
         "role": "user", 
         "content": `${content} ${JSON.stringify(data)}` 
       }
     ],
-    max_tokens: 300, // Sets the maximum number of tokens in the response
+    max_tokens: 1000, // Sets the maximum number of tokens in the response
     temperature: 0.7 // Sets the creativity of the response
   };
 

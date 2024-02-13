@@ -1,29 +1,39 @@
 import { useState, useEffect } from 'react';
-import { StravaActivity } from '../types/StravaInterface';
+import { StravaActivity, YtdRideTotals } from '../types/StravaInterface';
 
 // Add type annotations for the parameters
 const useFetchStravaActivities = (startDate: Date, endDate: Date) => {
-  // Specify the type for data state as StravaActivity[] | null
-  const [data, setData] = useState<StravaActivity[] | null>(null);
+  const [activities, setActivities] = useState<StravaActivity[] | null>(null);
+  const [ytdRideTotals, setYtdRideTotals] = useState<YtdRideTotals | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      const startTimestamp = startDate.getTime() / 1000;
-      const endTimestamp = endDate.getTime() / 1000;
-      const response = await fetch(`/api/getStravaActivities?start_date=${startTimestamp}&end_date=${endTimestamp}`);
-      const result = await response.json() as StravaActivity[]; // Assuming the response is always an array of StravaActivity
-      setData(result);
-      // console.log('Strava Result:', result);
-      setIsLoading(false);
+      const startTimestamp = Math.floor(startDate.getTime() / 1000);
+      const endTimestamp = Math.floor(endDate.getTime() / 1000);
+      try {
+        const response = await fetch(`/api/getStravaActivities?start_date=${startTimestamp}&end_date=${endTimestamp}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        // Assuming your updated API now returns an object with both activities and ytdRideTotals
+        setActivities(result.activities);
+        setYtdRideTotals(result.ytdRideTotals);
+      } catch (error) {
+        console.error("Failed to fetch Strava activities:", error);
+        setActivities(null);
+        setYtdRideTotals(null);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchData();
   }, [startDate, endDate]);
-  // The return type is inferred correctly here
-  // console.log('Strava Activities:', JSON.stringify(data));
-  return { data, isLoading };
+
+  return { activities, ytdRideTotals, isLoading };
 };
 
 export default useFetchStravaActivities;
