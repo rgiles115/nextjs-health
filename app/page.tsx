@@ -14,11 +14,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeartbeat } from '@fortawesome/free-solid-svg-icons';
 
 // Custom hooks for data fetching
-import useFetchStravaActivities from './components/useFetchStravaActivities';
-import useFetchOuraData from './components/useFetchOuraData';
-import useFetchHrvData from './components/useFetchHrvData';
-import useProcessStravaData from './components/useProcessStravaData';
-import useProcessStravaAndHRVData from './components/useProcessStravaAndHRVData';
+import useFetchStravaActivities from './hooks/useFetchStravaActivities';
+import useFetchOuraData from './hooks/useFetchOuraData';
+import useFetchHrvData from './hooks/useFetchHrvData';
+import useProcessStravaData from './hooks/useProcessStravaData';
+import useProcessStravaAndHRVData from './hooks/useProcessStravaAndHRVData';
 
 // Importing custom components
 import ActivityChart from './components/ActivityChart';
@@ -176,7 +176,7 @@ export default function Home() {
       average_heartrate: activity.average_heartrate,
       max_heartrate: activity.max_heartrate
     }));
-
+    console.log('Strava:', JSON.stringify(simplifiedStravaActivities));
     try {
       const response = await axios.post('/api/chatgpt-analysis', {
         content: stravaAnalysisPrompt,
@@ -283,7 +283,7 @@ const getOuraAnalysis = async () => {
 
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+<div className="bg-gray-50 min-h-screen flex flex-col">
       <SideMenu />
       <Head>
         <title>My Health Data</title>
@@ -310,10 +310,10 @@ const getOuraAnalysis = async () => {
         {!isStravaAuthed && !isOuraAuthed && (
           <main className="flex-1 pt-32 pb-16 md:pt-28">
             <div className="mx-auto flex flex-col justify-center items-center h-[20vh] w-[60vw] text-center">
-              <div className="empty-state-message-header text-[1.8em] font-light dark:text-gray-200">
+              <div className="empty-state-message-header text-[1.8em] font-light">
                 <p>My Health Data works when you connect to your exercise and health data.</p>
               </div>
-              <div className="empty-state-message text-[1.4em] font-light dark:text-gray-400">
+              <div className="empty-state-message text-[1.4em] font-light">
                 <p>It only stores this in your browser, so it remains secure and private. To get started, please connect Strava or Oura in the menu at the top right.</p>
               </div>
             </div>
@@ -323,7 +323,7 @@ const getOuraAnalysis = async () => {
 
 
         {(isStravaAuthed || isOuraAuthed) && (
-          <div id="datePicker" className="flex justify-start bg-white border border-gray-300 rounded-xl w-96 ml-5 mt-5">
+          <div id="datePicker" className="flex justify-start bg-white border border-gray-300 bg-white rounded-xl w-96 ml-5 mt-5">
             <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
             <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
           </div>
@@ -339,7 +339,7 @@ const getOuraAnalysis = async () => {
             <h2 className="text-2xl font-semibold mb-2 px-5">Strava Overview</h2>
 
             <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
-              <div className="flex-1 m-5 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
+              <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
                 <StravaChart
                   processedData={processedResults}
                   isLoading={isStravaLoading}
@@ -374,7 +374,7 @@ const getOuraAnalysis = async () => {
           <div>
             <h2 className="text-2xl font-semibold mb-2 px-5">Oura Readiness</h2>
             <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
-              <div className="flex-1 m-5 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
+              <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
                 <ReadinessChart readinessData={readinessData} isLoading={isReadinessLoading} startDate={startDate} endDate={endDate} />
               </div>
               <div className="p-4 w-full md:w-1/2">
@@ -399,12 +399,12 @@ const getOuraAnalysis = async () => {
 
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
-                <div className="m-1 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
+                <div className="m-1 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
                   <ActivityChart startDate={startDate} endDate={endDate} />
                 </div>
               </div>
               <div className="w-full md:w-1/2 p-4">
-                <div className="m-1 border border-gray-200 rounded-lg max-h-[400px] overflow-hidden">
+                <div className="m-1 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
                   <SleepChart startDate={startDate} endDate={endDate} />
                 </div>
               </div>

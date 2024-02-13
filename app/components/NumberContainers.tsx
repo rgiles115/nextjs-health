@@ -8,13 +8,18 @@ interface NumberContainersProps {
 }
 
 const NumberContainers: React.FC<NumberContainersProps> = ({ totalDistance, totalElevationGain }) => {
+    // Function to format numbers with thousands separators
+    const formatNumber = (number: number) => {
+        return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(number);
+    };
+
     return (
         <div className="flex justify-between">
             <div className="flex flex-1 flex-col justify-center items-center mx-5 my-5 border border-gray-200 rounded-lg overflow-hidden bg-white py-2.5">
                 <FontAwesomeIcon icon={faRoad} className="icon" style={{ color: "#219ebc" }} />
                 <div className="total-distance text-center">
                     <div className={`total-value text-black mb-1 font-bold dynamic-font-size`}>
-                        {totalDistance.toFixed(2)}
+                        {formatNumber(totalDistance)}
                     </div>
                     <div className="total-title text-base uppercase text-gray-600 tracking-wide">
                         TOTAL KILOMETERS
@@ -25,7 +30,7 @@ const NumberContainers: React.FC<NumberContainersProps> = ({ totalDistance, tota
                 <FontAwesomeIcon icon={faMountain} className="icon" style={{ color: "#fb8500" }} />
                 <div className="total-distance text-center">
                     <div className={`total-value text-black mb-1 font-bold dynamic-font-size`}>
-                        {totalElevationGain}
+                        {formatNumber(totalElevationGain)}
                     </div>
                     <div className="total-title text-base uppercase text-gray-600 tracking-wide">
                         TOTAL ELEVATION

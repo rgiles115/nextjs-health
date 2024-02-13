@@ -12,7 +12,7 @@ interface StravaAnalysisProps {
 const StravaAnalysis: React.FC<StravaAnalysisProps> = ({ stravaData, analysis, isLoading, loadingDots }) => {
 
     return (
-        <div className="flex-grow flex flex-col items-stretch border border-gray-200 mb-5 rounded-lg overflow-auto py-5 px-5 h-[240px]">
+        <div className="flex-grow flex flex-col items-stretch border border-gray-200 mb-5 rounded-lg bg-white overflow-auto py-5 px-5 h-[240px]">
             {analysis && (
                 <Typewriter
                     options={{
