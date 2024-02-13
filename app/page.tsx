@@ -39,6 +39,15 @@ interface HRVData {
   averageHRV: number;
 }
 
+interface AthleteProfile {
+  id: number;
+  username: string;
+  firstname: string;
+  lastname: string;
+  profile_medium: string;
+  // Add other relevant fields as necessary
+}
+
 export default function Home() {
   // State variables for managing date range, authentication status, and data
   const currentDate = new Date();
@@ -53,6 +62,7 @@ export default function Home() {
   const [analysis, setAnalysis] = useState('');
   const [stravaAnalysisError, setStravaAnalysisError] = useState<string | null>(null);
   const [ouraAnalysisError, setOuraAnalysisError] = useState<string | null>(null);
+  const [athleteProfile, setAthleteProfile] = useState<AthleteProfile | null>(null);
 
   // Loading states for different asynchronous operations
   const [isLoading, setIsLoading] = useState(false);
@@ -115,10 +125,15 @@ export default function Home() {
       .then(response => response.json())
       .then(data => {
         setIsStravaAuthed(data.isStravaAuthed);
+        if (data.isStravaAuthed && data.athlete) {
+          // Use the athlete data here to set state variables, for example:
+          setAthleteProfile(data.athlete);
+        }
       })
       .catch(error => {
         console.error('Error fetching Strava auth status:', error);
-      });
+      })
+      .finally(() => setIsAuthCheckLoading(false));
 
     // Fetch Oura authentication status
     fetch('/api/ouraAuthStatus')
@@ -211,50 +226,50 @@ export default function Home() {
     setIsStravaAnalysisLoading(false);
   };
 
-// Function for Oura Readiness Data Analysis
-const getOuraAnalysis = async () => {
-  // Clear any previous error at the start
-  setOuraAnalysisError(null);
+  // Function for Oura Readiness Data Analysis
+  const getOuraAnalysis = async () => {
+    // Clear any previous error at the start
+    setOuraAnalysisError(null);
 
-  if (!isOuraAuthed) {
-    console.error('Not authenticated for Oura.');
-    setOuraAnalysisError('Not authenticated for Oura.');
-    return;
-  }
-
-  if (!readinessData) {
-    console.error('Readiness data is not available.');
-    setOuraAnalysisError('Readiness data is not available.');
-    return;
-  }
-
-  setIsOuraAnalysisLoading(true);
-
-  try {
-    const response = await axios.post('/api/chatgpt-analysis', {
-      content: ouraAnalysisPrompt,
-      data: readinessData
-    });
-
-    if (response.data.choices && response.data.choices.length > 0) {
-      setOuraAnalysisResult(response.data.choices[0].message.content);
-    } else {
-      setOuraAnalysisResult('No analysis available.');
-      // Optionally, if no data is returned, you might consider setting a specific error message
-      setOuraAnalysisError('No analysis could be generated from the data.');
+    if (!isOuraAuthed) {
+      console.error('Not authenticated for Oura.');
+      setOuraAnalysisError('Not authenticated for Oura.');
+      return;
     }
-  } catch (error) {
-    console.error('Error in getOuraAnalysis:', error);
-    let errorMessage = 'Error fetching analysis.';
-    // Handle the case if error is an AxiosError for more specific error messaging
-    if (axios.isAxiosError(error) && error.response) {
-      errorMessage = error.response.data.message || 'Error fetching analysis.';
-    }
-    setOuraAnalysisError(errorMessage);
-  }
 
-  setIsOuraAnalysisLoading(false);
-};
+    if (!readinessData) {
+      console.error('Readiness data is not available.');
+      setOuraAnalysisError('Readiness data is not available.');
+      return;
+    }
+
+    setIsOuraAnalysisLoading(true);
+
+    try {
+      const response = await axios.post('/api/chatgpt-analysis', {
+        content: ouraAnalysisPrompt,
+        data: readinessData
+      });
+
+      if (response.data.choices && response.data.choices.length > 0) {
+        setOuraAnalysisResult(response.data.choices[0].message.content);
+      } else {
+        setOuraAnalysisResult('No analysis available.');
+        // Optionally, if no data is returned, you might consider setting a specific error message
+        setOuraAnalysisError('No analysis could be generated from the data.');
+      }
+    } catch (error) {
+      console.error('Error in getOuraAnalysis:', error);
+      let errorMessage = 'Error fetching analysis.';
+      // Handle the case if error is an AxiosError for more specific error messaging
+      if (axios.isAxiosError(error) && error.response) {
+        errorMessage = error.response.data.message || 'Error fetching analysis.';
+      }
+      setOuraAnalysisError(errorMessage);
+    }
+
+    setIsOuraAnalysisLoading(false);
+  };
 
   useEffect(() => {
     let interval: number | undefined;
@@ -283,7 +298,7 @@ const getOuraAnalysis = async () => {
 
 
   return (
-<div className="bg-gray-50 min-h-screen flex flex-col">
+    <div className="bg-gray-50 min-h-screen flex flex-col">
       <SideMenu />
       <Head>
         <title>My Health Data</title>
@@ -332,6 +347,14 @@ const getOuraAnalysis = async () => {
 
         {isStravaAuthed && stravaData && (
           <div>
+            {athleteProfile && (
+              <div className="flex justify-center items-center mt-5">
+                <div className="flex items-center space-x-4">
+                  <img src={athleteProfile.profile_medium} alt="Profile" className="h-16 w-16 rounded-full border-2 border-gray-300" />
+                  <h2 className="text-xl font-semibold">{athleteProfile.firstname} {athleteProfile.lastname}</h2>
+                </div>
+              </div>
+            )}
             <NumberContainers
               totalDistance={totalDistance}
               totalElevationGain={totalElevationGain}
