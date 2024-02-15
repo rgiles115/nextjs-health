@@ -129,8 +129,14 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
 
     // Render the component
     return (
-        <div className="graph-container">
-            {chartRef.current && <canvas ref={chartRef} />}
+        <div>
+            {isLoading ? (
+                <Loading /> // Show loading component if data is still loading
+            ) : (
+                <div className="graph-container">
+                    <canvas ref={chartRef} />
+                </div>
+            )}
         </div>
     );
 };
