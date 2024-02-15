@@ -30,8 +30,8 @@ import SideMenu from './components/SideMenu';
 import StravaChart from './components/StravaChart';
 import ReadinessAnalysis from './components/ReadinessAnalysis';
 import NumberContainers from './components/NumberContainers';
-import SkeletonLoader from './components/SkeletonLoader'; // Adjust the import path based on your file structure
-
+import StravaSkeletonLoader from './components/StravaSkeletonLoader'; // Adjust the import path based on your file structure
+import OuraSkeletonLoader from './components/OuraSkeletonLoader';
 
 // Type definitions for the data used in the component
 import { StravaActivity } from '../app/types/StravaInterface';
@@ -347,14 +347,14 @@ export default function Home() {
         )}
 
         {isStravaAuthed && isStravaLoading && (
-          <SkeletonLoader />
+          <StravaSkeletonLoader />
         )}
 
         {isStravaAuthed && !isStravaLoading && stravaData && (
           <div>
             {athleteProfile && ytdRideTotals && (
               <div className="m-5 p-4 border border-gray-200 rounded-lg bg-white">
-                <div className="flex justify-center items-center mt-5">
+                <div className="flex justify-start items-center mt-5">
                   <img src={athleteProfile.profile_medium} alt="Profile" className="h-16 w-16 rounded-full border-2 border-gray-300" />
                   <div className="ml-4">
                     <h2 className="text-xl font-semibold">{athleteProfile.firstname} {athleteProfile.lastname}</h2>
@@ -428,7 +428,10 @@ export default function Home() {
             </div>
           </div>
         )}
-        {isOuraAuthed && (
+        {isOuraAuthed && isReadinessLoading && (
+          <OuraSkeletonLoader />
+        )}
+        {isOuraAuthed && !isReadinessLoading && readinessData && (
           <div>
             <h2 className="text-2xl font-semibold mb-2 px-5">Oura Readiness</h2>
             <div className="flex flex-wrap -m-4 px-2.5 py-2.5">

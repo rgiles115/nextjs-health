@@ -1,17 +1,17 @@
-// components/SkeletonLoader.js
+// components/StravaSkeletonLoader.js
 
-function SkeletonLoader() {
+function StravaSkeletonLoader() {
     return (
       <div className="space-y-10 animate-pulse">
-        {/* Profile and YTD Totals */}
-        <div className="m-5 p-4 border border-gray-200 rounded-lg bg-white">
+        {/* Profile and YTD Totals - Adjusted for double height */}
+        <div className="m-5 p-8 border border-gray-200 rounded-lg bg-white"> {/* Increased padding for larger inner space */}
           <div className="flex items-center space-x-4">
-            <div className="h-16 w-16 bg-gray-300 rounded-full"></div>
-            <div className="flex-1 space-y-3">
-              <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-              <div className="space-y-2">
-                <div className="h-4 bg-gray-300 rounded"></div>
-                <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+            <div className="h-16 w-16 bg-gray-300 rounded-full"></div> {/* Doubled height and width for the profile */}
+            <div className="flex-1 space-y-6"> {/* Increased spacing between lines */}
+              <div className="h-8 bg-gray-300 rounded w-3/4"></div> {/* Doubled height for the title line */}
+              <div className="space-y-4"> {/* Increased spacing for line items */}
+                <div className="h-8 bg-gray-300 rounded"></div> {/* Doubled height for detail lines */}
+                <div className="h-8 bg-gray-300 rounded w-5/6"></div>
               </div>
             </div>
           </div>
@@ -45,5 +45,5 @@ function SkeletonLoader() {
     );
   }
   
-  export default SkeletonLoader;
+  export default StravaSkeletonLoader;
   
