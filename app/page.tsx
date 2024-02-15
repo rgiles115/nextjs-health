@@ -360,7 +360,7 @@ export default function Home() {
                     <h2 className="text-xl font-semibold">{athleteProfile.firstname} {athleteProfile.lastname}</h2>
                     <div>
                       {/* Displaying YTD Totals */}
-                      <p><span className="text-gray-600">Distance:</span> {ytdRideTotals.distance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} km</p>
+                      <p><span className="text-gray-600">Distance:</span> {((ytdRideTotals.distance / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }))} km</p>
                       <p><span className="text-gray-600">Elevation Gain:</span> {ytdRideTotals.elevation_gain.toLocaleString()} meters</p>
                       {/* Displaying Year-End Estimations */}
                       {(() => {
