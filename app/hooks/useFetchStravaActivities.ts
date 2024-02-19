@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { StravaActivity, YtdRideTotals } from '../types/StravaInterface';
 
-// Add type annotations for the parameters
 const useFetchStravaActivities = (startDate: Date, endDate: Date) => {
   const [activities, setActivities] = useState<StravaActivity[] | null>(null);
   const [ytdRideTotals, setYtdRideTotals] = useState<YtdRideTotals | null>(null);
@@ -10,8 +9,17 @@ const useFetchStravaActivities = (startDate: Date, endDate: Date) => {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      const startTimestamp = Math.floor(startDate.getTime() / 1000);
-      const endTimestamp = Math.floor(endDate.getTime() / 1000);
+
+      // Adjust startDate to the beginning of the day
+      const startOfDay = new Date(startDate);
+      startOfDay.setHours(0, 0, 0, 0); // Sets to beginning of the day
+      const startTimestamp = Math.floor(startOfDay.getTime() / 1000);
+
+      // Adjust endDate to the end of the day
+      const endOfDay = new Date(endDate);
+      endOfDay.setHours(23, 59, 59, 999); // Sets to end of the day
+      const endTimestamp = Math.floor(endOfDay.getTime() / 1000);
+
       try {
         const response = await fetch(`/api/getStravaActivities?start_date=${startTimestamp}&end_date=${endTimestamp}`);
         if (!response.ok) {

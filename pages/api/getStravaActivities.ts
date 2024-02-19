@@ -198,6 +198,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const ytdRideTotals = statsResponse.data.ytd_ride_totals;
 
+        // console.log('Strava:', allActivities);
+        // console.log('Start Date:', start_date);
+
         // Include YTD ride totals in the response
         res.status(200).json({
             activities: allActivities,
