@@ -127,6 +127,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
         };
     }, [processedData, isLoading]); // Depend on processedData and isLoading to re-run the effect
 
+    
     // Render the component
     return (
         <div>

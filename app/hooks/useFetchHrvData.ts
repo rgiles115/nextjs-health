@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, subDays } from 'date-fns';
 
 interface SleepEntry {
     average_hrv: number | null;
@@ -25,11 +25,12 @@ const useFetchHrvData = (startDate: Date, endDate: Date): UseFetchHrvDataReturn 
     useEffect(() => {
         const fetchHRVData = async () => {
             setIsLoading(true);
-            const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+            // Subtract one day from startDate to get the sleep data for the night before
+            const adjustedStartDate = subDays(startDate, 1);
+            const formattedStartDate = format(adjustedStartDate, 'yyyy-MM-dd');
             const formattedEndDate = format(endDate, 'yyyy-MM-dd');
-
+            console.log('Adjusted Start date:', formattedStartDate);
             try {
-                // Replace the URL with your actual endpoint that accepts startDate and endDate as query parameters
                 const response = await fetch(`/api/getSleepData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
