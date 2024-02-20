@@ -325,7 +325,7 @@ export default function Home() {
 
         {/* Empty state message */}
         {!isStravaAuthed && !isOuraAuthed && (
-          <main className="flex-1 pt-32 pb-16 md:pt-28">
+          <main className="flex-1 pt-48 pb-16 md:pt-28">
             <div className="mx-auto flex flex-col justify-center items-center h-[20vh] w-[60vw] text-center">
               <div className="empty-state-message-header text-[1.8em] font-light">
                 <p>My Health Data works when you connect to your exercise and health data.</p>
