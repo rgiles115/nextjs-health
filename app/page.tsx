@@ -12,6 +12,8 @@ import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeartbeat } from '@fortawesome/free-solid-svg-icons';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Custom hooks for data fetching
 import useFetchStravaActivities from './hooks/useFetchStravaActivities';
@@ -56,7 +58,7 @@ export default function Home() {
   const sevenDaysAgo = new Date(currentDate.getTime() - (7 * 24 * 60 * 60 * 1000));
   const [startDate, setStartDate] = useState(sevenDaysAgo);
   const [endDate, setEndDate] = useState(currentDate);
-  const [isStravaAuthed, setIsStravaAuthed] = useState(false);
+  const [isStravaAuthed, setIsStravaAuthed] = useState<boolean | undefined>(undefined);
   const [isOuraAuthed, setIsOuraAuthed] = useState(false);
 
   // State for managing fetched and processed data
@@ -151,6 +153,12 @@ export default function Home() {
     setIsAuthCheckLoading(false);
   }, []);
 
+  useEffect(() => {
+    // Display each error in a separate toast message
+    errors.forEach(error => {
+      toast.error(`Failed to load data: ${error}`);
+    });
+  }, [errors]); // Depend on errors to re-trigger when they change
 
 
   // Function for Strava Data Analysis
@@ -159,9 +167,9 @@ export default function Home() {
     setStravaAnalysisError(null);
 
     if (!isStravaAuthed) {
-      console.error('Not authenticated for Strava.');
+      console.error('Not authenticated for Strava!');
       // Optionally, update error state here too
-      setStravaAnalysisError('Not authenticated for Strava.');
+      setStravaAnalysisError('Not authenticated for Strava!');
       return;
     }
 
@@ -300,7 +308,6 @@ export default function Home() {
     };
   }, [isOuraAnalysisLoading]);
 
-
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
       <SideMenu />
@@ -340,18 +347,14 @@ export default function Home() {
         )}
 
         {(isStravaAuthed || isOuraAuthed) && (
-          <div id="datePicker" className="flex justify-start bg-white border border-gray-300 bg-white rounded-xl w-96 ml-5 mt-5">
-            <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
-            <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
+          <div id="datePicker" className="flex justify-start bg-white border border-gray-300 bg-white rounded-xl w-80 ml-5 mt-5">
+            <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMM yyyy" className="custom-datepicker" />
+            <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMM yyyy" className="custom-datepicker" />
           </div>
         )}
 
         {isStravaAuthed && isStravaLoading && (
           <StravaSkeletonLoader />
-        )}
-
-        {errors.length > 0 && (
-          <p>Failed to load data: {errors.join(', ')}</p> // Combine and display all error messages
         )}
 
         {isStravaAuthed && !isStravaLoading && stravaData && (
@@ -477,8 +480,21 @@ export default function Home() {
 
           </div>
         )}
+        <ToastContainer
+          position="bottom-center"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
         <div id="footer"><Footer /></div>
       </div>
+
     </div>
   );
 
