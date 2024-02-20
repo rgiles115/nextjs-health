@@ -71,7 +71,7 @@ export default function Home() {
   const [loadingDots, setLoadingDots] = useState('');
 
   // Using custom hooks for fetching data from APIs
-  const { activities: stravaActivities, ytdRideTotals, isLoading: isStravaLoading } = useFetchStravaActivities(startDate, endDate, isStravaAuthed);
+  const { activities: stravaActivities, ytdRideTotals, isLoading: isStravaLoading, error: stravaError } = useFetchStravaActivities(startDate, endDate, isStravaAuthed);
   const { data: readinessData, isLoading: isReadinessLoading, error: ouraError } = useFetchOuraData(startDate, endDate, isOuraAuthed);
   const { data: hrvData, isLoading: isHrvLoading, error: hrvError } = useFetchHrvData(startDate, endDate, isOuraAuthed);
 
@@ -93,6 +93,8 @@ export default function Home() {
   const [isAuthCheckLoading, setIsAuthCheckLoading] = useState(true);
 
   const processedResults = useProcessStravaAndHRVData(processedData, hrvData);
+  const errors = [stravaError, ouraError, hrvError].filter(Boolean); // Filter out null values
+
 
   // Function to get a cookie value by name
   const getCookie = (name: string): string | undefined => {
@@ -337,8 +339,6 @@ export default function Home() {
           </main>
         )}
 
-
-
         {(isStravaAuthed || isOuraAuthed) && (
           <div id="datePicker" className="flex justify-start bg-white border border-gray-300 bg-white rounded-xl w-96 ml-5 mt-5">
             <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMMM yyyy" className="custom-datepicker" />
@@ -350,11 +350,15 @@ export default function Home() {
           <StravaSkeletonLoader />
         )}
 
+        {errors.length > 0 && (
+          <p>Failed to load data: {errors.join(', ')}</p> // Combine and display all error messages
+        )}
+
         {isStravaAuthed && !isStravaLoading && stravaData && (
           <div>
             {athleteProfile && ytdRideTotals && (
               <div className="m-5 p-4 border border-gray-200 rounded-lg bg-white">
-                <div className="flex justify-start items-center mt-5">
+                <div className="flex justify-start items-center mt-0">
                   <img src={athleteProfile.profile_medium} alt="Profile" className="h-16 w-16 rounded-full border-2 border-gray-300" />
                   <div className="ml-4">
                     <h2 className="text-xl font-semibold">{athleteProfile.firstname} {athleteProfile.lastname}</h2>
