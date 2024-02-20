@@ -1,12 +1,23 @@
 import { useState, useEffect } from 'react';
 import { StravaActivity, YtdRideTotals } from '../types/StravaInterface';
 
-const useFetchStravaActivities = (startDate: Date, endDate: Date) => {
+// Added isStravaAuthed as a parameter to the hook
+const useFetchStravaActivities = (startDate: Date, endDate: Date, isStravaAuthed: boolean) => {
   const [activities, setActivities] = useState<StravaActivity[] | null>(null);
   const [ytdRideTotals, setYtdRideTotals] = useState<YtdRideTotals | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    // Check if Strava is authenticated before fetching
+    if (!isStravaAuthed) {
+      console.log("Strava is not authenticated, skipping fetch.");
+      // Optionally, you can set activities and ytdRideTotals to null here if you want to reset the state
+      // setActivities(null);
+      // setYtdRideTotals(null);
+      setIsLoading(false); // Make sure to set loading to false as we're not fetching
+      return; // Exit early as we do not want to proceed with the fetch
+    }
+
     const fetchData = async () => {
       setIsLoading(true);
 
@@ -26,7 +37,6 @@ const useFetchStravaActivities = (startDate: Date, endDate: Date) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        // Assuming your updated API now returns an object with both activities and ytdRideTotals
         setActivities(result.activities);
         setYtdRideTotals(result.ytdRideTotals);
       } catch (error) {
@@ -39,7 +49,7 @@ const useFetchStravaActivities = (startDate: Date, endDate: Date) => {
     };
 
     fetchData();
-  }, [startDate, endDate]);
+  }, [startDate, endDate, isStravaAuthed]); // Make sure to include isStravaAuthed as a dependency
 
   return { activities, ytdRideTotals, isLoading };
 };

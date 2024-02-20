@@ -1,45 +1,42 @@
-// Importing necessary modules and components from React, Chart.js, and Next.js
 import React, { useRef, useEffect } from 'react';
 import { Chart, ChartConfiguration } from 'chart.js';
-import 'chartjs-adapter-date-fns'; // For date handling within charts
+import 'chartjs-adapter-date-fns';
 import dynamic from 'next/dynamic';
 
-// Interface for individual processed Strava activity data
 interface ProcessedStravaActivity {
-    day: string; // The day of the activity
-    distance: number; // Distance covered in the activity
-    totalElevationGain: number; // Total elevation gain during the activity
-    averageHRV?: number; // Optional average Heart Rate Variability
-    averageWatts?: number; // Optional average Watts generated
+    day: string;
+    distance: number;
+    totalElevationGain: number;
+    averageHRV?: number;
+    averageWatts?: number;
 }
 
-// Props for the StravaChart component
 interface StravaChartProps {
-    processedData: ProcessedStravaActivity[]; // Array of processed Strava activities
-    isLoading: boolean; // Loading state to manage rendering
+    processedData: ProcessedStravaActivity[];
+    isLoading: boolean;
 }
 
-// Dynamically import the Loading component for better performance
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
-// Functional component definition using React.FC with StravaChartProps as props
 const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoading }) => {
-    const chartRef = useRef<HTMLCanvasElement>(null); // Ref for the canvas element
-    const chartInstanceRef = useRef<Chart | null>(null); // Ref to store the Chart.js instance
+    const chartRef = useRef<HTMLCanvasElement>(null);
+    const chartInstanceRef = useRef<Chart | null>(null);
 
-    // useEffect hook to create or update the chart when processedData or isLoading changes
     useEffect(() => {
-        // Only proceed if not loading, data is available, and the canvas ref is current
-        if (!isLoading && processedData.length > 0 && chartRef.current) {
-            const ctx = chartRef.current.getContext('2d'); // Get the rendering context
-            if (ctx) {
-                chartInstanceRef.current?.destroy(); // Destroy any existing chart instance
+        const handleResize = () => {
+            if (chartInstanceRef.current) {
+                chartInstanceRef.current.resize();
+            }
+        };
 
-                // Check for the presence of HRV and Watts data in the dataset
+        if (!isLoading && processedData.length > 0 && chartRef.current) {
+            const ctx = chartRef.current.getContext('2d');
+            if (ctx) {
+                chartInstanceRef.current?.destroy();
+
                 const hasHRVData = processedData.some(data => data.averageHRV != null);
                 const hasWattsData = processedData.some(data => data.averageWatts != null);
 
-                // Define datasets for the chart
                 const datasets = [
                     {
                         label: 'Distance (km)',
@@ -59,11 +56,10 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                     },
                 ];
 
-                // Conditionally add datasets for Watts and HRV if data is present
                 if (hasWattsData) {
                     datasets.push({
                         label: 'Average Watts',
-                        data: processedData.map(data => data.averageWatts ?? 0), // Replace null with 0
+                        data: processedData.map(data => data.averageWatts ?? 0),
                         borderColor: '#ffbe0b',
                         tension: 0.4,
                         pointRadius: 0,
@@ -74,19 +70,18 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                 if (hasHRVData) {
                     datasets.push({
                         label: 'Average HRV',
-                        data: processedData.map(data => data.averageHRV ?? 0), // Replace null with 0
+                        data: processedData.map(data => data.averageHRV ?? 0),
                         borderColor: '#8338ec',
                         tension: 0.4,
                         pointRadius: 0,
-                        yAxisID: hasWattsData ? 'y1' : 'y', // Use a separate axis if both HRV and Watts data are present
+                        yAxisID: hasWattsData ? 'y1' : 'y',
                     });
                 }
 
-                // Chart configuration
                 const chartConfig: ChartConfiguration<'line', number[], string> = {
                     type: 'line',
                     data: {
-                        labels: processedData.map(data => data.day), // Use the day as labels
+                        labels: processedData.map(data => data.day),
                         datasets,
                     },
                     options: {
@@ -101,14 +96,14 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                                     maxTicksLimit: 10
                                 }
                             },
-                            y: { // Configure the primary Y axis
+                            y: {
                                 position: 'left',
                             },
                             ...(hasHRVData && hasWattsData && {
-                                y1: { // Optionally configure a secondary Y axis
+                                y1: {
                                     position: 'right',
                                     grid: {
-                                        drawOnChartArea: false, // Avoid drawing grid lines for the secondary axis on the chart area
+                                        drawOnChartArea: false,
                                     },
                                 }
                             }),
@@ -116,23 +111,24 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                     },
                 };
 
-                // Initialize the chart with the config
                 chartInstanceRef.current = new Chart(ctx, chartConfig);
+
+                // Add the resize event listener
+                window.addEventListener('resize', handleResize);
             }
         }
 
-        // Cleanup function to destroy the chart instance when the component unmounts
+        // Cleanup function to remove the resize event listener and destroy the chart instance
         return () => {
             chartInstanceRef.current?.destroy();
+            window.removeEventListener('resize', handleResize);
         };
-    }, [processedData, isLoading]); // Depend on processedData and isLoading to re-run the effect
+    }, [processedData, isLoading]);
 
-    
-    // Render the component
     return (
         <div>
             {isLoading ? (
-                <Loading /> // Show loading component if data is still loading
+                <Loading />
             ) : (
                 <div className="graph-container">
                     <canvas ref={chartRef} />
@@ -142,13 +138,11 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
     );
 };
 
-// Function to compare props to prevent unnecessary re-renders
 const areEqual = (prevProps: StravaChartProps, nextProps: StravaChartProps) => {
     return prevProps.isLoading === nextProps.isLoading &&
-        prevProps.processedData === nextProps.processedData; // Simple comparison, consider deeper comparison if necessary
+        prevProps.processedData === nextProps.processedData;
 };
 
-// Wrap the component with React.memo for performance optimization
 const StravaChart = React.memo(StravaChartComponent, areEqual);
 
-export default StravaChart; // Export the component for use in other parts of the application
+export default StravaChart;

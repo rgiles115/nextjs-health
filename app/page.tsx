@@ -71,9 +71,9 @@ export default function Home() {
   const [loadingDots, setLoadingDots] = useState('');
 
   // Using custom hooks for fetching data from APIs
-  const { activities: stravaActivities, ytdRideTotals, isLoading: isStravaLoading } = useFetchStravaActivities(startDate, endDate);
-  const { data: readinessData, isLoading: isReadinessLoading } = useFetchOuraData(startDate, endDate);
-  const { data: hrvData, isLoading: isHrvLoading } = useFetchHrvData(startDate, endDate);
+  const { activities: stravaActivities, ytdRideTotals, isLoading: isStravaLoading } = useFetchStravaActivities(startDate, endDate, isStravaAuthed);
+  const { data: readinessData, isLoading: isReadinessLoading, error: ouraError } = useFetchOuraData(startDate, endDate, isOuraAuthed);
+  const { data: hrvData, isLoading: isHrvLoading, error: hrvError } = useFetchHrvData(startDate, endDate, isOuraAuthed);
 
   // Processing Strava data with a custom hook
   const { processedData, totalDistance, totalElevationGain, averageWatts } = useProcessStravaData(stravaActivities, startDate, endDate);

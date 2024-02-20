@@ -78,7 +78,7 @@ export default async function handler(req: Request) {
   const estimatedTokens = estimateTokenCount(combinedText);
 
   // Check if the estimated token count exceeds the limit (e.g., 4096 tokens for GPT-4)
-  if (estimatedTokens > 4096) { // Adjust the limit based on your model's specific limits
+  if (estimatedTokens > 2096) { // Adjust the limit based on your model's specific limits
     const errorMessage = "The amount of data to analyse is too large. Reduce the date window and please try again.";
     console.error(errorMessage); // Log the specific error message for server-side visibility
     return new Response(JSON.stringify({ message: errorMessage }), {

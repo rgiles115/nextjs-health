@@ -17,19 +17,30 @@ interface UseFetchHrvDataReturn {
     error: Error | null;
 }
 
-const useFetchHrvData = (startDate: Date, endDate: Date): UseFetchHrvDataReturn => {
+// Added isAuthenticated as a parameter
+const useFetchHrvData = (startDate: Date, endDate: Date, isAuthenticated: boolean): UseFetchHrvDataReturn => {
     const [data, setData] = useState<HRVData[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
+        // Immediately return if not authenticated
+        if (!isAuthenticated) {
+            console.log("Not authenticated, skipping HRV data fetch.");
+            setIsLoading(false); // Make sure to set loading to false as we're not fetching
+            // Optionally, reset data and error here if you want to clear previous state
+            // setData(null);
+            // setError(null);
+            return; // Exit early
+        }
+
         const fetchHRVData = async () => {
             setIsLoading(true);
             // Subtract one day from startDate to get the sleep data for the night before
             const adjustedStartDate = subDays(startDate, 1);
             const formattedStartDate = format(adjustedStartDate, 'yyyy-MM-dd');
             const formattedEndDate = format(endDate, 'yyyy-MM-dd');
-            console.log('Adjusted Start date:', formattedStartDate);
+            
             try {
                 const response = await fetch(`/api/getSleepData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`);
                 if (!response.ok) {
@@ -53,7 +64,7 @@ const useFetchHrvData = (startDate: Date, endDate: Date): UseFetchHrvDataReturn 
         };
 
         fetchHRVData();
-    }, [startDate, endDate]);
+    }, [startDate, endDate, isAuthenticated]); // Include isAuthenticated in the dependency array
 
     return { data, isLoading, error };
 };
