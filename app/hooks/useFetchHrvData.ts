@@ -7,9 +7,9 @@ interface SleepEntry {
 }
 
 interface HRVData {
-    date: string; // Using ISO date format 'yyyy-MM-dd'
-    averageHRV: number;
-}
+    date: string;
+    averageHRV: number | null; // Allow null values
+  }
 
 interface UseFetchHrvDataReturn {
     data: HRVData[] | null;
@@ -38,43 +38,50 @@ const useFetchHrvData = (startDate: Date, endDate: Date, isAuthenticated: boolea
             const adjustedStartDate = subDays(startDate, 1);
             const formattedStartDate = format(adjustedStartDate, 'yyyy-MM-dd');
             const formattedEndDate = format(endDate, 'yyyy-MM-dd');
-            
-            try {
-                const response = await fetch(`/api/getSleepData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`);
-                
-                // Check if the response is not ok to log additional details
-                if (!response.ok) {
-                    console.error(`HTTP Error Response: status ${response.status} ${response.statusText}`);
-        
-                    // Attempt to read and log the response body which might contain more details about the error
-                    try {
-                        const errorBody = await response.json(); // Assuming the server returns JSON with error details
-                        console.error("Error Body:", errorBody);
-                    } catch (bodyError) {
-                        console.error("Failed to parse error response body:", bodyError);
+
+            // Define the timeout duration in milliseconds
+            const timeoutDuration = 10000; // for example, 10 seconds
+
+            // Create a timeout flag
+            let didTimeout = false;
+
+            // Create a promise that logs a message after a timeout but does not reject
+            const timeoutPromise = new Promise(resolve => {
+                setTimeout(() => {
+                    didTimeout = true;
+                    console.log('Request might have timed out');
+                    resolve(null); // Resolve instead of reject to avoid throwing an error
+                }, timeoutDuration);
+            });
+
+            // Fetch request wrapped in a promise to work with Promise.race
+            const fetchPromise = fetch(`/api/getSleepData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`)
+                .then(response => {
+                    if (!response.ok) {
+                        console.error(`HTTP Error Response: status ${response.status} ${response.statusText}`);
+                        throw new Error('Network response was not ok');
                     }
-        
-                    throw new Error('Network response was not ok');
-                }
-        
-                const { data } = await response.json();
-        
-                const transformedData = data
-                    .filter((entry: SleepEntry) => entry.average_hrv !== null)
-                    .map((entry: SleepEntry) => ({
-                        date: format(parseISO(entry.day), 'yyyy-MM-dd'), // Ensure the date is in ISO format
-                        averageHRV: entry.average_hrv as number,
+                    return response.json(); // Proceed to process the response if it's ok
+                });
+
+            // Use Promise.race to race the fetch request against the timeout
+            const result = await Promise.race([fetchPromise, timeoutPromise]);
+
+            // Proceed only if the fetchPromise resolved before the timeout
+            if (!didTimeout && result) {
+                const transformedData = (result.data as SleepEntry[])
+                    .filter((entry) => entry.average_hrv !== null)
+                    .map((entry) => ({
+                        date: format(parseISO(entry.day), 'yyyy-MM-dd'),
+                        averageHRV: entry.average_hrv,
                     }));
-        
+
+
                 setData(transformedData);
-            } catch (err) {
-                console.error("Fetch HRV Data Error:", err);
-                setError(err as Error);
-            } finally {
-                setIsLoading(false);
             }
+
+            setIsLoading(false);
         };
-        
 
         fetchHRVData();
     }, [startDate, endDate, isAuthenticated]); // Include isAuthenticated in the dependency array
