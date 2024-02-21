@@ -59,7 +59,8 @@ export default function Home() {
   const [startDate, setStartDate] = useState(sevenDaysAgo);
   const [endDate, setEndDate] = useState(currentDate);
   const [isStravaAuthed, setIsStravaAuthed] = useState<boolean | undefined>(undefined);
-  const [isOuraAuthed, setIsOuraAuthed] = useState(false);
+  const [isOuraAuthed, setIsOuraAuthed] = useState<boolean | undefined>(undefined);
+  const [isAuthCheckLoading, setIsAuthCheckLoading] = useState(true);
 
   // State for managing fetched and processed data
   const [stravaData, setStravaData] = useState<StravaActivity[]>([]);
@@ -74,9 +75,9 @@ export default function Home() {
 
   // Using custom hooks for fetching data from APIs
   const { activities: stravaActivities, ytdRideTotals, isLoading: isStravaLoading, error: stravaError } = useFetchStravaActivities(startDate, endDate, isStravaAuthed);
-  const { data: readinessData, isLoading: isReadinessLoading, error: ouraError } = useFetchOuraData(startDate, endDate, isOuraAuthed);
-  const { data: hrvData, isLoading: isHrvLoading, error: hrvError } = useFetchHrvData(startDate, endDate, isOuraAuthed);
-
+  const { data: readinessData, isLoading: isReadinessLoading, error: ouraError } = useFetchOuraData(startDate, endDate, isOuraAuthed || false);
+  const { data: hrvData, isLoading: isHrvLoading, error: hrvError } = useFetchHrvData(startDate, endDate, isOuraAuthed || false);
+  
   // Processing Strava data with a custom hook
   const { processedData, totalDistance, totalElevationGain, averageWatts } = useProcessStravaData(stravaActivities, startDate, endDate);
 
@@ -92,7 +93,6 @@ export default function Home() {
   // Animation states for loading indicators
   const [stravaLoadingDots, setStravaLoadingDots] = useState('');
   const [ouraLoadingDots, setOuraLoadingDots] = useState('');
-  const [isAuthCheckLoading, setIsAuthCheckLoading] = useState(true);
 
   const processedResults = useProcessStravaAndHRVData(processedData, hrvData);
   const errors = [stravaError, ouraError, hrvError].filter(Boolean); // Filter out null values
@@ -125,33 +125,31 @@ export default function Home() {
 
   // Effect hook to check authentication status on component mount
   useEffect(() => {
-    setIsAuthCheckLoading(true);
-    // Fetch Strava authentication status
-    fetch('/api/stravaAuthStatus')
-      .then(response => response.json())
-      .then(data => {
-        setIsStravaAuthed(data.isStravaAuthed);
-        if (data.isStravaAuthed && data.athlete) {
-          // Use the athlete data here to set state variables, for example:
-          setAthleteProfile(data.athlete);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching Strava auth status:', error);
-      })
-      .finally(() => setIsAuthCheckLoading(false));
+    // Define asynchronous function to perform auth checks
+    const checkAuthStatuses = async () => {
+        try {
+            // Fetch Strava authentication status
+            const stravaResponse = await fetch('/api/stravaAuthStatus');
+            const stravaData = await stravaResponse.json();
+            setIsStravaAuthed(stravaData.isStravaAuthed);
+            if (stravaData.isStravaAuthed && stravaData.athlete) {
+                setAthleteProfile(stravaData.athlete);
+            }
 
-    // Fetch Oura authentication status
-    fetch('/api/ouraAuthStatus')
-      .then(response => response.json())
-      .then(data => {
-        setIsOuraAuthed(data.isOuraAuthed);
-      })
-      .catch(error => {
-        console.error('Error fetching Oura auth status:', error);
-      });
-    setIsAuthCheckLoading(false);
-  }, []);
+            // Fetch Oura authentication status
+            const ouraResponse = await fetch('/api/ouraAuthStatus');
+            const ouraData = await ouraResponse.json();
+            setIsOuraAuthed(ouraData.isOuraAuthed);
+        } catch (error) {
+            console.error('Error fetching authentication statuses:', error);
+            // Consider setting auth statuses to false or handling the error appropriately
+        } finally {
+            setIsAuthCheckLoading(false); // Indicate that auth checks are completed
+        }
+    };
+
+    checkAuthStatuses();
+}, []);
 
   useEffect(() => {
     // Display each error in a separate toast message
@@ -167,9 +165,9 @@ export default function Home() {
     setStravaAnalysisError(null);
 
     if (!isStravaAuthed) {
-      console.error('Not authenticated for Strava!');
+      // console.error('Not authenticated for Strava!');
       // Optionally, update error state here too
-      setStravaAnalysisError('Not authenticated for Strava!');
+      // setStravaAnalysisError('Not authenticated for Strava!');
       return;
     }
 

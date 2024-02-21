@@ -19,7 +19,7 @@ const useFetchStravaActivities = (startDate: Date, endDate: Date, isStravaAuthed
     if (!isStravaAuthed) {
       console.log("Strava is not authenticated, skipping fetch.");
       setIsLoading(false);
-      setError('Not authenticated for Strava.');
+      // setError('Not authenticated for Strava.');
       return;
     }
 
