@@ -1,10 +1,6 @@
 import React from 'react';
 import Typewriter from 'typewriter-effect';
-
-interface HRVData {
-    date: string; // The date of the HRV reading, in a suitable format for your application
-    averageHRV: number; // The average HRV value for that date
-}
+import { HRVData } from '../../app/types/OuraInterfaces';
 
 interface HRVAnalysisProps {
     hrvData: HRVData | null;

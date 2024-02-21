@@ -1,10 +1,6 @@
 import { useState, useEffect } from 'react';
 import { parseISO, isEqual, format } from 'date-fns';
-
-interface HRVData {
-    date: string;
-    averageHRV: number;
-}
+import { HRVData } from '../../app/types/OuraInterfaces';
 
 // Extending HRVData to include a parsedDate property for internal use
 interface ExtendedHRVData extends HRVData {
@@ -45,12 +41,20 @@ const useProcessStravaAndHRVData = (
             const matchingHRV = hrvDataWithParsedDates.find(hrv =>
                 isEqual(activityDate, hrv.parsedDate)
             );
-
+        
+            // Explicitly handle null values for averageHRV
+            let averageHRV = matchingHRV?.averageHRV;
+            if (averageHRV === null) {
+                averageHRV = undefined; // Ensure averageHRV is only number or undefined
+            }
+        
             return {
                 ...activity,
-                averageHRV: matchingHRV ? matchingHRV.averageHRV : undefined,
+                averageHRV,
             };
         });
+        
+        
 
         const formattedData = mergedData.map(activity => ({
             ...activity,

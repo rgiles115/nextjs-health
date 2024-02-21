@@ -38,10 +38,6 @@ import OuraSkeletonLoader from './components/OuraSkeletonLoader';
 // Type definitions for the data used in the component
 import { StravaActivity } from '../app/types/StravaInterface';
 
-interface HRVData {
-  date: string;
-  averageHRV: number;
-}
 
 interface AthleteProfile {
   id: number;
@@ -345,7 +341,7 @@ export default function Home() {
         )}
 
         {(isStravaAuthed || isOuraAuthed) && (
-          <div id="datePicker" className="flex justify-start bg-white border border-gray-300 bg-white rounded-xl w-80 ml-5 mt-5">
+          <div id="datePicker" className="flex justify-start bg-white border border-gray-300 bg-white rounded-xl w-80 ml-5 mt-5 mb-5">
             <ReactDatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} dateFormat="dd MMM yyyy" className="custom-datepicker" />
             <ReactDatePicker selected={endDate} onChange={(date: Date | null) => date && setEndDate(date)} dateFormat="dd MMM yyyy" className="custom-datepicker" />
           </div>

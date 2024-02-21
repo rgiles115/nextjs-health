@@ -3,14 +3,11 @@ import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import dynamic from 'next/dynamic';
 import "react-datepicker/dist/react-datepicker.css";
+import { HRVData } from '../../app/types/OuraInterfaces';
+
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 Chart.register(...registerables);
-
-interface HRVData {
-    date: string; // The date of the HRV reading, in a suitable format for your application
-    averageHRV: number; // The average HRV value for that date
-}
 
 interface HRVChartProps {
     hrvData: HRVData[];

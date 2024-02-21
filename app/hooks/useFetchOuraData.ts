@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { format } from 'date-fns'; // Ensure date-fns is installed and imported for formatting
+import { useState, useEffect, useRef } from 'react';
+import { format } from 'date-fns';
 
 interface ReadinessData {
   dates: string[];
@@ -8,61 +8,74 @@ interface ReadinessData {
   bodyTemperature: number[];
 }
 
-// Added isOuraAuthed as a parameter
 const useFetchOuraData = (startDate: Date, endDate: Date, isOuraAuthed: boolean) => {
   const [data, setData] = useState<ReadinessData | null>(null);
   const [isLoading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+
+  // Use a ref to track whether a timeout has occurred
+  const timeoutOccurred = useRef(false);
 
   useEffect(() => {
-    // Immediately return if not authenticated with Oura
     if (!isOuraAuthed) {
       console.log("Oura is not authenticated, skipping fetch.");
-      setLoading(false); // Make sure to set loading to false as we're not fetching
-      // Optionally, reset data and error here if you want to clear previous state
-      // setData(null);
-      // setError(null);
-      return; // Exit early
+      setLoading(false);
+      return; // Exit early if not authenticated
     }
 
-    setLoading(true);
     const fetchData = async () => {
+      setLoading(true);
+
+      // Setup a timeout to indicate a slow request
+      const timeoutDuration = 10000; // Set timeout to 10 seconds
+      setTimeout(() => {
+        timeoutOccurred.current = true;
+        console.log('Request might be slow');
+        // Optionally, set a state here to show a message in the UI
+      }, timeoutDuration);
+
       try {
-        const formattedStartDate = format(startDate, 'yyyy-MM-dd');
-        const formattedEndDate = format(endDate, 'yyyy-MM-dd');
-        const url = `/api/getReadinessData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`;
-
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Network response was not ok.');
-
-        const result = await response.json();
-
-        const formattedDates = result.data.map((entry: any) =>
-            format(new Date(entry.day), 'do MMM yyyy')
-        );
-        const readinessData: ReadinessData = {
-            dates: formattedDates,
-            restingHeartRate: result.data.map((entry: any) => entry.contributors.resting_heart_rate),
-            hrvBalance: result.data.map((entry: any) => entry.contributors.hrv_balance),
-            bodyTemperature: result.data.map((entry: any) => entry.contributors.body_temperature)
-        };
-
-        setData(readinessData);
-      } catch (err: unknown) {
-        let errorMessage: string;
-        if (err instanceof Error) {
-          errorMessage = err.message;
-        } else {
-          errorMessage = 'An unknown error occurred';
+        const response = await fetch(`/api/getReadinessData?start_date=${format(startDate, 'yyyy-MM-dd')}&end_date=${format(endDate, 'yyyy-MM-dd')}`);
+        if (!response.ok) {
+          throw new Error(`HTTP Error Response: status ${response.status} ${response.statusText}`);
         }
-        setError(errorMessage);
+        const result = await response.json();
+        // console.log('Result:', result);
+
+        if (!timeoutOccurred.current) {
+          // Process the data only if timeout did not occur, or process regardless if you want
+          const formattedDates = result.data.map((entry: any) =>
+          format(new Date(entry.day), 'do MMM yyyy')
+      );
+      const readinessData: ReadinessData = {
+          dates: formattedDates,
+          restingHeartRate: result.data.map((entry: any) => entry.contributors.resting_heart_rate),
+          hrvBalance: result.data.map((entry: any) => entry.contributors.hrv_balance),
+          bodyTemperature: result.data.map((entry: any) => entry.contributors.body_temperature)
+      };
+          setData(readinessData);
+          // console.log('Readiness Data:', readinessData);
+        }
+      } catch (error: unknown) {
+        console.error('Fetch error:', error);
+        if (error instanceof Error) {
+          setError(error); // Set the error state if it's an instance of Error
+        } else {
+          // Handle cases where the error might not be an Error instance
+          setError(new Error('An unexpected error occurred'));
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [startDate, endDate, isOuraAuthed]); // Include isOuraAuthed in the dependency array
+
+    // Cleanup function to reset the timeoutOccurred flag upon component unmount or before next effect runs
+    return () => {
+      timeoutOccurred.current = false;
+    };
+  }, [startDate, endDate, isOuraAuthed]);
 
   return { data, isLoading, error };
 };

@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
 import { format, parseISO, subDays } from 'date-fns';
+import { HRVData } from '../../app/types/OuraInterfaces';
+
 
 interface SleepEntry {
     average_hrv: number | null;
     day: string; // Assuming 'day' is already in an acceptable format for parseISO
 }
-
-interface HRVData {
-    date: string;
-    averageHRV: number | null; // Allow null values
-  }
 
 interface UseFetchHrvDataReturn {
     data: HRVData[] | null;
