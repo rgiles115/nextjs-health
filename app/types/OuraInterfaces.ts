@@ -1,5 +1,3 @@
-// HRVData.ts (or in any other common types file)
-
 export interface OuraData {
     access_token: string;
     token_type: string;
@@ -21,7 +19,7 @@ export interface ReadinessEntry {
     contributors: {
         resting_heart_rate: number;
         hrv_balance: number;
-        body_temperature: number; // Ensure these match the actual API response fields
+        body_temperature: number; 
     };
 }
 
@@ -30,7 +28,6 @@ export interface SleepData {
     next_token: string | null;
 }
 
-// In ActivityInterfaces.ts
 export interface ActivityData {
     data: ActivityEntry[];
     next_token: string | null;
@@ -109,7 +106,6 @@ export interface DailySleepContributors {
     total_sleep: number;
 }
 
-
 export interface Contributors {
     deep_sleep: number;
     efficiency: number;
@@ -119,7 +115,6 @@ export interface Contributors {
     timing: number;
     total_sleep: number;
 }
-
 
 export interface SleepEntry {
     id: string;
@@ -151,7 +146,7 @@ export interface SleepEntry {
     total_sleep_duration: number;
     type: string;
     detailedSleepData: DetailedSleepData;
-    hrv_values?: number[]; // Add this line to include HRV values
+    hrv_values?: number[]; 
 }
 
 export interface HeartRateData {
@@ -171,5 +166,5 @@ type DetailedSleepData = SleepEntry;
 
 export interface transformedHrvData {
     date: string;
-    averageHRV: number | null; // Adjusted to match the actual data structure
+    averageHRV: number | null;
 }

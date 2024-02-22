@@ -1,83 +1,76 @@
+// Imports necessary hooks and utility functions from React and date-fns libraries.
 import { useState, useEffect } from 'react';
 import { format, parseISO, subDays } from 'date-fns';
+// Imports types for transformed HRV data and sleep entries.
 import { transformedHrvData, SleepEntry } from '../../app/types/OuraInterfaces';
 
+// Defines the TypeScript interface for the hook's return type.
 interface UseFetchHrvDataReturn {
-    data: transformedHrvData[] | null;
-    isLoading: boolean;
-    error: Error | null;
+    data: transformedHrvData[] | null; // The processed HRV data or null if not available.
+    isLoading: boolean; // Flag indicating whether the data is currently being loaded.
+    error: Error | null; // Stores any error that occurs during data fetching or processing.
 }
 
-// Added isAuthenticated as a parameter
+// The custom hook definition, accepting start and end dates to fetch data for, and an authentication status.
 const useFetchHrvData = (startDate: Date, endDate: Date, isAuthenticated: boolean): UseFetchHrvDataReturn => {
+    // State hooks for managing HRV data, loading status, and any errors.
     const [data, setData] = useState<transformedHrvData[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
 
+    // useEffect hook to perform the data fetch operation when the hook's inputs change.
     useEffect(() => {
-        // Immediately return if not authenticated
+        // Checks if the user is authenticated. If not, skips fetching data and sets loading to false.
         if (!isAuthenticated) {
             console.log("Not authenticated, skipping HRV data fetch.");
-            setIsLoading(false); // Make sure to set loading to false as we're not fetching
-            // Optionally, reset data and error here if you want to clear previous state
-            // setData(null);
-            // setError(null);
-            return; // Exit early
+            setIsLoading(false);
+            return;
         }
+
+        // Asynchronous function to fetch HRV data from the API.
         const fetchHRVData = async () => {
-            setIsLoading(true);
+            setIsLoading(true); // Indicates the start of data fetching.
+            setError(null); // Resets any previous errors before fetching new data.
+
+            // Adjusts the start date by subtracting one day and formats start and end dates.
             const adjustedStartDate = subDays(startDate, 1);
             const formattedStartDate = format(adjustedStartDate, 'yyyy-MM-dd');
             const formattedEndDate = format(endDate, 'yyyy-MM-dd');
 
-            // Define the timeout duration in milliseconds
-            const timeoutDuration = 10000; // for example, 10 seconds
+            try {
+                // Attempts to fetch data from the API with the formatted query parameters.
+                const response = await fetch(`/api/getSleepData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`);
+                if (!response.ok) {
+                    // Throws an error if the response status is not OK.
+                    throw new Error(`HTTP Error Response: status ${response.status} ${response.statusText}`);
+                }
+                const result = await response.json(); // Parses the JSON response.
 
-            // Create a timeout flag
-            let didTimeout = false;
-
-            // Create a promise that logs a message after a timeout but does not reject
-            const timeoutPromise = new Promise(resolve => {
-                setTimeout(() => {
-                    didTimeout = true;
-                    console.log('Request might have timed out');
-                    resolve(null); // Resolve instead of reject to avoid throwing an error
-                }, timeoutDuration);
-            });
-
-            // Fetch request wrapped in a promise to work with Promise.race
-            const fetchPromise = fetch(`/api/getSleepData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`)
-                .then(response => {
-                    if (!response.ok) {
-                        console.error(`HTTP Error Response: status ${response.status} ${response.statusText}`);
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json(); // Proceed to process the response if it's ok
-                });
-
-            // Use Promise.race to race the fetch request against the timeout
-            const result = await Promise.race([fetchPromise, timeoutPromise]);
-
-            // Proceed only if the fetchPromise resolved before the timeout
-            if (!didTimeout && result) {
-                const transformedHrvData = (result.data as SleepEntry[])
+                // Transforms the fetched data by filtering and mapping to the desired structure.
+                const transformedData = (result.data as SleepEntry[])
                     .filter((entry) => entry.average_hrv !== null)
                     .map((entry) => ({
                         date: format(parseISO(entry.day), 'yyyy-MM-dd'),
                         averageHRV: entry.average_hrv,
                     }));
 
-
-                setData(transformedHrvData);
+                setData(transformedData); // Sets the transformed data to the state.
+            } catch (error) {
+                // Catches and logs any errors that occur during fetching or processing.
+                console.error("Failed to fetch HRV data:", error);
+                // Sets an error state, ensuring it's an Error object.
+                setError(error instanceof Error ? error : new Error('An error occurred while fetching HRV data'));
+            } finally {
+                setIsLoading(false); // Sets loading to false after the fetch operation is complete, regardless of outcome.
             }
-
-            setIsLoading(false);
         };
 
-        fetchHRVData();
-    }, [startDate, endDate, isAuthenticated]); // Include isAuthenticated in the dependency array
+        fetchHRVData(); // Calls the fetchHRVData function defined above.
+    }, [startDate, endDate, isAuthenticated]); // Dependencies array, effect reruns when any of these values change.
 
+    // Returns the HRV data, loading status, and any error state.
     return { data, isLoading, error };
 };
 
+// Exports the custom hook for use in other parts of the application.
 export default useFetchHrvData;

@@ -1,12 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
-import { format } from 'date-fns';
-import "react-datepicker/dist/react-datepicker.css";
 import dynamic from 'next/dynamic';
 import isEqual from 'lodash/isEqual';
-import { DailySleepEntry } from '../../app/types/OuraInterfaces';
-
+import { useFetchSleepData } from '../hooks/useFetchSleepData';
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 Chart.register(...registerables);
@@ -14,47 +11,12 @@ Chart.register(...registerables);
 interface SleepChartProps {
     startDate: Date;
     endDate: Date;
-    sleepData?: { // Make sleepData optional
-      dates: string[];
-      totalSleep: number[];
-      // Add other fields as necessary
-    } | null;
-    isLoading?: boolean; // Make isLoading optional
-  }
-
+}
 
 const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
-    const [sleepData, setSleepData] = useState({ dates: [], total: [], rem: [], deep: [], light: [], restfulness: [] });
+    const { data: sleepData, isLoading } = useFetchSleepData(startDate, endDate);
     const chartRef = useRef<HTMLCanvasElement>(null);
     const chartInstanceRef = useRef<Chart | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-
-    useEffect(() => {
-        setIsLoading(true); // Start loading
-        const formattedStartDate = startDate.toISOString().split('T')[0];
-        const formattedEndDate = endDate.toISOString().split('T')[0];
-
-        fetch(`/api/getDailySleepData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`)
-            .then(response => response.json())
-            .then(data => {
-                const formattedDates = data.data.map((entry: DailySleepEntry) => format(new Date(entry.timestamp), 'do MMM yyyy'));
-                const total = data.data.map((entry: DailySleepEntry) => entry.contributors.total_sleep);
-                setSleepData({
-                    dates: formattedDates,
-                    total: data.data.map((entry: DailySleepEntry) => entry.contributors.total_sleep),
-                    rem: data.data.map((entry: DailySleepEntry) => entry.contributors.rem_sleep),
-                    deep: data.data.map((entry: DailySleepEntry) => entry.contributors.deep_sleep),
-                    light: data.data.map((entry: DailySleepEntry) => entry.score),
-                    restfulness: data.data.map((entry: DailySleepEntry) => entry.contributors.restfulness),
-                });
-                setIsLoading(false); // Stop loading after data is fetched
-
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                setIsLoading(false); // Stop loading in case of error
-            });
-    }, [startDate, endDate]);
 
     useEffect(() => {
         if (sleepData.dates.length > 0 && chartRef.current) {
