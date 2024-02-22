@@ -72,7 +72,7 @@ export default function Home() {
   // Using custom hooks for fetching data from APIs
   const { activities: stravaActivities, ytdRideTotals, isLoading: isStravaLoading, error: stravaError } = useFetchStravaActivities(startDate, endDate, isStravaAuthed);
   const { data: readinessData, isLoading: isReadinessLoading, error: ouraError } = useFetchOuraData(startDate, endDate, isOuraAuthed || false);
-  const { data: hrvData, isLoading: isHrvLoading, error: hrvError } = useFetchHrvData(startDate, endDate, isOuraAuthed || false);
+  const { data: transformedHrvData, isLoading: isHrvLoading, error: hrvError } = useFetchHrvData(startDate, endDate, isOuraAuthed || false);
   
   // Processing Strava data with a custom hook
   const { processedData, totalDistance, totalElevationGain, averageWatts } = useProcessStravaData(stravaActivities, startDate, endDate);
@@ -90,7 +90,7 @@ export default function Home() {
   const [stravaLoadingDots, setStravaLoadingDots] = useState('');
   const [ouraLoadingDots, setOuraLoadingDots] = useState('');
 
-  const processedResults = useProcessStravaAndHRVData(processedData, hrvData);
+  const processedResults = useProcessStravaAndHRVData(processedData, transformedHrvData);
   const errors = [stravaError, ouraError, hrvError].filter(Boolean); // Filter out null values
 
 

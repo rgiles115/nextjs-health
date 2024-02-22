@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
-import { format } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
 import dynamic from 'next/dynamic';
-import ReadinessAnalysis from './ReadinessAnalysis';
 import isEqual from 'lodash/isEqual'; // Import isEqual from lodash for deep comparison
 
 
@@ -20,15 +18,6 @@ interface ReadinessChartProps {
         bodyTemperature: number[];
     } | null;
     isLoading: boolean;
-}
-
-interface ReadinessEntry {
-    day: string;
-    contributors: {
-        resting_heart_rate: number;
-        hrv_balance: number;
-        body_temperature: number; // Ensure these match the actual API response fields
-    };
 }
 
 const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, readinessData, isLoading }) => {

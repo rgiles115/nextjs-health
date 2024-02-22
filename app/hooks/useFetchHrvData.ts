@@ -1,22 +1,16 @@
 import { useState, useEffect } from 'react';
 import { format, parseISO, subDays } from 'date-fns';
-import { HRVData } from '../../app/types/OuraInterfaces';
-
-
-interface SleepEntry {
-    average_hrv: number | null;
-    day: string; // Assuming 'day' is already in an acceptable format for parseISO
-}
+import { transformedHrvData, SleepEntry } from '../../app/types/OuraInterfaces';
 
 interface UseFetchHrvDataReturn {
-    data: HRVData[] | null;
+    data: transformedHrvData[] | null;
     isLoading: boolean;
     error: Error | null;
 }
 
 // Added isAuthenticated as a parameter
 const useFetchHrvData = (startDate: Date, endDate: Date, isAuthenticated: boolean): UseFetchHrvDataReturn => {
-    const [data, setData] = useState<HRVData[] | null>(null);
+    const [data, setData] = useState<transformedHrvData[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
 
@@ -66,7 +60,7 @@ const useFetchHrvData = (startDate: Date, endDate: Date, isAuthenticated: boolea
 
             // Proceed only if the fetchPromise resolved before the timeout
             if (!didTimeout && result) {
-                const transformedData = (result.data as SleepEntry[])
+                const transformedHrvData = (result.data as SleepEntry[])
                     .filter((entry) => entry.average_hrv !== null)
                     .map((entry) => ({
                         date: format(parseISO(entry.day), 'yyyy-MM-dd'),
@@ -74,7 +68,7 @@ const useFetchHrvData = (startDate: Date, endDate: Date, isAuthenticated: boolea
                     }));
 
 
-                setData(transformedData);
+                setData(transformedHrvData);
             }
 
             setIsLoading(false);

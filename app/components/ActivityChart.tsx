@@ -5,7 +5,7 @@ import 'chartjs-adapter-date-fns';
 import { format } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
 import dynamic from 'next/dynamic';
-import { ActivityData, ActivityEntry, ActivityContributors, MetData, ActivityChartProps } from '../types/ActivityInterfaces';
+import { ActivityData, ActivityEntry, ActivityContributors, MetData, ActivityChartProps } from '../types/OuraInterfaces';
 
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });

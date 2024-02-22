@@ -5,34 +5,11 @@ import { format } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
 import dynamic from 'next/dynamic';
 import isEqual from 'lodash/isEqual';
+import { DailySleepEntry } from '../../app/types/OuraInterfaces';
 
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 Chart.register(...registerables);
-
-interface SleepData {
-    data: SleepEntry[];
-    next_token: string | null;
-}
-
-interface SleepEntry {
-    id: string;
-    contributors: Contributors;
-    day: string;
-    score: number;
-    timestamp: string;
-}
-
-interface Contributors {
-    deep_sleep: number;
-    efficiency: number;
-    latency: number;
-    rem_sleep: number;
-    restfulness: number;
-    timing: number;
-    total_sleep: number;
-}
-
 
 interface SleepChartProps {
     startDate: Date;
@@ -60,15 +37,15 @@ const SleepChart: React.FC<SleepChartProps> = ({ startDate, endDate }) => {
         fetch(`/api/getDailySleepData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`)
             .then(response => response.json())
             .then(data => {
-                const formattedDates = data.data.map((entry: SleepEntry) => format(new Date(entry.timestamp), 'do MMM yyyy'));
-                const total = data.data.map((entry: SleepEntry) => entry.contributors.total_sleep);
+                const formattedDates = data.data.map((entry: DailySleepEntry) => format(new Date(entry.timestamp), 'do MMM yyyy'));
+                const total = data.data.map((entry: DailySleepEntry) => entry.contributors.total_sleep);
                 setSleepData({
                     dates: formattedDates,
-                    total: data.data.map((entry: SleepEntry) => entry.contributors.total_sleep),
-                    rem: data.data.map((entry: SleepEntry) => entry.contributors.rem_sleep),
-                    deep: data.data.map((entry: SleepEntry) => entry.contributors.deep_sleep),
-                    light: data.data.map((entry: SleepEntry) => entry.score),
-                    restfulness: data.data.map((entry: SleepEntry) => entry.contributors.restfulness),
+                    total: data.data.map((entry: DailySleepEntry) => entry.contributors.total_sleep),
+                    rem: data.data.map((entry: DailySleepEntry) => entry.contributors.rem_sleep),
+                    deep: data.data.map((entry: DailySleepEntry) => entry.contributors.deep_sleep),
+                    light: data.data.map((entry: DailySleepEntry) => entry.score),
+                    restfulness: data.data.map((entry: DailySleepEntry) => entry.contributors.restfulness),
                 });
                 setIsLoading(false); // Stop loading after data is fetched
 

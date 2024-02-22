@@ -3,14 +3,14 @@ import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import dynamic from 'next/dynamic';
 import "react-datepicker/dist/react-datepicker.css";
-import { HRVData } from '../../app/types/OuraInterfaces';
+import { transformedHrvData } from '../../app/types/OuraInterfaces';
 
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 Chart.register(...registerables);
 
 interface HRVChartProps {
-    hrvData: HRVData[];
+    hrvData: transformedHrvData[];
     isLoading: boolean; // Ensure this accepts a boolean
 }
 

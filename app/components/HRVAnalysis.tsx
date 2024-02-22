@@ -2,13 +2,12 @@ import React from 'react';
 import Typewriter from 'typewriter-effect';
 import { HRVData } from '../../app/types/OuraInterfaces';
 
-interface HRVAnalysisProps {
+export interface HRVAnalysisProps {
     hrvData: HRVData | null;
     analysis: string;
     isLoading: boolean;
     loadingDots: string;
 }
-
 
 const HRVAnalysis: React.FC<HRVAnalysisProps> = ({ hrvData, analysis, isLoading, loadingDots }) => {
     return (

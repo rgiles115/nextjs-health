@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { parseISO, isEqual, format } from 'date-fns';
-import { HRVData } from '../../app/types/OuraInterfaces';
+import { transformedHrvData } from '../../app/types/OuraInterfaces';
 
 // Extending HRVData to include a parsedDate property for internal use
-interface ExtendedHRVData extends HRVData {
+interface ExtendedHRVData extends transformedHrvData {
     parsedDate: Date;
 }
 
@@ -17,7 +17,7 @@ interface ProcessedStravaActivity {
 
 const useProcessStravaAndHRVData = (
     stravaData: ProcessedStravaActivity[] | null,
-    hrvData: HRVData[] | null
+    hrvData: transformedHrvData[] | null
 ): ProcessedStravaActivity[] => {
     const [processedData, setProcessedData] = useState<ProcessedStravaActivity[]>([]);
 

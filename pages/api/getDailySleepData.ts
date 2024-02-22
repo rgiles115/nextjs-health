@@ -1,37 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Cookies from 'cookies';
-
-interface OuraData {
-    access_token: string;
-    token_type: string;
-    expires_in: number;
-    refresh_token: string;
-    expires_at: number;
-}
-
-interface SleepData {
-    data: SleepEntry[];
-    next_token: string | null;
-}
-
-interface SleepEntry {
-    id: string;
-    contributors: Contributors;
-    day: string;
-    score: number;
-    timestamp: string;
-    detailedSleepData?: any; // Add this line for the detailed sleep data
-}
-
-interface Contributors {
-    deep_sleep: number;
-    efficiency: number;
-    latency: number;
-    rem_sleep: number;
-    restfulness: number;
-    timing: number;
-    total_sleep: number;
-}
+import { OuraData } from '../../app/types/OuraInterfaces';
+import { DailySleepData } from '../../app/types/OuraInterfaces';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { start_date, end_date } = req.query;
@@ -64,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return;
         }
 
-        const data: SleepData = await response.json();
+        const data: DailySleepData = await response.json();
 
         // Iterate over sleep data and fetch individual sleep details
         for (const entry of data.data) {
@@ -99,7 +69,7 @@ async function fetchDetailedSleepData(sleepId: string, token: string) {
     }
 }
 
-function processSleepData(data: SleepData): SleepData {
+function processSleepData(data: DailySleepData): DailySleepData {
     data.data.forEach(entry => {
         entry.timestamp = convertToUTC(entry.timestamp);
         // No need to fetch detailed data here as it's done in the handler
