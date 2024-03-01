@@ -20,6 +20,7 @@ import useFetchStravaActivities from './hooks/useFetchStravaActivities';
 import useFetchOuraData from './hooks/useFetchOuraData';
 import useFetchHrvData from './hooks/useFetchHrvData';
 import useProcessStravaData from './hooks/useProcessStravaData';
+import useFetchEnhancedTags from './hooks/useFetchEnhancedTags';
 import useProcessStravaAndHRVData from './hooks/useProcessStravaAndHRVData';
 
 // Importing custom components
@@ -73,7 +74,9 @@ export default function Home() {
   const { activities: stravaActivities, ytdRideTotals, isLoading: isStravaLoading, error: stravaError } = useFetchStravaActivities(startDate, endDate, isStravaAuthed);
   const { data: readinessData, isLoading: isReadinessLoading, error: ouraError } = useFetchOuraData(startDate, endDate, isOuraAuthed || false);
   const { data: transformedHrvData, isLoading: isHrvLoading, error: hrvError } = useFetchHrvData(startDate, endDate, isOuraAuthed || false);
-  
+  const { tagsData: tagsData, isLoading: isLoadingTags, error: errorTags } = useFetchEnhancedTags(startDate, endDate);
+  console.log('Tags Data:', tagsData);
+
   // Processing Strava data with a custom hook
   const { processedData, totalDistance, totalElevationGain, averageWatts } = useProcessStravaData(stravaActivities, startDate, endDate);
 
@@ -90,7 +93,10 @@ export default function Home() {
   const [stravaLoadingDots, setStravaLoadingDots] = useState('');
   const [ouraLoadingDots, setOuraLoadingDots] = useState('');
 
-  const processedResults = useProcessStravaAndHRVData(processedData, transformedHrvData);
+  const processedResults = useProcessStravaAndHRVData(processedData, transformedHrvData, tagsData);
+  console.log('Tags Data:', JSON.stringify(tagsData));
+
+  console.log('Processed Data:', JSON.stringify(processedResults));
   const errors = [stravaError, ouraError, hrvError].filter(Boolean); // Filter out null values
 
 
@@ -197,7 +203,7 @@ export default function Home() {
       average_heartrate: activity.average_heartrate,
       max_heartrate: activity.max_heartrate
     }));
-    console.log('Strava:', JSON.stringify(simplifiedStravaActivities));
+    // console.log('Strava:', JSON.stringify(simplifiedStravaActivities));
     try {
       const response = await axios.post('/api/chatgpt-analysis', {
         content: stravaAnalysisPrompt,
@@ -253,8 +259,8 @@ export default function Home() {
 
     try {
       const response = await axios.post('/api/chatgpt-analysis', {
-        content: ouraAnalysisPrompt,
-        data: readinessData
+        content: hrvAnalysisPrompt,
+        data: transformedHrvData
       });
 
       if (response.data.choices && response.data.choices.length > 0) {

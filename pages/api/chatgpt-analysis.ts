@@ -94,7 +94,7 @@ export default async function handler(req: Request) {
     });
   } catch (error) {
     console.error('Error processing the request:', error);
-    return new Response(JSON.stringify({ message: "An error occurred while processing your request." }), {
+    return new Response(JSON.stringify({ message: error }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });

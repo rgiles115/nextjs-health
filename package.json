@@ -18,6 +18,7 @@
     "axios": "^1.6.4",
     "chart.js": "^4.4.1",
     "chartjs-adapter-date-fns": "^3.0.0",
+    "chartjs-plugin-annotation": "^3.0.1",
     "cookie": "^0.6.0",
     "cookies": "^0.9.1",
     "date-fns": "^3.0.6",

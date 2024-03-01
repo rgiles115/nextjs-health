@@ -1,7 +1,11 @@
 import React, { useRef, useEffect } from 'react';
-import { Chart, ChartConfiguration } from 'chart.js';
+import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import annotationPlugin from 'chartjs-plugin-annotation';
 import 'chartjs-adapter-date-fns';
 import dynamic from 'next/dynamic';
+
+Chart.register(...registerables, annotationPlugin);
+
 
 interface ProcessedStravaActivity {
     day: string;
@@ -9,6 +13,7 @@ interface ProcessedStravaActivity {
     totalElevationGain: number;
     averageHRV?: number;
     averageWatts?: number;
+    tags?: string[]; // Include tags here
 }
 
 interface StravaChartProps {
@@ -28,6 +33,18 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                 chartInstanceRef.current.resize();
             }
         };
+
+        const tagAnnotations = processedData.flatMap((data, index) => {
+            return data.tags?.map(tag => ({
+                type: 'label', // Specify as 'label' directly
+                content: tag,
+                xValue: data.day,
+                yValue: 0, // Assuming you want it at the top of the chart
+                yAdjust: -10, // Adjust this value as needed to move the label up
+                backgroundColor: 'rgba(255, 99, 132, 0.25)',
+                // Add other properties as needed
+            })) || [];
+        });        
 
         if (!isLoading && processedData.length > 0 && chartRef.current) {
             const ctx = chartRef.current.getContext('2d');
@@ -108,8 +125,14 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                                 }
                             }),
                         },
+                        plugins: { 
+                            annotation: {
+                                annotations: tagAnnotations,
+                            },
+                        },
                     },
                 };
+                
 
                 chartInstanceRef.current = new Chart(ctx, chartConfig);
 

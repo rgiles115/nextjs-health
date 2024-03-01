@@ -168,3 +168,14 @@ export interface transformedHrvData {
     date: string;
     averageHRV: number | null;
 }
+
+export interface EnhancedTagData {
+    id: string;
+    tag_type_code: string;
+    start_time: string; // Assuming all dates are strings, could also be Date depending on usage
+    end_time: string | null; // Could be null based on your example
+    start_day: string;
+    end_day: string | null; // Could be null based on your example
+    comment: string;
+  }
+  
