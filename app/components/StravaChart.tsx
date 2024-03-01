@@ -34,17 +34,19 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
             }
         };
 
+        const annotationType: 'label' = 'label'; // Correctly typed
+
         const tagAnnotations = processedData.flatMap((data, index) => {
-            return data.tags?.map(tag => ({
-                type: 'label', // Specify as 'label' directly
-                content: tag,
-                xValue: data.day,
-                yValue: 0, // Assuming you want it at the top of the chart
-                yAdjust: -10, // Adjust this value as needed to move the label up
+            // Ensure `data.tags` is not null or undefined before mapping
+            return (data.tags ?? []).map(tag => ({
+                type: annotationType,
+                content: tag, // The content of the tag
+                xValue: data.day, // The day corresponding to the tag
                 backgroundColor: 'rgba(255, 99, 132, 0.25)',
-                // Add other properties as needed
-            })) || [];
-        });        
+                rotation: -90,
+                // Specify other properties as needed
+            }));
+        });  
 
         if (!isLoading && processedData.length > 0 && chartRef.current) {
             const ctx = chartRef.current.getContext('2d');

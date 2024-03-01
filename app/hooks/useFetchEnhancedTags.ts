@@ -40,7 +40,6 @@ export const useFetchEnhancedTags = (startDate: Date, endDate: Date) => {
 
     fetchEnhancedTags();
   }, [startDate, endDate]);
-
   return { tagsData, isLoading, error };
 };
 

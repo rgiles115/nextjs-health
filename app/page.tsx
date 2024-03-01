@@ -75,7 +75,6 @@ export default function Home() {
   const { data: readinessData, isLoading: isReadinessLoading, error: ouraError } = useFetchOuraData(startDate, endDate, isOuraAuthed || false);
   const { data: transformedHrvData, isLoading: isHrvLoading, error: hrvError } = useFetchHrvData(startDate, endDate, isOuraAuthed || false);
   const { tagsData: tagsData, isLoading: isLoadingTags, error: errorTags } = useFetchEnhancedTags(startDate, endDate);
-  console.log('Tags Data:', tagsData);
 
   // Processing Strava data with a custom hook
   const { processedData, totalDistance, totalElevationGain, averageWatts } = useProcessStravaData(stravaActivities, startDate, endDate);
@@ -94,9 +93,6 @@ export default function Home() {
   const [ouraLoadingDots, setOuraLoadingDots] = useState('');
 
   const processedResults = useProcessStravaAndHRVData(processedData, transformedHrvData, tagsData);
-  console.log('Tags Data:', JSON.stringify(tagsData));
-
-  console.log('Processed Data:', JSON.stringify(processedResults));
   const errors = [stravaError, ouraError, hrvError].filter(Boolean); // Filter out null values
 
 

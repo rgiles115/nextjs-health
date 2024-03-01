@@ -38,7 +38,6 @@ const useProcessStravaAndHRVData = (
 
         const mergedData = stravaData.map(activity => {
             const activityDateFormatted = format(parseISO(activity.day), 'yyyy-MM-dd');
-            
             const matchingTags = tagsData?.filter(tag => {
                 const tagStartDateFormatted = format(parseISO(tag.start_day), 'yyyy-MM-dd');
                 return tagStartDateFormatted === activityDateFormatted;
