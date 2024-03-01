@@ -53,7 +53,7 @@ export const useFetchSleepData = (startDate: Date, endDate: Date) => {
             })
             .catch(error => {
                 // Handle any errors that occur during the fetch operation, logging them and setting an error state.
-                console.error('Error:', error);
+                console.error('Error getting sleep data:', error);
                 setError(error);
                 setIsLoading(false); // Ensure the loading state is false after the operation, regardless of outcome.
             });
