@@ -37,17 +37,7 @@ import StravaSkeletonLoader from './components/StravaSkeletonLoader'; // Adjust 
 import OuraSkeletonLoader from './components/OuraSkeletonLoader';
 
 // Type definitions for the data used in the component
-import { StravaActivity } from '../app/types/StravaInterface';
-
-
-interface AthleteProfile {
-  id: number;
-  username: string;
-  firstname: string;
-  lastname: string;
-  profile_medium: string;
-  // Add other relevant fields as necessary
-}
+import { StravaActivity, AthleteProfile  } from '../app/types/StravaInterface';
 
 export default function Home() {
   // State variables for managing date range, authentication status, and data

@@ -1,3 +1,26 @@
+export interface AthleteProfile {
+  badge_type_id: number;
+  bio: string;
+  city: string;
+  country: string;
+  created_at: string; // ISO 8601 date string
+  firstname: string;
+  follower: number | null; // Assuming this could be a specific type when not null
+  friend: number | null; // Assuming this could be a specific type when not null
+  id: number;
+  lastname: string;
+  premium: boolean;
+  profile: string; // URL string
+  profile_medium: string; // URL string
+  resource_state: number;
+  sex: "M" | "F"; // Assuming 'M' for male, 'F' for female. Adjust if there are more options
+  state: string;
+  summit: boolean;
+  updated_at: string; // ISO 8601 date string
+  username: string;
+  weight: number;
+}
+
 export interface StravaData {
     token_type: string;
     expires_at: number;
