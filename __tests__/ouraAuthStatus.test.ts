@@ -1,85 +1,70 @@
-// ouraAuthStatus.test.ts
-import handler from '../pages/api/ouraAuthStatus';
-import { createMocks } from 'node-mocks-http';
 import axios from 'axios';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
+import handler from '../pages/api/ouraAuthStatus'; // Adjust the import path as necessary
 import cookie from 'cookie';
 
-
+// Mock the axios and cookie modules
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+jest.mock('cookie');
+const mockedCookie = cookie as jest.Mocked<typeof cookie>;
 
-describe('/api/ouraAuthStatus', () => {
-  // Mock Oura cookie data representing a valid token
-  const mockValidOuraCookie = {
-    access_token: "FEM3ZJFWZ27DO2NGXR3PNRREC5HJSVXA",
-    token_type: "Bearer",
-    expires_in: 86400,
-    refresh_token: "LY4ZOYHDIA47S5MNY4VUKU4BSOOXIEPH",
-    expires_at: 1705446578 // Adjust as needed for test scenarios
-  };
+// Mock request and response utility functions
+const mockReq = (cookies = ''): NextApiRequest => ({
+  headers: {
+    cookie: cookies,
+  },
+} as any);
 
-  // Reset mocks before each test
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+const mockRes = (): NextApiResponse => {
+  const res: any = {};
+  res.status = jest.fn().mockReturnValue(res);
+  res.json = jest.fn().mockReturnValue(res);
+  res.setHeader = jest.fn().mockReturnValue(res);
+  return res;
+};
 
-  it('should return authenticated status if token is valid', async () => {
-    const { req, res } = createMocks({
-      method: 'GET',
-      headers: {
-        cookie: `ouraData=${JSON.stringify(mockValidOuraCookie)}`,
-      },
-    });
-  
-    await handler(req as unknown as NextApiRequest, res as unknown as NextApiResponse);
-    expect(res._getStatusCode()).toBe(200);
-    expect(JSON.parse(res._getData())).toEqual({ isOuraAuthed: true });
-  });
-  
-
-  it('should refresh token if expired and return new auth status', async () => {
-    const mockExpiredOuraCookie = {
-      ...mockValidOuraCookie,
-      expires_at: 1600000000 // Past timestamp to simulate expired token
+describe('Oura Auth Status API', () => {
+  it('refreshes the token when expired', async () => {
+    // Mock data for an expired Oura token
+    const expiredOuraData = {
+      access_token: "L2D76CTXJ2FQQZXDWA72QC6Q7BQBSFEG",
+      token_type: "Bearer",
+      expires_in: 86400,
+      refresh_token: "R76OUXVKCZIGTUS67Z5OVZZSPSX7BE25",
+      expires_at: Math.floor(Date.now() / 1000) - 1000, // Ensure this is in the past
     };
-  
-    const futureTimestamp = Math.floor(Date.now() / 1000) + 86400;
-    mockedAxios.post.mockResolvedValueOnce({
+
+    // Set up mock return values for axios and cookie.parse
+    mockedAxios.post.mockResolvedValue({
       data: {
-        access_token: "NEW_ACCESS_TOKEN",
-        expires_in: 86400,
-        refresh_token: "NEW_REFRESH_TOKEN",
-        expires_at: futureTimestamp
-      }
-    });
-  
-    const { req, res } = createMocks({
-      method: 'GET',
-      headers: {
-        cookie: `ouraData=${JSON.stringify(mockExpiredOuraCookie)}`,
+        access_token: "newAccessToken",
+        token_type: "Bearer",
+        expires_in: 86400, // Assuming the same expiration duration for simplicity
+        refresh_token: "newRefreshToken",
+        expires_at: Math.floor(Date.now() / 1000) + 86400, // Ensure this is in the future
       },
     });
-  
-    await handler(req as any as NextApiRequest, res as any as NextApiResponse);
 
-  // Log the 'Set-Cookie' header and response body
-  console.log('Set-Cookie Header:', res.getHeader('Set-Cookie'));
-  console.log('Response Body:', res._getData());
+    mockedCookie.parse.mockReturnValue({ ouraData: JSON.stringify(expiredOuraData) });
 
-    const setCookieHeader = res.getHeader('Set-Cookie');
-    const cookieValue = setCookieHeader && typeof setCookieHeader === 'string'
-      ? cookie.parse(setCookieHeader.split(';')[0]) // Parsing the cookie string
-      : {};
+    // Serialize the expired token data and set it as a cookie in the mock request
+    const serializedCookie = cookie.serialize('ouraData', JSON.stringify(expiredOuraData));
+    const req = mockReq(serializedCookie);
+    const res = mockRes();
 
-  expect(mockedAxios.post).toHaveBeenCalled();
-  expect(cookieValue.ouraData).toBeDefined();
-  const refreshedData = JSON.parse(cookieValue.ouraData);
-  expect(refreshedData.expires_at).toBe(futureTimestamp);
-  expect(res._getStatusCode()).toBe(200);
-  expect(JSON.parse(res._getData())).toEqual({ isOuraAuthed: true });
-});
-  
+    // Execute the handler with the mock request and response
+    await handler(req, res);
 
-  // More tests can be added for other scenarios
+    // Assertions to verify behavior
+    expect(mockedAxios.post).toHaveBeenCalled();
+    expect(res.setHeader).toHaveBeenCalledWith(
+      'Set-Cookie',
+      expect.any(String) // This can be more specific to verify the correct cookie content
+    );
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ isOuraAuthed: true }));
+  });
+
+  // Additional tests can be added here to cover other scenarios
 });

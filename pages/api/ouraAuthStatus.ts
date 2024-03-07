@@ -25,84 +25,58 @@ interface OuraCookieData {
 
 // Main handler for the API route
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    // Parse cookies from the request
-    const cookies = cookie.parse(req.headers.cookie || '');
+  // Parse cookies from the request
+  const cookies = cookie.parse(req.headers.cookie || '');
 
-    // Function to check if the Oura token has expired
-    const isOuraExpired = (ouraData: OuraCookieData): boolean => {
-        const currentTimestamp = Math.floor(Date.now() / 1000);
-        // Compare current timestamp to token's expiry timestamp
-        return currentTimestamp >= ouraData.expires_at;
-    };
+  // Function to check if the Oura token has expired
+  const isOuraExpired = (ouraData: OuraCookieData): boolean => {
+      const currentTimestamp = Math.floor(Date.now() / 1000);
+      return currentTimestamp >= ouraData.expires_at;
+  };
 
-    // Function to refresh the Oura token
-    const refreshOuraToken = async (ouraData: OuraCookieData): Promise<OuraCookieData | null> => {
-        try {
-            // Request to Oura API for token refresh
-            const response = await axios.post(
-                'https://api.ouraring.com/oauth/token',
-                {
-                    client_id: OURA_CLIENT_ID,
-                    client_secret: OURA_CLIENT_SECRET,
-                    grant_type: 'refresh_token',
-                    refresh_token: ouraData.refresh_token,
-                }
-            );
+  // Function to refresh the Oura token
+  const refreshOuraToken = async (ouraData: OuraCookieData): Promise<OuraCookieData | null> => {
+      try {
+          const response = await axios.post('https://api.ouraring.com/oauth/token', {
+              client_id: OURA_CLIENT_ID,
+              client_secret: OURA_CLIENT_SECRET,
+              grant_type: 'refresh_token',
+              refresh_token: ouraData.refresh_token,
+          });
 
-            // If response is successful, return updated token data
-            if (response.data && response.data.access_token) {
-                return {
-                    ...ouraData,
-                    access_token: response.data.access_token,
-                    expires_at: Math.floor(Date.now() / 1000) + response.data.expires_in,
-                    expires_in: response.data.expires_in,
-                    refresh_token: response.data.refresh_token
-                };
-            } else {
-                return null;
-            }
-        } catch (error) {
-            console.error('Error refreshing Oura token:', error);
-            return null;
-        }
-    };
+          if (response.data && response.data.access_token) {
+              return {
+                  ...ouraData,
+                  access_token: response.data.access_token,
+                  expires_at: Math.floor(Date.now() / 1000) + response.data.expires_in,
+                  expires_in: response.data.expires_in,
+                  refresh_token: response.data.refresh_token
+              };
+          } else {
+              return null;
+          }
+      } catch (error) {
+          console.error('Error refreshing Oura token:', error);
+          return null;
+      }
+  };
 
-    // Function to check if the Oura token is authenticated and not expired
-    const isOuraAuthed = (): boolean => {
-        if (cookies.ouraData) {
-            try {
-                // Parse the Oura data from the cookie
-                const ouraData: OuraCookieData = JSON.parse(cookies.ouraData);
-                // Check if the token is not expired
-                return !isOuraExpired(ouraData);
-            } catch (error) {
-                return false;
-            }
-        }
-        return false;
-    };
-    
-    // Check the authentication status of the Oura token
-    if (isOuraAuthed()) {
-        console.log('Oura token is authenticated and not expired.');
-    } else {
-        console.log('Oura token is either not present or expired.');
-        if (cookies.ouraData) {
-            // If the token is expired, attempt to refresh it
-            const ouraData: OuraCookieData = JSON.parse(cookies.ouraData);
-            if (isOuraExpired(ouraData)) {
-                const refreshedData = await refreshOuraToken(ouraData);
-                if (refreshedData) {
-                    // Update the cookie with the refreshed token data
-                    res.setHeader('Set-Cookie', `ouraData=${JSON.stringify(refreshedData)}; HttpOnly; Secure`);
-                    // console.log('Oura token refreshed.');
-                } else {
-                    console.log('Failed to refresh Oura token.');
-                }
-            }
-        }
-    }
-    
-    // Respond with the authentication status
-    res.status(200).json({ isOuraAuthed: isOuraAuthed() });
+  let ouraData: OuraCookieData | null = cookies.ouraData ? JSON.parse(cookies.ouraData) : null;
+
+  // Check if the Oura token is expired and attempt to refresh it
+  if (ouraData && isOuraExpired(ouraData)) {
+      const refreshedData = await refreshOuraToken(ouraData);
+      if (refreshedData) {
+          ouraData = refreshedData; // Update ouraData with the refreshed token data
+          res.setHeader('Set-Cookie', `ouraData=${JSON.stringify(refreshedData)}; HttpOnly; Secure`);
+      } else {
+          console.log('Failed to refresh Oura token.');
+      }
+  }
+
+  // Determine the authentication status after any refresh attempt
+  const isOuraAuthed = ouraData && !isOuraExpired(ouraData);
+
+  // Respond with the authentication status
+  res.status(200).json({ isOuraAuthed });
 }

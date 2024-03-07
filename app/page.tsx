@@ -33,7 +33,7 @@ import SideMenu from './components/SideMenu';
 import StravaChart from './components/StravaChart';
 import ReadinessAnalysis from './components/ReadinessAnalysis';
 import NumberContainers from './components/NumberContainers';
-import StravaSkeletonLoader from './components/StravaSkeletonLoader'; // Adjust the import path based on your file structure
+import StravaSkeletonLoader from './components/StravaSkeletonLoader';
 import OuraSkeletonLoader from './components/OuraSkeletonLoader';
 
 // Type definitions for the data used in the component
@@ -72,7 +72,7 @@ export default function Home() {
   // States for analysis results
   const [stravaAnalysisResult, setStravaAnalysisResult] = useState('');
   const [ouraAnalysisResult, setOuraAnalysisResult] = useState('');
-  const [hrvAnalysisResult, setHrvAnalysisResult] = useState('');
+  const [hrvAnalysisResult, setHrvAnalysisResult] = useState(''); // Not used at the moment
 
   // Loading states for analysis operations
   const [isStravaAnalysisLoading, setIsStravaAnalysisLoading] = useState(false);
