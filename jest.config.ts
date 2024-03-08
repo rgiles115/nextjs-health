@@ -17,6 +17,7 @@ const config: Config = {
 module.exports = {
   preset: 'ts-jest/presets/js-with-ts',
   testEnvironment: 'node',
+  setupFilesAfterEnv: ['./jest.setup.js'], // Adjust the path according to your project structure
 };
 
  
