@@ -46,7 +46,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                 rotation: -90,
                 // Specify other properties as needed
             }));
-        });  
+        });
 
         if (!isLoading && processedData.length > 0 && chartRef.current) {
             const ctx = chartRef.current.getContext('2d');
@@ -127,14 +127,17 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                                 }
                             }),
                         },
-                        plugins: { 
+                        plugins: {
+                            legend: {
+                                display: window.innerWidth > 600, // Only show legend if window width is greater than 600px
+                            },
                             annotation: {
                                 annotations: tagAnnotations,
                             },
                         },
                     },
                 };
-                
+
 
                 chartInstanceRef.current = new Chart(ctx, chartConfig);
 

@@ -126,10 +126,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (stravaData && cookies.stravaData) {
         if (!isStravaExpired(cookies.stravaData)) {
             // Token is valid and not expired
-            console.log('Strava token is authenticated and not expired.');
+            // console.log('Strava token is authenticated and not expired.');
         } else {
             // Token is either not present or expired
-            console.log('Strava token is either not present or expired.');
+            // console.log('Strava token is either not present or expired.');
             if (stravaData.refresh_token) {
                 // Attempt to refresh the Strava token
                 const refreshedStravaData = await refreshStravaToken(stravaData);

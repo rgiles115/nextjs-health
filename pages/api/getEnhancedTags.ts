@@ -1,7 +1,11 @@
 // Importing necessary modules from Next.js and external libraries.
 import { NextApiRequest, NextApiResponse } from 'next';
 import Cookies from 'cookies'; // Used for handling cookies in Next.js API routes.
-import axios from 'axios'; // Preferred for making HTTP requests due to its convenience over fetch.
+import axios, { AxiosError } from 'axios';
+
+interface ErrorResponse {
+    error: string;
+}
 
 // Asynchronous function to handle requests to this API route.
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -38,23 +42,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const ouraApiUrl = `https://api.ouraring.com/v2/usercollection/enhanced_tag?start_date=${start_date}&end_date=${end_date}`;
 
     try {
-        // Attempt to fetch data from the Oura API using the constructed URL and authorization token.
         const response = await axios.get(ouraApiUrl, {
-            headers: { 'Authorization': `Bearer ${token}` }, // Set the authorization header with the bearer token.
+            headers: { 'Authorization': `Bearer ${token}` },
         });
-
-        // If successful, relay the fetched data back to the client.
+    
         res.status(200).json(response.data);
-    } catch (error) {
-        // Error handling for failed Oura API request.
+    } catch (error: unknown) {
+        console.log('Error caught:', error);
+        console.log('Is Axios Error:', axios.isAxiosError(error));
+    
         if (axios.isAxiosError(error)) {
-            // Log the error and respond with the appropriate status code and error message if it's an Axios error.
-            console.error('Error fetching enhanced tags data:', error.response?.data);
-            res.status(error.response?.status || 500).json({ error: error.response?.data.error || 'An error occurred while fetching enhanced tags data.' });
+            // Correctly identified as an Axios error
+            const status = error.response?.status || 500;
+            const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+    
+            console.error('Axios Error fetching enhanced tags data:', errorMessage);
+            res.status(status).json({ error: errorMessage });
         } else {
-            // Generic error handler for non-Axios errors.
-            console.error('Error fetching enhanced tags data:', error);
+            // Handle non-Axios errors
+            console.error('Non-Axios Error fetching enhanced tags data:', error);
             res.status(500).json({ error: 'An internal server error occurred.' });
         }
     }
+    
 }

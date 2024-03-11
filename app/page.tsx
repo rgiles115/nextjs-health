@@ -64,7 +64,7 @@ export default function Home() {
   const { activities: stravaActivities, ytdRideTotals, isLoading: isStravaLoading, error: stravaError } = useFetchStravaActivities(startDate, endDate, isStravaAuthed);
   const { data: readinessData, isLoading: isReadinessLoading, error: ouraError } = useFetchOuraData(startDate, endDate, isOuraAuthed || false);
   const { data: transformedHrvData, isLoading: isHrvLoading, error: hrvError } = useFetchHrvData(startDate, endDate, isOuraAuthed || false);
-  const { tagsData: tagsData, isLoading: isLoadingTags, error: errorTags } = useFetchEnhancedTags(startDate, endDate);
+  const { tagsData: tagsData, isLoading: isLoadingTags, error: errorTags } = useFetchEnhancedTags(startDate, endDate, isOuraAuthed || false);
 
   // Processing Strava data with a custom hook
   const { processedData, totalDistance, totalElevationGain, averageWatts } = useProcessStravaData(stravaActivities, startDate, endDate);
@@ -128,6 +128,7 @@ export default function Home() {
             const ouraResponse = await fetch('/api/ouraAuthStatus');
             const ouraData = await ouraResponse.json();
             setIsOuraAuthed(ouraData.isOuraAuthed);
+            console.log("Oura Auth Status:", ouraData.isOuraAuthed);
         } catch (error) {
             console.error('Error fetching authentication statuses:', error);
             // Consider setting auth statuses to false or handling the error appropriately

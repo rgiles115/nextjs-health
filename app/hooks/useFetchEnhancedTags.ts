@@ -9,8 +9,8 @@ interface FetchEnhancedTagsResponse {
   next_token?: string; // Optional property for pagination token.
 }
 
-// Custom hook for fetching enhanced tags data between two dates.
-export const useFetchEnhancedTags = (startDate: Date, endDate: Date) => {
+// Custom hook for fetching enhanced tags data between two dates, now including authentication check.
+export const useFetchEnhancedTags = (startDate: Date, endDate: Date, isOuraAuthed: boolean) => {
   // State to hold the tags data fetched from the API.
   const [tagsData, setTagsData] = useState<EnhancedTagData[]>([]);
   // State to track the loading status.
@@ -20,6 +20,13 @@ export const useFetchEnhancedTags = (startDate: Date, endDate: Date) => {
 
   // useEffect hook to perform the fetch operation when the component mounts or the dates change.
   useEffect(() => {
+    // Early exit if not authenticated with Oura.
+    if (!isOuraAuthed) {
+      console.log("Oura is not authenticated, skipping fetch.");
+      setIsLoading(false);
+      return;
+    }
+
     // Async function to fetch the enhanced tags data.
     const fetchEnhancedTags = async () => {
       setIsLoading(true); // Sets loading to true at the start of the fetch operation.
@@ -53,7 +60,7 @@ export const useFetchEnhancedTags = (startDate: Date, endDate: Date) => {
 
     // Calls the fetch function defined above.
     fetchEnhancedTags();
-  }, [startDate, endDate]); // Dependency array to trigger useEffect when these values change.
+  }, [startDate, endDate, isOuraAuthed]); // Include isOuraAuthed in the dependency array.
 
   // Returns the state values to be used by the component that uses this hook.
   return { tagsData, isLoading, error };
