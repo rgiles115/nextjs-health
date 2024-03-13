@@ -69,16 +69,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         const readinessData: ReadinessData = await readinessResponse.json();
-        
-        // Fetch individual sleep data for each readiness entry
-        for (const entry of readinessData.data) {
-            const sleepData = await fetchSleepData(entry.id, token);
-            entry.sleepData = sleepData;
-        }
+
+        // Map each readiness entry to a promise for fetching sleep data
+        const sleepDataPromises = readinessData.data.map(entry =>
+            fetchSleepData(entry.id, token)
+        );
+
+        // Use Promise.all to wait for all sleep data fetch operations to complete
+        const sleepDataResults = await Promise.all(sleepDataPromises);
+
+        // Assign fetched sleep data to the respective readiness entries
+        readinessData.data.forEach((entry, index) => {
+            entry.sleepData = sleepDataResults[index];
+        });
 
         res.status(200).json(processReadinessData(readinessData));
     } catch (error) {
-        // console.error('Error fetching readiness data:', error);
+        console.error('Error fetching readiness data:', error);
         res.status(500).json({ error: 'Internal Server Error' });
         return;
     }
