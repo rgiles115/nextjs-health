@@ -170,7 +170,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const accessToken = stravaData.access_token;
     const allActivities = [];
     let page = 1;
-    const perPage = 30;
+    const perPage = 200;
 
     try {
         while (true) {
