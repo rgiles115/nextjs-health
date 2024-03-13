@@ -13,12 +13,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const cookies = new Cookies(req, res);
     const encodedOuraCookie = cookies.get('ouraData'); // Replace with your actual cookie name
-    
+
     if (!encodedOuraCookie) {
         res.status(400).json({ error: 'Oura cookie not found' });
         return;
     }
-    
+
     const decodedOuraCookie = decodeURIComponent(encodedOuraCookie);
     const ouraData: OuraData = JSON.parse(decodedOuraCookie);
     const token = ouraData.access_token;
@@ -36,17 +36,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const data: SleepData = await response.json();
 
-        for (const entry of data.data) {
-            const detailedSleepData = await fetchDetailedSleepData(entry.id, token);
+        // Map sleep entries to fetch promises for detailed data
+        const fetchPromises = data.data.map(entry => fetchDetailedSleepData(entry.id, token));
+
+        // Use Promise.all to wait for all promises to resolve
+        const detailedDataResults = await Promise.all(fetchPromises);
+
+        // Combine the detailed data with each sleep entry
+        data.data.forEach((entry, index) => {
+            const detailedSleepData = detailedDataResults[index];
             if (detailedSleepData) {
-                entry.detailedSleepData = detailedSleepData; // Combine the detailed data with the sleep entry
-                entry.hrv_values = detailedSleepData.hrv_values; // Extract HRV values specifically
+                entry.detailedSleepData = detailedSleepData;
+                entry.hrv_values = detailedSleepData.hrv_values;
             }
-        }
+        });
 
         res.status(200).json(data);
-        // console.log('Sleep Data:', JSON.stringify(data));
-
     } catch (error) {
         console.error('Error fetching sleep data:', error);
         res.status(500).json({ error: 'Internal Server Error' });

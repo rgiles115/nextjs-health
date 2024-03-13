@@ -37,7 +37,7 @@ import StravaSkeletonLoader from './components/StravaSkeletonLoader';
 import OuraSkeletonLoader from './components/OuraSkeletonLoader';
 
 // Type definitions for the data used in the component
-import { StravaActivity, AthleteProfile  } from '../app/types/StravaInterface';
+import { StravaActivity, AthleteProfile } from '../app/types/StravaInterface';
 
 export default function Home() {
   // State variables for managing date range, authentication status, and data
@@ -115,30 +115,30 @@ export default function Home() {
   useEffect(() => {
     // Define asynchronous function to perform auth checks
     const checkAuthStatuses = async () => {
-        try {
-            // Fetch Strava authentication status
-            const stravaResponse = await fetch('/api/stravaAuthStatus');
-            const stravaData = await stravaResponse.json();
-            setIsStravaAuthed(stravaData.isStravaAuthed);
-            if (stravaData.isStravaAuthed && stravaData.athlete) {
-                setAthleteProfile(stravaData.athlete);
-            }
-
-            // Fetch Oura authentication status
-            const ouraResponse = await fetch('/api/ouraAuthStatus');
-            const ouraData = await ouraResponse.json();
-            setIsOuraAuthed(ouraData.isOuraAuthed);
-            console.log("Oura Auth Status:", ouraData.isOuraAuthed);
-        } catch (error) {
-            console.error('Error fetching authentication statuses:', error);
-            // Consider setting auth statuses to false or handling the error appropriately
-        } finally {
-            setIsAuthCheckLoading(false); // Indicate that auth checks are completed
+      try {
+        // Fetch Strava authentication status
+        const stravaResponse = await fetch('/api/stravaAuthStatus');
+        const stravaData = await stravaResponse.json();
+        setIsStravaAuthed(stravaData.isStravaAuthed);
+        if (stravaData.isStravaAuthed && stravaData.athlete) {
+          setAthleteProfile(stravaData.athlete);
         }
+
+        // Fetch Oura authentication status
+        const ouraResponse = await fetch('/api/ouraAuthStatus');
+        const ouraData = await ouraResponse.json();
+        setIsOuraAuthed(ouraData.isOuraAuthed);
+        console.log("Oura Auth Status:", ouraData.isOuraAuthed);
+      } catch (error) {
+        console.error('Error fetching authentication statuses:', error);
+        // Consider setting auth statuses to false or handling the error appropriately
+      } finally {
+        setIsAuthCheckLoading(false); // Indicate that auth checks are completed
+      }
     };
 
     checkAuthStatuses();
-}, []);
+  }, []);
 
   useEffect(() => {
     // Display each error in a separate toast message
