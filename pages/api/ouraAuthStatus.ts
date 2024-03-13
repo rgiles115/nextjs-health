@@ -19,11 +19,14 @@ interface OuraCookieData {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Parse cookies from the request
   const cookies = cookie.parse(req.headers.cookie || '');
+  console.log('Parsed cookies:', cookies);
 
   // Function to check if the Oura token has expired
   const isOuraExpired = (ouraData: OuraCookieData): boolean => {
     const currentTimestamp = Math.floor(Date.now() / 1000);
-    return currentTimestamp >= ouraData.expires_at;
+    const expired = currentTimestamp >= ouraData.expires_at;
+    console.log('Checking if Oura token has expired:', expired);
+    return expired;
   };
 
   // Function to refresh the Oura token
@@ -44,6 +47,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       const data = response.data;
+      console.log('Refresh token response:', data);
 
       const currentTimestamp = Math.floor(Date.now() / 1000);
       const expiresAt = currentTimestamp + data.expires_in;
@@ -55,6 +59,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         expires_in: data.expires_in,
         expires_at: expiresAt,
       };
+
+      console.log('Refreshed data:', refreshedData);
 
       const cookieString = serialize('ouraData', JSON.stringify(refreshedData), {
         httpOnly: true,
@@ -76,21 +82,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   };
 
   let ouraData: OuraCookieData | null = cookies.ouraData ? JSON.parse(cookies.ouraData) : null;
+  console.log('Initial ouraData:', ouraData);
 
-// Check if the Oura token is expired and attempt to refresh it
-if (ouraData && isOuraExpired(ouraData)) {
-    console.log('Attempting to refresh Oura token.');
+  // Check if the Oura token is expired and attempt to refresh it
+  if (ouraData && isOuraExpired(ouraData)) {
+    console.log('Oura token has expired. Attempting to refresh.');
     const refreshedData = await refreshOuraToken(ouraData);
     if (refreshedData) {
         ouraData = refreshedData; // Successfully refreshed token
+        console.log('Token successfully refreshed');
     } else {
         // Refresh failed, potentially requires re-authentication
         console.log('Token refresh failed. May require re-authentication.');
         return res.status(401).json({ error: 'reauthentication_required', message: 'Please re-authenticate.' });
     }
-}
-
+  }
 
   const isOuraAuthed = ouraData && !isOuraExpired(ouraData);
+  console.log('Final isOuraAuthed status:', isOuraAuthed);
   res.status(200).json({ isOuraAuthed });
 }
