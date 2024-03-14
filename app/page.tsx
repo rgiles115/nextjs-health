@@ -24,7 +24,7 @@ import useFetchEnhancedTags from './hooks/useFetchEnhancedTags';
 import useProcessStravaAndHRVData from './hooks/useProcessStravaAndHRVData';
 
 // Importing custom components
-import ActivityChart from './components/ActivityChart';
+import SleepDataChartComponent from './components/SleepDataChartComponent';
 import SleepChart from './components/SleepChart';
 import ReadinessChart from './components/ReadinessChart';
 import StravaAnalysis from './components/StravaAnalysis';
@@ -448,19 +448,12 @@ export default function Home() {
                 />
               </div>
             </div>
-
-
-            <h2 className="text-2xl font-semibold mb-2 px-5">Oura Activity & Sleep</h2>
-
+            <h2 className="text-2xl font-semibold mb-2 px-5">Oura Sleep</h2>
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
                 <div className="m-1 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
-                  <ActivityChart startDate={startDate} endDate={endDate} />
-                </div>
-              </div>
-              <div className="w-full md:w-1/2 p-4">
-                <div className="m-1 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
-                  <SleepChart startDate={startDate} endDate={endDate} />
+                  <SleepDataChartComponent sleepData={processedResults}
+                    isLoading={isStravaLoading} />
                 </div>
               </div>
             </div>

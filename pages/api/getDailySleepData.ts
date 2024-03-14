@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         data.data.forEach((entry, index) => {
             entry.detailedSleepData = detailedSleepDataResults[index];
         });
-
+        
         res.status(200).json(processSleepData(data));
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });

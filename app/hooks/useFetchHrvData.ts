@@ -1,76 +1,85 @@
-// Imports necessary hooks and utility functions from React and date-fns libraries.
 import { useState, useEffect } from 'react';
 import { format, parseISO, subDays } from 'date-fns';
-// Imports types for transformed HRV data and sleep entries.
 import { transformedHrvData, SleepEntry } from '../../app/types/OuraInterfaces';
 
-// Defines the TypeScript interface for the hook's return type.
 interface UseFetchHrvDataReturn {
-    data: transformedHrvData[] | null; // The processed HRV data or null if not available.
-    isLoading: boolean; // Flag indicating whether the data is currently being loaded.
-    error: Error | null; // Stores any error that occurs during data fetching or processing.
+    data: transformedHrvData[] | null;
+    isLoading: boolean;
+    error: Error | null;
 }
 
-// The custom hook definition, accepting start and end dates to fetch data for, and an authentication status.
+interface AggregatedSleepData {
+    [date: string]: {
+        total_sleep_duration: number;
+        average_hrv?: number | null; 
+        average_breath?: number | null;
+        average_heart_rate?: number | null;
+        lowest_heart_rate?: number | null;
+        count: number;
+    };
+}
+
 const useFetchHrvData = (startDate: Date, endDate: Date, isAuthenticated: boolean): UseFetchHrvDataReturn => {
-    // State hooks for managing HRV data, loading status, and any errors.
     const [data, setData] = useState<transformedHrvData[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
 
-    // useEffect hook to perform the data fetch operation when the hook's inputs change.
     useEffect(() => {
-        // Checks if the user is authenticated. If not, skips fetching data and sets loading to false.
         if (!isAuthenticated) {
             console.log("Not authenticated, skipping HRV data fetch.");
             setIsLoading(false);
             return;
         }
 
-        // Asynchronous function to fetch HRV data from the API.
         const fetchHRVData = async () => {
-            setIsLoading(true); // Indicates the start of data fetching.
-            setError(null); // Resets any previous errors before fetching new data.
+            setIsLoading(true);
+            setError(null);
 
-            // Adjusts the start date by subtracting one day and formats start and end dates.
             const adjustedStartDate = subDays(startDate, 1);
             const formattedStartDate = format(adjustedStartDate, 'yyyy-MM-dd');
             const formattedEndDate = format(endDate, 'yyyy-MM-dd');
 
             try {
-                // Attempts to fetch data from the API with the formatted query parameters.
                 const response = await fetch(`/api/getSleepData?start_date=${formattedStartDate}&end_date=${formattedEndDate}`);
                 if (!response.ok) {
-                    // Throws an error if the response status is not OK.
                     throw new Error(`HTTP Error Response: status ${response.status} ${response.statusText}`);
                 }
-                const result = await response.json(); // Parses the JSON response.
+                const result = await response.json();
+                console.log("Sleep:", result);
+                let groupedByDate = result.data.reduce((acc: AggregatedSleepData, entry: SleepEntry) => {
+                    const entryDate = format(parseISO(entry.day), 'yyyy-MM-dd');
+                    if (!acc[entryDate]) {
+                        acc[entryDate] = { ...entry, total_sleep_duration: entry.total_sleep_duration, count: 1 };
+                    } else {
+                        // Only keep the entry if it's longer than the current one for the same date
+                        if (entry.total_sleep_duration > acc[entryDate].total_sleep_duration) {
+                            acc[entryDate] = { ...entry, total_sleep_duration: entry.total_sleep_duration, count: 1 };
+                        }
+                    }
+                    return acc;
+                }, {});
 
-                // Transforms the fetched data by filtering and mapping to the desired structure.
-                const transformedData = (result.data as SleepEntry[])
-                    .filter((entry) => entry.average_hrv !== null)
-                    .map((entry) => ({
-                        date: format(parseISO(entry.day), 'yyyy-MM-dd'),
-                        averageHRV: entry.average_hrv,
-                    }));
-
-                setData(transformedData); // Sets the transformed data to the state.
+                const transformedData = Object.keys(groupedByDate).map(date => ({
+                    date: date,
+                    averageHRV: groupedByDate[date].average_hrv,
+                    averageBreath: groupedByDate[date].average_breath,
+                    averageHeartRate: groupedByDate[date].average_heart_rate,
+                    lowestHeartRate: groupedByDate[date].lowest_heart_rate,
+                    totalSleepDuration: groupedByDate[date].total_sleep_duration,
+                }));
+                setData(transformedData);
             } catch (error) {
-                // Catches and logs any errors that occur during fetching or processing.
                 console.error("Failed to fetch HRV data:", error);
-                // Sets an error state, ensuring it's an Error object.
                 setError(error instanceof Error ? error : new Error('An error occurred while fetching HRV data'));
             } finally {
-                setIsLoading(false); // Sets loading to false after the fetch operation is complete, regardless of outcome.
+                setIsLoading(false);
             }
         };
 
-        fetchHRVData(); // Calls the fetchHRVData function defined above.
-    }, [startDate, endDate, isAuthenticated]); // Dependencies array, effect reruns when any of these values change.
+        fetchHRVData();
+    }, [startDate, endDate, isAuthenticated]);
 
-    // Returns the HRV data, loading status, and any error state.
     return { data, isLoading, error };
 };
 
-// Exports the custom hook for use in other parts of the application.
 export default useFetchHrvData;

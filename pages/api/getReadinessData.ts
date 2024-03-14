@@ -1,40 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Cookies from 'cookies';
-
-interface OuraData {
-    access_token: string;
-    token_type: string;
-    expires_in: number;
-    refresh_token: string;
-    expires_at: number;
-}
-
-interface ReadinessData {
-    data: ReadinessEntry[];
-    next_token: string | null;
-}
-
-interface ReadinessEntry {
-    id: string;
-    contributors: Contributors;
-    day: string;
-    score: number;
-    temperature_deviation: number;
-    temperature_trend_deviation: number | null;
-    timestamp: string;
-    sleepData?: any; // Add this line
-}
-
-interface Contributors {
-    activity_balance: number | null;
-    body_temperature: number;
-    hrv_balance: number;
-    previous_day_activity: number | null;
-    previous_night: number;
-    recovery_index: number;
-    resting_heart_rate: number;
-    sleep_balance: number;
-}
+import { OuraData, DailyReadinessData, DailyReadinessEntry } from '../../app/types/OuraInterfaces';
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -68,8 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return;
         }
 
-        const readinessData: ReadinessData = await readinessResponse.json();
-
+        const readinessData: DailyReadinessData = await readinessResponse.json();
         // Map each readiness entry to a promise for fetching sleep data
         const sleepDataPromises = readinessData.data.map(entry =>
             fetchSleepData(entry.id, token)
@@ -113,8 +78,8 @@ async function fetchSleepData(sleepId: string, token: string) {
 }
 
 
-function processReadinessData(data: ReadinessData): ReadinessData {
-    data.data.forEach((entry: ReadinessEntry) => {
+function processReadinessData(data: DailyReadinessData): DailyReadinessData {
+    data.data.forEach((entry: DailyReadinessEntry) => {
         entry.timestamp = convertToUTC(entry.timestamp);
     });
 

@@ -4,6 +4,10 @@ import { transformedHrvData, EnhancedTagData } from '../../app/types/OuraInterfa
 
 interface ExtendedHRVData extends transformedHrvData {
     parsedDate: Date;
+    averageBreath?: number;
+    averageHeartRate?: number;
+    lowestHeartRate?: number;
+    totalSleepDuration?: number;
 }
 
 interface ProcessedStravaActivity {
@@ -11,63 +15,60 @@ interface ProcessedStravaActivity {
     distance: number;
     totalElevationGain: number;
     averageHRV?: number;
+    averageBreath?: number;
+    averageHeartRate?: number;
+    lowestHeartRate?: number;
+    totalSleepDuration?: number;
     averageWatts?: number;
-    tags?: string[]; // Array to hold tag comments
+    tags?: string[];
 }
 
 const useProcessStravaAndHRVData = (
     stravaData: ProcessedStravaActivity[] | null,
     hrvData: transformedHrvData[] | null,
-    tagsData: EnhancedTagData[] | null // Added as a parameter
+    tagsData: EnhancedTagData[] | null
 ): ProcessedStravaActivity[] => {
     const [processedData, setProcessedData] = useState<ProcessedStravaActivity[]>([]);
 
     useEffect(() => {
-        if (!stravaData) {
-            setProcessedData([]);
+        // Check for the absence of data or empty arrays
+        if (!stravaData || stravaData.length === 0 || !hrvData || hrvData.length === 0) {
+            // Optionally, process stravaData if it's the only dataset available
+            setProcessedData(stravaData || []);
             return;
         }
 
-        let hrvDataWithParsedDates: ExtendedHRVData[] = [];
-        if (hrvData) {
-            hrvDataWithParsedDates = hrvData.map(hrv => ({
-                ...hrv,
-                parsedDate: parseISO(hrv.date),
-            }));
-        }
+        // Map hrvData to include parsed dates
+        const hrvDataWithParsedDates: ExtendedHRVData[] = hrvData.map(hrv => ({
+            ...hrv,
+            parsedDate: parseISO(hrv.date),
+        }));
 
+        // Merge Strava and HRV data based on matching dates
         const mergedData = stravaData.map(activity => {
-            const activityDateFormatted = format(parseISO(activity.day), 'yyyy-MM-dd');
-            const matchingTags = tagsData?.filter(tag => {
-                const tagStartDateFormatted = format(parseISO(tag.start_day), 'yyyy-MM-dd');
-                return tagStartDateFormatted === activityDateFormatted;
-            }).map(tag => tag.comment) || [];
-        
-            // Now find the matching HRV data as before
-            const matchingHRV = hrvDataWithParsedDates.find(hrv => {
-                const hrvDateFormatted = format(hrv.parsedDate, 'yyyy-MM-dd');
-                return hrvDateFormatted === activityDateFormatted;
-            });
-        
-            let averageHRV = matchingHRV?.averageHRV;
-            if (averageHRV === null) {
-                averageHRV = undefined;
-            }
+            const matchingHRV = hrvDataWithParsedDates.find(hrv => isEqual(hrv.parsedDate, parseISO(activity.day)));
         
             return {
                 ...activity,
-                averageHRV,
-                tags: matchingTags, // Include the matching tags based on the normalized date comparison
+                averageHRV: matchingHRV?.averageHRV ?? undefined, // Convert null to undefined
+                averageBreath: matchingHRV?.averageBreath ?? undefined,
+                averageHeartRate: matchingHRV?.averageHeartRate ?? undefined,
+                lowestHeartRate: matchingHRV?.lowestHeartRate ?? undefined,
+                totalSleepDuration: matchingHRV?.totalSleepDuration ?? undefined,
+                tags: tagsData?.filter(tag => isEqual(parseISO(tag.start_day), parseISO(activity.day)))
+                                   .map(tag => `${tag.tag_type_code}: ${tag.comment}`) || [],
             };
         });
+        
 
+        // Further process merged data if necessary
         const formattedData = mergedData.map(activity => ({
             ...activity,
             day: format(parseISO(activity.day), 'do MMM yyyy'),
         }));
 
         setProcessedData(formattedData);
-    }, [stravaData, hrvData, tagsData]); // Include tagsData in the dependency array
+    }, [stravaData, hrvData, tagsData]);
 
     return processedData;
 };

@@ -13,12 +13,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const cookies = new Cookies(req, res);
     const encodedOuraCookie = cookies.get('ouraData'); // Replace with your actual cookie name
-
+    
     if (!encodedOuraCookie) {
         res.status(400).json({ error: 'Oura cookie not found' });
         return;
     }
-
+    
     const decodedOuraCookie = decodeURIComponent(encodedOuraCookie);
     const ouraData: OuraData = JSON.parse(decodedOuraCookie);
     const token = ouraData.access_token;

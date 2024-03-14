@@ -5,8 +5,9 @@ export interface OuraData {
     refresh_token: string;
     expires_at: number;
 }
-
   
+
+
   export interface ReadinessData {
     dates: string[];
     restingHeartRate: number[];
@@ -78,9 +79,8 @@ export interface MetData {
 }
 
 export interface ActivityChartProps {
-    startDate: Date;
-    endDate: Date;
-}
+    activityData: ActivityData | null;
+  }
 
 export interface DailySleepData {
     data: DailySleepEntry[];
@@ -179,3 +179,29 @@ export interface EnhancedTagData {
     comment: string;
   }
   
+  export interface DailyReadinessData {
+    data: DailyReadinessEntry[];
+    next_token: string | null;
+}
+
+export interface DailyReadinessEntry {
+    id: string;
+    contributors: DailyContributors;
+    day: string;
+    score: number;
+    temperature_deviation: number;
+    temperature_trend_deviation: number | null;
+    timestamp: string;
+    sleepData?: any;
+}
+
+export interface DailyContributors {
+    activity_balance: number | null;
+    body_temperature: number;
+    hrv_balance: number;
+    previous_day_activity: number | null;
+    previous_night: number;
+    recovery_index: number;
+    resting_heart_rate: number;
+    sleep_balance: number;
+}
