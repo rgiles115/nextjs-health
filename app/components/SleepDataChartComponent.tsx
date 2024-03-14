@@ -4,6 +4,7 @@ import annotationPlugin from 'chartjs-plugin-annotation';
 import 'chartjs-adapter-date-fns';
 import dynamic from 'next/dynamic';
 
+// Register Chart.js and the annotation plugin globally
 Chart.register(...registerables, annotationPlugin);
 
 interface SleepData {
@@ -26,21 +27,19 @@ interface SleepDataChartProps {
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
+// Comparison function for React.memo
 const arePropsEqual = (prevProps: SleepDataChartProps, nextProps: SleepDataChartProps) => {
     return prevProps.isLoading === nextProps.isLoading &&
-           JSON.stringify(prevProps.sleepData) === JSON.stringify(nextProps.sleepData);
+        JSON.stringify(prevProps.sleepData) === JSON.stringify(nextProps.sleepData);
 };
 
-const SleepDataChartComponent = React.memo(({ sleepData, isLoading }: SleepDataChartProps) => {
+function SleepDataChartComponent({ sleepData, isLoading }: SleepDataChartProps) {
     const chartRef = useRef<HTMLCanvasElement>(null);
     const chartInstanceRef = useRef<Chart | null>(null);
 
     useEffect(() => {
-
         const handleResize = () => {
-            if (chartInstanceRef.current) {
-                chartInstanceRef.current.resize();
-            }
+            chartInstanceRef.current?.resize();
         };
 
         if (!isLoading && sleepData.length > 0 && chartRef.current) {
@@ -49,6 +48,7 @@ const SleepDataChartComponent = React.memo(({ sleepData, isLoading }: SleepDataC
                 chartInstanceRef.current?.destroy();
 
                 const datasets = [
+                    // Dataset configurations
                     {
                         label: 'Average Sleep Heart Rate',
                         data: sleepData.map(data => data.averageHeartRate ?? 0),
@@ -73,14 +73,13 @@ const SleepDataChartComponent = React.memo(({ sleepData, isLoading }: SleepDataC
                         pointRadius: 0,
                         yAxisID: 'y',
                     },
-                    // Updated dataset for total sleep duration with a specific yAxisID
                     {
                         label: 'Total Sleep Duration (hours)',
                         data: sleepData.map(data => Number(((data.totalSleepDuration ?? 0) / 3600).toFixed(2))),
                         borderColor: '#eb34d2',
                         tension: 0.4,
                         pointRadius: 0,
-                        yAxisID: 'y1', // Assign to the second Y axis
+                        yAxisID: 'y1',
                     },
                 ];
 
@@ -146,6 +145,6 @@ const SleepDataChartComponent = React.memo(({ sleepData, isLoading }: SleepDataC
             {isLoading ? <Loading /> : <div className="graph-container"><canvas ref={chartRef} /></div>}
         </div>
     );
-}, arePropsEqual);
+}
 
-export default SleepDataChartComponent;
+export default React.memo(SleepDataChartComponent, arePropsEqual);
