@@ -19,16 +19,19 @@ interface OuraCookieData {
 // Main handler for the API route
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Parse cookies from the request
+    console.log("Attempting to check cookie for Oura token");
     const cookies = cookie.parse(req.headers.cookie || '');
 
-    // Function to check if the Oura token needs refreshing (either expired or new day)
+    // Function to check if the Oura token needs refreshing (either expired, new day, or less than an hour left)
     const needsTokenRefresh = (ouraData: OuraCookieData): boolean => {
         const currentTimestamp = Math.floor(Date.now() / 1000);
         const currentDate = new Date().toDateString();
         const expired = currentTimestamp >= ouraData.expires_at;
         const isNewDay = ouraData.last_checked !== currentDate;
-        return expired || isNewDay;
+        const lessThanAnHourLeft = (ouraData.expires_at - currentTimestamp) < 3600; // Less than 3600 seconds left
+        return expired || isNewDay || lessThanAnHourLeft;
     };
+
 
     // Function to refresh the Oura token
     const refreshOuraToken = async (ouraData: OuraCookieData): Promise<OuraCookieData | null> => {
@@ -86,7 +89,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (ouraData && !ouraData.last_checked) {
         ouraData.last_checked = new Date().toDateString(); // Initialize if missing
     }
-
     // Check if the Oura token needs to be refreshed and attempt to refresh it
     if (ouraData && needsTokenRefresh(ouraData)) {
         console.log('Token needs refresh. Attempting to refresh.');
@@ -103,6 +105,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Final check to determine if Oura authentication is valid
     const isOuraAuthed = ouraData && !needsTokenRefresh(ouraData);
+    console.log('Oura Cookie:', JSON.stringify(ouraData));
     console.log('Final isOuraAuthed status:', isOuraAuthed);
     res.status(200).json({ isOuraAuthed });
 }
