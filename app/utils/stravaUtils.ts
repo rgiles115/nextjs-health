@@ -47,14 +47,14 @@ export const fetchStravaActivities = async (
     startDate: string,
     endDate: string
 ): Promise<StravaActivity[]> => {
-    console.log(`Fetching Strava activities from ${startDate} to ${endDate}...`);
+    // console.log(`Fetching Strava activities from ${startDate} to ${endDate}...`);
 
     let page = 1;
     const perPage = 30;
     const allActivities: StravaActivity[] = [];
 
     while (true) {
-        console.log(`Fetching page ${page}...`);
+        // console.log(`Fetching page ${page}...`);
         const stravaApiUrl = `https://www.strava.com/api/v3/athlete/activities?before=${endDate}&after=${startDate}&per_page=${perPage}&page=${page}`;
         const response = await axios.get(stravaApiUrl, {
             headers: { Authorization: `Bearer ${accessToken}` },
@@ -67,15 +67,15 @@ export const fetchStravaActivities = async (
 
         const activities: StravaActivity[] = response.data;
         if (activities.length === 0) {
-            console.log("No more activities to fetch.");
+            // console.log("No more activities to fetch.");
             break; // No more activities to fetch
         }
 
-        console.log(`Fetched ${activities.length} activities on page ${page}.`);
+        // console.log(`Fetched ${activities.length} activities on page ${page}.`);
         allActivities.push(...activities);
         page++;
     }
 
-    console.log(`Fetched a total of ${allActivities.length} activities.`);
+    // console.log(`Fetched a total of ${allActivities.length} activities.`);
     return allActivities;
 };

@@ -3,6 +3,8 @@ import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import 'chartjs-adapter-date-fns';
 import dynamic from 'next/dynamic';
+import { format, parse } from 'date-fns';
+
 
 Chart.register(...registerables, annotationPlugin);
 
@@ -23,9 +25,28 @@ interface StravaChartProps {
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
+function convertDateString(dateString: string): string {
+    // Attempt to extract the day, month, and year from the input string
+    const parts = dateString.match(/(\d+)(?:th|st|nd|rd)\s([A-Za-z]+)\s(\d{4})/);
+    if (!parts) return ''; // Return an empty string or handle the error as appropriate
+
+    // Use date-fns parse function with a custom format to interpret the extracted parts
+    const parsedDate = parse(`${parts[1]} ${parts[2]} ${parts[3]}`, 'd MMMM yyyy', new Date());
+
+    // Return the date in "YYYY-MM-DD" format
+    return format(parsedDate, 'yyyy-MM-dd');
+}
+
 const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoading }) => {
     const chartRef = useRef<HTMLCanvasElement>(null);
     const chartInstanceRef = useRef<Chart | null>(null);
+
+    const processedDataWithStandardDates = processedData.map(data => ({
+        ...data,
+        day: convertDateString(data.day), // Convert to a format that can be parsed
+    }));
+        // console.log('Day:', processedData);
+
 
     useEffect(() => {
         const handleResize = () => {
@@ -36,17 +57,17 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
 
         const annotationType: 'label' = 'label'; // Correctly typed
 
-        const tagAnnotations = processedData.flatMap((data, index) => {
-            // Ensure `data.tags` is not null or undefined before mapping
+        const tagAnnotations = processedDataWithStandardDates.flatMap((data, index) => {
+            // Now using processedDataWithStandardDates
             return (data.tags ?? []).map(tag => ({
                 type: annotationType,
-                content: tag, // The content of the tag
-                xValue: data.day, // The day corresponding to the tag
+                content: tag,
+                xValue: data.day, // Ensure this uses the converted date
                 backgroundColor: 'rgba(255, 99, 132, 0.25)',
                 rotation: -90,
-                // Specify other properties as needed
             }));
         });
+        
 
         if (!isLoading && processedData.length > 0 && chartRef.current) {
             const ctx = chartRef.current.getContext('2d');
@@ -100,7 +121,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                 const chartConfig: ChartConfiguration<'line', number[], string> = {
                     type: 'line',
                     data: {
-                        labels: processedData.map(data => data.day),
+                        labels: processedDataWithStandardDates.map(data => data.day), // Use converted dates
                         datasets,
                     },
                     options: {
@@ -108,25 +129,32 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                         maintainAspectRatio: true,
                         scales: {
                             x: {
-                                ticks: {
-                                    autoSkip: true,
-                                    maxRotation: 0,
-                                    minRotation: 0,
-                                    maxTicksLimit: 10
-                                }
+                                type: 'time',
+                                time: {
+                                    tooltipFormat: 'd MMM yy',
+                                    displayFormats: {
+                                        day: 'd MMM yy',
+                                    }
+                                },
+                                grid: {
+                                    display: false,
+                                },
                             },
                             y: {
-                                position: 'left',
+                                grid: {
+                                    drawOnChartArea: true, // Keeps your previous setting for horizontal grid lines
+                                },
                             },
                             ...(hasHRVData && hasWattsData && {
                                 y1: {
                                     position: 'right',
                                     grid: {
-                                        drawOnChartArea: false,
+                                        drawOnChartArea: false, // Keeps your adjustment based on axis preference
                                     },
                                 }
                             }),
                         },
+                                         
                         plugins: {
                             legend: {
                                 display: window.innerWidth > 600, // Only show legend if window width is greater than 600px

@@ -23,6 +23,17 @@ interface ProcessedStravaActivity {
     tags?: string[];
 }
 
+// Function to process Strava data similarly to HRV data
+const processStravaData = (stravaData: ProcessedStravaActivity[], tagsData: EnhancedTagData[] | null) => {
+    return stravaData.map(activity => ({
+        ...activity,
+        // Any processing logic specific to Strava data can be added here
+        day: format(parseISO(activity.day), 'do MMM yyyy'),
+        tags: tagsData?.filter(tag => isEqual(parseISO(tag.start_day), parseISO(activity.day)))
+            .map(tag => `${tag.tag_type_code}: ${tag.comment}`) || [],
+    }));
+};
+
 const useProcessStravaAndHRVData = (
     stravaData: ProcessedStravaActivity[] | null,
     hrvData: transformedHrvData[] | null,
@@ -31,6 +42,19 @@ const useProcessStravaAndHRVData = (
     const [processedData, setProcessedData] = useState<ProcessedStravaActivity[]>([]);
 
     useEffect(() => {
+        if (!stravaData || stravaData.length === 0) {
+            setProcessedData([]);
+            return;
+        }
+
+        // Separate condition when only Strava data is present
+        if (!hrvData || hrvData.length === 0) {
+            // Process Strava data only and set it
+            const processedStravaData = processStravaData(stravaData, tagsData);
+            setProcessedData(processedStravaData);
+            return;
+        }
+
         // Check for the absence of data or empty arrays
         if (!stravaData || stravaData.length === 0 || !hrvData || hrvData.length === 0) {
             // Optionally, process stravaData if it's the only dataset available
@@ -60,7 +84,6 @@ const useProcessStravaAndHRVData = (
             };
         });
         
-
         // Further process merged data if necessary
         const formattedData = mergedData.map(activity => ({
             ...activity,

@@ -3,6 +3,7 @@ import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import 'chartjs-adapter-date-fns';
 import dynamic from 'next/dynamic';
+import { format, parse } from 'date-fns';
 
 // Register Chart.js and the annotation plugin globally
 Chart.register(...registerables, annotationPlugin);
@@ -27,6 +28,14 @@ interface SleepDataChartProps {
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
+function convertDateString(dateString: string): string {
+    const parts = dateString.match(/(\d+)(?:th|st|nd|rd)\s([A-Za-z]+)\s(\d{4})/);
+    if (!parts) return ''; // Return an empty string or handle the error as appropriate
+
+    const parsedDate = parse(`${parts[1]} ${parts[2]} ${parts[3]}`, 'd MMMM yyyy', new Date());
+    return format(parsedDate, 'yyyy-MM-dd');
+}
+
 // Comparison function for React.memo
 const arePropsEqual = (prevProps: SleepDataChartProps, nextProps: SleepDataChartProps) => {
     return prevProps.isLoading === nextProps.isLoading &&
@@ -43,6 +52,10 @@ function SleepDataChartComponent({ sleepData, isLoading }: SleepDataChartProps) 
         };
 
         if (!isLoading && sleepData.length > 0 && chartRef.current) {
+            const convertedSleepData = sleepData.map(data => ({
+                ...data,
+                day: convertDateString(data.day),
+            }));
             const ctx = chartRef.current.getContext('2d');
             if (ctx) {
                 chartInstanceRef.current?.destroy();
@@ -86,7 +99,7 @@ function SleepDataChartComponent({ sleepData, isLoading }: SleepDataChartProps) 
                 const chartConfig: ChartConfiguration<'line', number[], string> = {
                     type: 'line',
                     data: {
-                        labels: sleepData.map(data => data.day),
+                        labels: convertedSleepData.map(data => data.day), // Use converted dates
                         datasets,
                     },
                     options: {
@@ -94,12 +107,16 @@ function SleepDataChartComponent({ sleepData, isLoading }: SleepDataChartProps) 
                         maintainAspectRatio: true,
                         scales: {
                             x: {
-                                ticks: {
-                                    autoSkip: true,
-                                    maxRotation: 0,
-                                    minRotation: 0,
-                                    maxTicksLimit: 10
-                                }
+                                type: 'time',
+                                time: {
+                                    tooltipFormat: 'd MMM yy',
+                                    displayFormats: {
+                                        day: 'd MMM yy',
+                                    }
+                                },
+                                grid: {
+                                    display: false,
+                                },
                             },
                             y: { // Primary Y axis configuration
                                 position: 'left',

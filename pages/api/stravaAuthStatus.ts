@@ -54,7 +54,7 @@ interface CustomCookies {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Parse cookies from the request
     const cookies: CustomCookies = cookie.parse(req.headers.cookie || '');
-
+    console.log('Cookies:', cookies);
     // Function to check if the Strava token has expired
     const isStravaExpired = (stravaCookie: string): boolean => {
         try {

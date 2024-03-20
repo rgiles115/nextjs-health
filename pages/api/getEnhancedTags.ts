@@ -45,17 +45,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const response = await axios.get(ouraApiUrl, {
             headers: { 'Authorization': `Bearer ${token}` },
         });
-    
+        console.log('Enhanced Tag:', response.data);
         res.status(200).json(response.data);
     } catch (error: unknown) {
         console.log('Error caught:', error);
         console.log('Is Axios Error:', axios.isAxiosError(error));
-    
+
         if (axios.isAxiosError(error)) {
             // Correctly identified as an Axios error
             const status = error.response?.status || 500;
             const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-    
+
             console.error('Axios Error fetching enhanced tags data:', errorMessage);
             res.status(status).json({ error: errorMessage });
         } else {
@@ -64,5 +64,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             res.status(500).json({ error: 'An internal server error occurred.' });
         }
     }
-    
+
 }

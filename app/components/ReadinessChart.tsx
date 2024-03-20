@@ -3,8 +3,8 @@ import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import "react-datepicker/dist/react-datepicker.css";
 import dynamic from 'next/dynamic';
-import isEqual from 'lodash/isEqual'; // Import isEqual from lodash for deep comparison
-
+import isEqual from 'lodash/isEqual';
+import { format, parse } from 'date-fns'; // Import format and parse from date-fns
 
 Chart.register(...registerables);
 
@@ -22,29 +22,33 @@ interface ReadinessChartProps {
 
 const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, readinessData, isLoading }) => {
     const Loading = dynamic(() => import('./Loading'), { ssr: false });
-
-    // Update state to include new data points
     const chartRef = useRef<HTMLCanvasElement>(null);
     const chartInstanceRef = useRef<Chart | null>(null);
-    
+
+    // Function to convert date strings from "8th Mar 2024" to "YYYY-MM-DD"
+    function convertDateString(dateString: string): string {
+        const parts = dateString.match(/(\d+)(?:th|st|nd|rd)\s([A-Za-z]+)\s(\d{4})/);
+        if (!parts) return ''; // Handle the error as appropriate
+
+        const parsedDate = parse(`${parts[1]} ${parts[2]} ${parts[3]}`, 'd MMMM yyyy', new Date());
+        return format(parsedDate, 'yyyy-MM-dd');
+    }
 
     useEffect(() => {
-        if (!readinessData) {
-            // If readinessData is null, do not proceed
+        if (!readinessData || readinessData.dates.length === 0 || !chartRef.current) {
             return;
         }
-        if (readinessData.dates.length > 0 && chartRef.current) {
-            const ctx = chartRef.current.getContext('2d');
-            if (ctx) {
-                if (chartInstanceRef.current) {
-                    chartInstanceRef.current.destroy();
-                }
 
-                chartInstanceRef.current = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: readinessData.dates,
-                        datasets: [
+        const convertedDates = readinessData.dates.map(date => convertDateString(date));
+        const ctx = chartRef.current.getContext('2d');
+        if (ctx) {
+            chartInstanceRef.current?.destroy();
+
+            chartInstanceRef.current = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: convertedDates, // Use converted dates here
+                    datasets: [
                             {
                                 label: 'Resting Heart Rate',
                                 data: readinessData.restingHeartRate,
@@ -76,16 +80,24 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
                         maintainAspectRatio: true,
                         scales: {
                             x: {
+                                type: 'time',
+                                time: {
+                                    tooltipFormat: 'd MMM yy',
+                                    displayFormats: {
+                                        day: 'd MMM yy',
+                                    }
+                                },
+                                grid: {
+                                    display: false
+                                },
                                 ticks: {
                                     autoSkip: true,
                                     maxRotation: 0,
                                     minRotation: 0,
                                     maxTicksLimit: 10
                                 },
-                                grid: {
-                                    display: false
-                                },
-                            }
+                            },
+                            // Other scales configurations...
                         },
                         plugins: {
                             tooltip: {
@@ -95,49 +107,34 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
                     }
                 });
             }
-        }
-        return () => {
-            if (chartInstanceRef.current) {
-                chartInstanceRef.current.destroy();
-            }
-        };
-    }, [readinessData]);
-
-    useEffect(() => {
-        const handleResize = () => {
-            if (chartInstanceRef.current) {
-                chartInstanceRef.current.resize();
-            }
-        };
-
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
-
-    return (
-        <div>
-            {isLoading ? (
-                <Loading /> // Use the Loading component when isLoading is true
-            ) : (
-                <div className="graph-container">
-                    <canvas ref={chartRef} />
-                </div>
-            )}
-        </div>
-    );
-
-
-};
-
-// Custom comparison function for React.memo with explicit types
-const areEqual = (prevProps: ReadinessChartProps, nextProps: ReadinessChartProps) => {
-    // Perform a deep comparison between prevProps and nextProps
-    return isEqual(prevProps, nextProps);
-};
-
-const MemoizedReadinessChart = React.memo(ReadinessChart, areEqual);
-
-export default MemoizedReadinessChart;
+    
+            return () => chartInstanceRef.current?.destroy();
+        }, [readinessData]);
+    
+        useEffect(() => {
+            const handleResize = () => {
+                if (chartInstanceRef.current) {
+                    chartInstanceRef.current.resize();
+                }
+            };
+    
+            window.addEventListener('resize', handleResize);
+            return () => window.removeEventListener('resize', handleResize);
+        }, []);
+    
+        return (
+            <div>
+                {isLoading ? <Loading /> : <div className="graph-container"><canvas ref={chartRef} /></div>}
+            </div>
+        );
+    };
+    
+    // Custom comparison function for React.memo with explicit types
+    const areEqual = (prevProps: ReadinessChartProps, nextProps: ReadinessChartProps) => {
+        // Perform a deep comparison between prevProps and nextProps
+        return isEqual(prevProps, nextProps);
+    };
+    
+    const MemoizedReadinessChart = React.memo(ReadinessChart, areEqual);
+    
+    export default MemoizedReadinessChart;

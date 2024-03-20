@@ -45,7 +45,7 @@ const useFetchHrvData = (startDate: Date, endDate: Date, isAuthenticated: boolea
                     throw new Error(`HTTP Error Response: status ${response.status} ${response.statusText}`);
                 }
                 const result = await response.json();
-                console.log("Sleep:", result);
+                // console.log("Sleep:", result);
                 let groupedByDate = result.data.reduce((acc: AggregatedSleepData, entry: SleepEntry) => {
                     const entryDate = format(parseISO(entry.day), 'yyyy-MM-dd');
                     if (!acc[entryDate]) {

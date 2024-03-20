@@ -115,30 +115,44 @@ export default function Home() {
   useEffect(() => {
     // Define asynchronous function to perform auth checks
     const checkAuthStatuses = async () => {
+      // Initially, we might want to indicate that we're checking auth statuses
+      setIsAuthCheckLoading(true);
+
+      // Check Strava authentication status
       try {
-        // Fetch Strava authentication status
         const stravaResponse = await fetch('/api/stravaAuthStatus');
+        if (!stravaResponse.ok) throw new Error('Failed to fetch Strava auth status');
         const stravaData = await stravaResponse.json();
         setIsStravaAuthed(stravaData.isStravaAuthed);
+        console.log("Strava Auth Status:", stravaData.isStravaAuthed);
         if (stravaData.isStravaAuthed && stravaData.athlete) {
           setAthleteProfile(stravaData.athlete);
         }
+      } catch (error) {
+        console.error('Error fetching Strava authentication status:', error);
+        setIsStravaAuthed(false);
+      }
 
-        // Fetch Oura authentication status
+      // Check Oura authentication status
+      try {
         const ouraResponse = await fetch('/api/ouraAuthStatus');
+        if (!ouraResponse.ok) throw new Error('Failed to fetch Oura auth status');
         const ouraData = await ouraResponse.json();
         setIsOuraAuthed(ouraData.isOuraAuthed);
         console.log("Oura Auth Status:", ouraData.isOuraAuthed);
       } catch (error) {
-        console.error('Error fetching authentication statuses:', error);
-        // Consider setting auth statuses to false or handling the error appropriately
+        console.error('Error fetching Oura authentication status:', error);
+        setIsOuraAuthed(false);
       } finally {
-        setIsAuthCheckLoading(false); // Indicate that auth checks are completed
+        // Indicate that both auth checks are completed, regardless of their outcomes.
+        setIsAuthCheckLoading(false);
       }
     };
 
     checkAuthStatuses();
-  }, []);
+  }, []); // Empty dependency array means this effect runs once after the initial render.
+
+
 
   useEffect(() => {
     // Display each error in a separate toast message
