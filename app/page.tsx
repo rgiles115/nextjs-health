@@ -83,6 +83,8 @@ export default function Home() {
   const [ouraLoadingDots, setOuraLoadingDots] = useState('');
 
   const processedResults = useProcessStravaAndHRVData(processedData, transformedHrvData, tagsData);
+  console.log('Processed Results:', JSON.stringify(processedResults));
+
   const errors = [stravaError, ouraError, hrvError].filter(Boolean); // Filter out null values
 
 
@@ -110,6 +112,12 @@ export default function Home() {
   const hrvAnalysisPrompt = `Analyse the following HRV data and provide insights. The data includes
   average heart rate variability (HRV) readings over time. Please provide a concise and
   professional analysis.`;
+
+  const stravaAndOuraAnalysisPrompt = `Analyse the combined dataset from Strava and Oura for an
+  amateur athlete, and provide integrated insights and recommendations from the perspective of a
+  professional coach. Consider metrics from cycling activities, sleep, HRV, and readiness. Keep
+  the response very short.`;
+
 
   // Effect hook to check authentication status on component mount
   useEffect(() => {
@@ -284,6 +292,45 @@ export default function Home() {
     setIsOuraAnalysisLoading(false);
   };
 
+  // Function to Analyze Combined Data
+  const getCombinedDataAnalyse = async () => {
+    // Checking for the presence of Oura data
+    const hasOuraData = processedResults.some(entry =>
+      (entry.averageSleepHRV !== undefined && entry.averageSleepHRV > 0) ||
+      (entry.averageSleepBreath !== undefined && entry.averageSleepBreath > 0) ||
+      (entry.averageSleepHeartRate !== undefined && entry.averageSleepHeartRate > 0) ||
+      (entry.lowestSleepHeartRate !== undefined && entry.lowestSleepHeartRate > 0) ||
+      (entry.totalSleepDuration !== undefined && entry.totalSleepDuration > 0)
+    );
+
+    // Determine which prompt to use based on the presence of Oura data
+    const prompt = hasOuraData ? stravaAndOuraAnalysisPrompt : stravaAnalysisPrompt;
+
+    // Set loading state and clear previous errors
+    setIsStravaAnalysisLoading(true);
+    setStravaAnalysisError(null);
+    try {
+      const response = await axios.post('/api/chatgpt-analysis', {
+        content: prompt,
+        data: processedResults // Sending the combined/processed data
+      });
+
+      // Handle response
+      if (response.data.choices && response.data.choices.length > 0) {
+        setStravaAnalysisResult(response.data.choices[0].message.content);
+      } else {
+        setStravaAnalysisResult('No analysis available.');
+        setStravaAnalysisError('No analysis could be generated from the data.');
+      }
+    } catch (error) {
+      // Handle errors
+      console.error('Error in analyzeCombinedData:', error);
+      setStravaAnalysisError('Error fetching analysis.');
+    } finally {
+      setIsStravaAnalysisLoading(false);
+    }
+  };
+
   useEffect(() => {
     let interval: number | undefined;
     if (isStravaAnalysisLoading) {
@@ -418,7 +465,7 @@ export default function Home() {
                     onClick={(e) => {
                       if (!isStravaAnalysisLoading) {
                         e.preventDefault();
-                        getStravaAnalysis();
+                        getCombinedDataAnalyse();
                       }
                     }}
                     className={`analyze-button ${isStravaAnalysisLoading ? 'disabled' : ''}`}>
@@ -440,28 +487,8 @@ export default function Home() {
           <OuraSkeletonLoader />
         )}
         {isOuraAuthed && !isReadinessLoading && readinessData && (
+
           <div>
-            <h2 className="text-2xl font-semibold mb-2 px-5">Oura Readiness</h2>
-            <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
-              <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
-                <ReadinessChart readinessData={readinessData} isLoading={isReadinessLoading} startDate={startDate} endDate={endDate} />
-              </div>
-              <div className="p-4 w-full md:w-1/2">
-                <div className="button-container">
-                  <a href="#" onClick={(e) => { if (!isOuraAnalysisLoading) { e.preventDefault(); getOuraAnalysis(); } }}
-                    className={`analyze-button ${isOuraAnalysisLoading ? 'disabled' : ''}`}>
-                    {isOuraAnalysisLoading ? <>Analysing<span className="loading-dots">{ouraLoadingDots}</span></> : <><img src="/sparkler.png" alt="Sparkles" />Analyse</>}
-                  </a>
-                </div>
-                {ouraAnalysisError && <div className="text-red-500">{ouraAnalysisError}</div>}
-                <ReadinessAnalysis
-                  readinessData={readinessData}
-                  analysis={ouraAnalysisResult}
-                  isLoading={isOuraAnalysisLoading}
-                  loadingDots={loadingDots}
-                />
-              </div>
-            </div>
             <h2 className="text-2xl font-semibold mb-2 px-5">Oura Sleep</h2>
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
@@ -471,7 +498,14 @@ export default function Home() {
                 </div>
               </div>
             </div>
-
+            <h2 className="text-2xl font-semibold mb-2 px-5">Oura Readiness</h2>
+            <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
+              <div className="w-full md:w-1/2 p-4">
+                <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
+                  <ReadinessChart readinessData={readinessData} isLoading={isReadinessLoading} startDate={startDate} endDate={endDate} />
+                </div>
+              </div>
+            </div>
           </div>
         )}
         <ToastContainer

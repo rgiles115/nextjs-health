@@ -7,10 +7,10 @@ interface ProcessedStravaActivity {
   day: string;
   distance: number;
   totalElevationGain: number;
-  averageHRV?: number;
-  averageBreath?: number;
-  averageHeartRate?: number;
-  lowestHeartRate?: number;
+  averageSleepHRV?: number;
+  averageSleepBreath?: number;
+  averageSleepHeartRate?: number;
+  lowestSleepHeartRate?: number;
   totalSleepDuration?: number;
   averageWatts?: number;
   tags?: string[];
@@ -23,7 +23,7 @@ const mockStravaData = [
 ];
 
 const mockHrvData = [
-  { date: '2023-04-01', averageHRV: 50 },
+  { date: '2023-04-01', averageSleepHRV: 50 },
   // Add more mock data as needed
 ];
 
@@ -62,7 +62,7 @@ describe('useProcessStravaAndHRVData Hook', () => {
       // Again, intentionally empty for demonstration
     });
     const activities = result.current as ProcessedStravaActivity[];
-    expect(activities[0]).toHaveProperty('averageHRV', 50);
+    expect(activities[0]).toHaveProperty('averageSleepHRV', 50);
   });
 
   it('integrates tags data correctly', () => {

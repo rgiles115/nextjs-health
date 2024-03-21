@@ -33,7 +33,7 @@ const HRVChart: React.FC<HRVChartProps> = ({ hrvData, isLoading }) => {
                         datasets: [
                             {
                                 label: 'Average HRV',
-                                data: hrvData.map(data => data.averageHRV), // Map averageHRV for data
+                                data: hrvData.map(data => data.averageSleepHRV), // Map averageSleepHRV for data
                                 borderColor: 'rgb(75, 192, 192)',
                                 tension: 0.4,
                             }

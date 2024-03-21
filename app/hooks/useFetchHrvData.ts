@@ -61,10 +61,10 @@ const useFetchHrvData = (startDate: Date, endDate: Date, isAuthenticated: boolea
 
                 const transformedData = Object.keys(groupedByDate).map(date => ({
                     date: date,
-                    averageHRV: groupedByDate[date].average_hrv,
-                    averageBreath: groupedByDate[date].average_breath,
-                    averageHeartRate: groupedByDate[date].average_heart_rate,
-                    lowestHeartRate: groupedByDate[date].lowest_heart_rate,
+                    averageSleepHRV: groupedByDate[date].average_hrv,
+                    averageSleepBreath: groupedByDate[date].average_breath,
+                    averageSleepHeartRate: groupedByDate[date].average_heart_rate,
+                    lowestSleepHeartRate: groupedByDate[date].lowest_heart_rate,
                     totalSleepDuration: groupedByDate[date].total_sleep_duration,
                 }));
                 setData(transformedData);

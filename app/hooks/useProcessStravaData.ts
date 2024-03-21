@@ -1,23 +1,18 @@
-//This hook simplifies the process of aggregating and analyzing Strava
-// activity data over a specified period, making it easier to display
-// summarized or detailed insights about an athlete's performance so that
-// it can be sent to ChatGPT for analysis and not use too many tokens.
-
-// Import necessary hooks and utility functions from React and date-fns.
 import { useState, useEffect } from 'react';
 import { eachDayOfInterval, format, parseISO } from 'date-fns';
-// Import the StravaActivity type for type safety.
 import { StravaActivity } from '../types/StravaInterface';
 
-// Define a structure for the processed Strava activities.
+// Interface for the structure of processed Strava activities
 interface ProcessedStravaActivity {
-  day: string; // The date of the activity
-  distance: number; // Total distance covered
-  totalElevationGain: number; // Total elevation gained
-  averageWatts: number; // Average power output
+  day: string; // Date of the activity
+  distance: number; // Total distance covered on the day (in kilometers)
+  totalElevationGain: number; // Total elevation gain on the day
+  averageWatts: number; // Calculated average watts for the day
+  totalWeightedWatts: number; // Total weighted watts for all activities on the day
+  totalDuration: number; // Total duration of all activities on the day (in the same unit as used in StravaActivity)
 }
 
-// The custom hook accepting raw Strava data and a date range as inputs.
+// Custom hook for processing raw Strava data within a specified date range
 const useProcessStravaData = (
   stravaData: StravaActivity[] | null,
   startDate: Date,
@@ -28,72 +23,80 @@ const useProcessStravaData = (
   totalElevationGain: number;
   averageWatts: number;
 } => {
-  // State hooks for storing processed data and aggregate statistics.
+  // State hooks for storing processed data and overall statistics
   const [processedData, setProcessedData] = useState<ProcessedStravaActivity[]>([]);
   const [totalDistance, setTotalDistance] = useState<number>(0);
   const [totalElevationGain, setTotalElevationGain] = useState<number>(0);
   const [averageWatts, setAverageWatts] = useState<number>(0);
 
   useEffect(() => {
-    // Check if stravaData is an array and not empty before proceeding.
+    // Early return if stravaData is not an array or is empty
     if (!Array.isArray(stravaData) || stravaData.length === 0) {
       setProcessedData([]);
       return;
     }
 
-    // Create a series of dates between startDate and endDate.
+    // Create a series of dates between the start and end dates
     const dateSeries = eachDayOfInterval({ start: startDate, end: endDate }).map(day =>
       format(day, 'yyyy-MM-dd')
     );
 
-    // Initialize an array to hold processed data for each date in the interval.
+    // Initialize the processed data array with structure for each day in the date range
     const processed: ProcessedStravaActivity[] = dateSeries.map(date => ({
       day: date,
       distance: 0,
       totalElevationGain: 0,
       averageWatts: 0,
+      totalWeightedWatts: 0,
+      totalDuration: 0,
     }));
 
-    // Temporary variables to hold aggregate values.
+    // Temporary variables for aggregate calculations
     let totalDistanceTemp = 0;
     let totalElevationGainTemp = 0;
-    let totalWattsTemp = 0;
-    let wattActivitiesCount = 0; // Count of activities with average watts recorded.
+    let totalWeightedWattsTemp = 0;
+    let totalDurationTemp = 0;
 
-    // Iterate over each Strava activity to aggregate data.
+    // Process each activity
     stravaData.forEach(activity => {
       const activityDate = format(parseISO(activity.start_date), 'yyyy-MM-dd');
       const index = dateSeries.indexOf(activityDate);
-      if (index !== -1) { // If the activity date is within the range.
-        processed[index].distance += activity.distance / 1000; // Convert distance from meters to kilometers.
+      if (index !== -1) {
+        // Update distance and elevation gain for the day
+        processed[index].distance += activity.distance / 1000; // Convert meters to kilometers
         processed[index].totalElevationGain += activity.total_elevation_gain;
+        
+        // If average watts is available, calculate weighted watts and update duration
         if (activity.average_watts) {
-          processed[index].averageWatts += activity.average_watts;
-          totalWattsTemp += activity.average_watts;
-          wattActivitiesCount++;
+          const duration = activity.elapsed_time; // Use elapsed_time or another appropriate field for duration
+          const weightedWatts = activity.average_watts * duration;
+          processed[index].totalWeightedWatts += weightedWatts;
+          processed[index].totalDuration += duration;
+          totalWeightedWattsTemp += weightedWatts;
+          totalDurationTemp += duration;
         }
-        totalDistanceTemp += activity.distance / 1000; // Update aggregate distance.
-        totalElevationGainTemp += activity.total_elevation_gain; // Update aggregate elevation gain.
+
+        // Update temporary aggregate values
+        totalDistanceTemp += activity.distance / 1000; // Convert meters to kilometers
+        totalElevationGainTemp += activity.total_elevation_gain;
       }
     });
 
-    // Calculate the average watts across all activities.
-    const averageWattsTemp = wattActivitiesCount > 0 ? totalWattsTemp / wattActivitiesCount : 0;
+    // Calculate overall average watts using total weighted watts and total duration
+    const averageWattsTemp = totalDurationTemp > 0 ? totalWeightedWattsTemp / totalDurationTemp : 0;
 
-    // Set the state with the processed and aggregated data.
+    // Set the processed data and overall statistics
     setProcessedData(processed.map(activity => ({
       ...activity,
-      // Calculate average watts per activity, if applicable.
-      averageWatts: activity.averageWatts > 0 ? activity.averageWatts / wattActivitiesCount : 0
+      averageWatts: activity.totalDuration > 0 ? activity.totalWeightedWatts / activity.totalDuration : 0,
     })));
     setTotalDistance(totalDistanceTemp);
     setTotalElevationGain(totalElevationGainTemp);
     setAverageWatts(averageWattsTemp);
-  }, [stravaData, startDate, endDate]); // Depend on stravaData, startDate, and endDate to re-run the effect when they change.
+  }, [stravaData, startDate, endDate]); // Dependency array to trigger re-calculation when any of these values change
 
-  // Return the processed data and aggregate statistics.
+  // Return the processed data and aggregate statistics
   return { processedData, totalDistance, totalElevationGain, averageWatts };
 };
 
-// Export the custom hook for use elsewhere in the application.
 export default useProcessStravaData;

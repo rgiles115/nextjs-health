@@ -166,7 +166,7 @@ type DetailedSleepData = SleepEntry;
 
 export interface transformedHrvData {
     date: string;
-    averageHRV: number | null;
+    averageSleepHRV: number | null;
 }
 
 export interface EnhancedTagData {

@@ -12,12 +12,12 @@ interface SleepData {
     day: string;
     distance: number;
     totalElevationGain: number;
-    averageHRV?: number;
+    averageSleepHRV?: number;
     averageWatts?: number;
     tags?: string[];
-    averageBreath?: number;
-    averageHeartRate?: number;
-    lowestHeartRate?: number;
+    averageSleepBreath?: number;
+    averageSleepHeartRate?: number;
+    lowestSleepHeartRate?: number;
     totalSleepDuration?: number;
 }
 
@@ -64,7 +64,7 @@ function SleepDataChartComponent({ sleepData, isLoading }: SleepDataChartProps) 
                     // Dataset configurations
                     {
                         label: 'Average Sleep Heart Rate',
-                        data: sleepData.map(data => data.averageHeartRate ?? 0),
+                        data: sleepData.map(data => data.averageSleepHeartRate ?? 0),
                         borderColor: '#eb4034',
                         tension: 0.4,
                         pointRadius: 0,
@@ -72,7 +72,7 @@ function SleepDataChartComponent({ sleepData, isLoading }: SleepDataChartProps) 
                     },
                     {
                         label: 'Lowest Sleep Heart Rate',
-                        data: sleepData.map(data => data.lowestHeartRate ?? 0),
+                        data: sleepData.map(data => data.lowestSleepHeartRate ?? 0),
                         borderColor: '#34eb98',
                         tension: 0.4,
                         pointRadius: 0,
@@ -80,7 +80,7 @@ function SleepDataChartComponent({ sleepData, isLoading }: SleepDataChartProps) 
                     },
                     {
                         label: 'Average Sleep Breath Rate',
-                        data: sleepData.map(data => data.averageBreath ?? 0),
+                        data: sleepData.map(data => data.averageSleepBreath ?? 0),
                         borderColor: '#3496eb',
                         tension: 0.4,
                         pointRadius: 0,

@@ -13,7 +13,7 @@ interface ProcessedStravaActivity {
     day: string;
     distance: number;
     totalElevationGain: number;
-    averageHRV?: number;
+    averageSleepHRV?: number;
     averageWatts?: number;
     tags?: string[]; // Include tags here
 }
@@ -74,7 +74,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
             if (ctx) {
                 chartInstanceRef.current?.destroy();
 
-                const hasHRVData = processedData.some(data => data.averageHRV != null);
+                const hasHRVData = processedData.some(data => data.averageSleepHRV != null);
                 const hasWattsData = processedData.some(data => data.averageWatts != null);
 
                 const datasets = [
@@ -110,7 +110,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                 if (hasHRVData) {
                     datasets.push({
                         label: 'Average HRV',
-                        data: processedData.map(data => data.averageHRV ?? 0),
+                        data: processedData.map(data => data.averageSleepHRV ?? 0),
                         borderColor: '#8338ec',
                         tension: 0.4,
                         pointRadius: 0,

@@ -4,9 +4,9 @@ import { transformedHrvData, EnhancedTagData } from '../../app/types/OuraInterfa
 
 interface ExtendedHRVData extends transformedHrvData {
     parsedDate: Date;
-    averageBreath?: number;
-    averageHeartRate?: number;
-    lowestHeartRate?: number;
+    averageSleepBreath?: number;
+    averageSleepHeartRate?: number;
+    lowestSleepHeartRate?: number;
     totalSleepDuration?: number;
 }
 
@@ -14,10 +14,10 @@ interface ProcessedStravaActivity {
     day: string;
     distance: number;
     totalElevationGain: number;
-    averageHRV?: number;
-    averageBreath?: number;
-    averageHeartRate?: number;
-    lowestHeartRate?: number;
+    averageSleepHRV?: number;
+    averageSleepBreath?: number;
+    averageSleepHeartRate?: number;
+    lowestSleepHeartRate?: number;
     totalSleepDuration?: number;
     averageWatts?: number;
     tags?: string[];
@@ -74,10 +74,10 @@ const useProcessStravaAndHRVData = (
         
             return {
                 ...activity,
-                averageHRV: matchingHRV?.averageHRV ?? undefined, // Convert null to undefined
-                averageBreath: matchingHRV?.averageBreath ?? undefined,
-                averageHeartRate: matchingHRV?.averageHeartRate ?? undefined,
-                lowestHeartRate: matchingHRV?.lowestHeartRate ?? undefined,
+                averageSleepHRV: matchingHRV?.averageSleepHRV ?? undefined, // Convert null to undefined
+                averageSleepBreath: matchingHRV?.averageSleepBreath ?? undefined,
+                averageSleepHeartRate: matchingHRV?.averageSleepHeartRate ?? undefined,
+                lowestSleepHeartRate: matchingHRV?.lowestSleepHeartRate ?? undefined,
                 totalSleepDuration: matchingHRV?.totalSleepDuration ?? undefined,
                 tags: tagsData?.filter(tag => isEqual(parseISO(tag.start_day), parseISO(activity.day)))
                                    .map(tag => `${tag.tag_type_code}: ${tag.comment}`) || [],
