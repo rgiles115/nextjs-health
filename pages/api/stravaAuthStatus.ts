@@ -80,39 +80,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     refresh_token: stravaData.refresh_token,
                 }
             );
-
+    
+            // Log the entire response from Strava
+            console.log('Strava refresh token response:', response.data);
+    
             if (response.data) {
                 return {
                     ...stravaData,
                     access_token: response.data.access_token,
                     expires_at: Math.floor(Date.now() / 1000) + response.data.expires_in,
                     expires_in: response.data.expires_in,
-                    refresh_token: response.data.refresh_token
+                    refresh_token: response.data.refresh_token // This should update the refresh token
                 };
             } else {
                 return null;
             }
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                // Axios-specific error
                 console.error('Axios error refreshing Strava token:', error.message);
                 if (error.response) {
-                    // The request was made and the server responded with a status code
-                    // that falls out of the range of 2xx
                     console.error('Error data:', error.response.data);
                     console.error('Error status:', error.response.status);
                     console.error('Error headers:', error.response.headers);
                 } else if (error.request) {
-                    // The request was made but no response was received
                     console.error('Error request:', error.request);
                 }
             } else {
-                // Non-Axios error
                 console.error('Error refreshing Strava token:', error);
             }
             return null;
         }
     };
+    
 
 
     // Initialize stravaData variable, to be populated with parsed cookie data

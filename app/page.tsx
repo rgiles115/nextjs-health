@@ -83,7 +83,7 @@ export default function Home() {
   const [ouraLoadingDots, setOuraLoadingDots] = useState('');
 
   const processedResults = useProcessStravaAndHRVData(processedData, transformedHrvData, tagsData);
-  console.log('Processed Results:', JSON.stringify(processedResults));
+  // console.log('Processed Results:', JSON.stringify(processedResults));
 
   const errors = [stravaError, ouraError, hrvError].filter(Boolean); // Filter out null values
 
@@ -314,7 +314,6 @@ export default function Home() {
         content: prompt,
         data: processedResults // Sending the combined/processed data
       });
-
       // Handle response
       if (response.data.choices && response.data.choices.length > 0) {
         setStravaAnalysisResult(response.data.choices[0].message.content);
@@ -525,5 +524,4 @@ export default function Home() {
 
     </div>
   );
-
 }
