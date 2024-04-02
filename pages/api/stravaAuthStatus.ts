@@ -53,6 +53,8 @@ interface CustomCookies {
 // Main handler for the API route
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Parse cookies from the request
+    console.log("Attempting to check cookie for Strava token");
+
     const cookies: CustomCookies = cookie.parse(req.headers.cookie || '');
     console.log('Cookies:', cookies);
     // Function to check if the Strava token has expired
@@ -70,6 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Function to refresh the Strava token
     const refreshStravaToken = async (stravaData: StravaCookieData): Promise<StravaCookieData | null> => {
+        console.log("Attempting to refresh token for Strava");
         try {
             const response = await axios.post(
                 'https://www.strava.com/api/v3/oauth/token',

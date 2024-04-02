@@ -27,8 +27,8 @@ function StravaSkeletonLoader() {
       </div>
 
       {/* Strava Overview Heading */}
-      <div className="px-5 mt-32">
-        <div className="h-10 bg-gray-300 rounded w-1/3"></div>
+      <div className="px-5">
+        <div className="mt-4 h-10 bg-gray-300 rounded w-1/3"></div>
       </div>
 
 

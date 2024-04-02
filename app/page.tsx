@@ -25,16 +25,18 @@ import useProcessStravaAndHRVData from './hooks/useProcessStravaAndHRVData';
 
 // Importing custom components
 import SleepDataChartComponent from './components/SleepDataChartComponent';
-import SleepChart from './components/SleepChart';
 import ReadinessChart from './components/ReadinessChart';
 import StravaAnalysis from './components/StravaAnalysis';
 import Footer from './components/Footer';
 import SideMenu from './components/SideMenu';
 import StravaChart from './components/StravaChart';
-import ReadinessAnalysis from './components/ReadinessAnalysis';
 import NumberContainers from './components/NumberContainers';
 import StravaSkeletonLoader from './components/StravaSkeletonLoader';
 import OuraSkeletonLoader from './components/OuraSkeletonLoader';
+
+// Utils
+import { checkAuthStatuses } from '../app/utils/authCheck'; // Adjust the import path as needed
+
 
 // Type definitions for the data used in the component
 import { StravaActivity, AthleteProfile } from '../app/types/StravaInterface';
@@ -51,13 +53,10 @@ export default function Home() {
 
   // State for managing fetched and processed data
   const [stravaData, setStravaData] = useState<StravaActivity[]>([]);
-  const [analysis, setAnalysis] = useState('');
   const [stravaAnalysisError, setStravaAnalysisError] = useState<string | null>(null);
-  const [ouraAnalysisError, setOuraAnalysisError] = useState<string | null>(null);
   const [athleteProfile, setAthleteProfile] = useState<AthleteProfile | null>(null);
 
   // Loading states for different asynchronous operations
-  const [isLoading, setIsLoading] = useState(false);
   const [loadingDots, setLoadingDots] = useState('');
 
   // Using custom hooks for fetching data from APIs
@@ -71,8 +70,6 @@ export default function Home() {
 
   // States for analysis results
   const [stravaAnalysisResult, setStravaAnalysisResult] = useState('');
-  const [ouraAnalysisResult, setOuraAnalysisResult] = useState('');
-  const [hrvAnalysisResult, setHrvAnalysisResult] = useState(''); // Not used at the moment
 
   // Loading states for analysis operations
   const [isStravaAnalysisLoading, setIsStravaAnalysisLoading] = useState(false);
@@ -104,15 +101,6 @@ export default function Home() {
   The data includes a range of metrics for each activity like distance,
   elevation gain, max watts, average watts, and moving time. Keep the response very short.`;
 
-  const ouraAnalysisPrompt = `Analyse the following data from an Oura ring. These are
-  Oura scores for HRV, resting heart rate and body temperature. They are not actual HRV,
-  heart rate, and body temperature readings. Please use is like a professional exercise
-  coach would use this type of information.  Keep the response very short.`;
-
-  const hrvAnalysisPrompt = `Analyse the following HRV data and provide insights. The data includes
-  average heart rate variability (HRV) readings over time. Please provide a concise and
-  professional analysis.`;
-
   const stravaAndOuraAnalysisPrompt = `Analyse the combined dataset from Strava and Oura for an
   amateur athlete, and provide integrated insights and recommendations from the perspective of a
   professional coach. Consider metrics from cycling activities, sleep, HRV, and readiness. Keep
@@ -121,46 +109,13 @@ export default function Home() {
 
   // Effect hook to check authentication status on component mount
   useEffect(() => {
-    // Define asynchronous function to perform auth checks
-    const checkAuthStatuses = async () => {
-      // Initially, we might want to indicate that we're checking auth statuses
-      setIsAuthCheckLoading(true);
-
-      // Check Strava authentication status
-      try {
-        const stravaResponse = await fetch('/api/stravaAuthStatus');
-        if (!stravaResponse.ok) throw new Error('Failed to fetch Strava auth status');
-        const stravaData = await stravaResponse.json();
-        setIsStravaAuthed(stravaData.isStravaAuthed);
-        console.log("Strava Auth Status:", stravaData.isStravaAuthed);
-        if (stravaData.isStravaAuthed && stravaData.athlete) {
-          setAthleteProfile(stravaData.athlete);
-        }
-      } catch (error) {
-        console.error('Error fetching Strava authentication status:', error);
-        setIsStravaAuthed(false);
-      }
-
-      // Check Oura authentication status
-      try {
-        const ouraResponse = await fetch('/api/ouraAuthStatus');
-        if (!ouraResponse.ok) throw new Error('Failed to fetch Oura auth status');
-        const ouraData = await ouraResponse.json();
-        setIsOuraAuthed(ouraData.isOuraAuthed);
-        console.log("Oura Auth Status:", ouraData.isOuraAuthed);
-      } catch (error) {
-        console.error('Error fetching Oura authentication status:', error);
-        setIsOuraAuthed(false);
-      } finally {
-        // Indicate that both auth checks are completed, regardless of their outcomes.
-        setIsAuthCheckLoading(false);
-      }
-    };
-
-    checkAuthStatuses();
-  }, []); // Empty dependency array means this effect runs once after the initial render.
-
-
+    checkAuthStatuses({
+      setIsStravaAuthed,
+      setIsOuraAuthed,
+      setIsAuthCheckLoading,
+      setAthleteProfile,
+    });
+  }, []);
 
   useEffect(() => {
     // Display each error in a separate toast message
@@ -169,128 +124,6 @@ export default function Home() {
     });
   }, [errors]); // Depend on errors to re-trigger when they change
 
-
-  // Function for Strava Data Analysis
-  const getStravaAnalysis = async () => {
-    // Clear any previous error right at the start
-    setStravaAnalysisError(null);
-
-    if (!isStravaAuthed) {
-      // console.error('Not authenticated for Strava!');
-      // Optionally, update error state here too
-      // setStravaAnalysisError('Not authenticated for Strava!');
-      return;
-    }
-
-    if (!Array.isArray(stravaActivities) || stravaActivities.length === 0) {
-      console.error('Strava activities data is not available.');
-      setStravaAnalysisError('Strava activities data is not available.');
-      return;
-    }
-
-    setIsStravaAnalysisLoading(true);
-
-    const simplifiedStravaActivities = stravaActivities.map(activity => ({
-      name: activity.name,
-      distance: activity.distance,
-      moving_time: activity.moving_time,
-      elapsed_time: activity.elapsed_time,
-      total_elevation_gain: activity.total_elevation_gain,
-      type: activity.type,
-      id: activity.id,
-      start_date: activity.start_date,
-      start_date_local: activity.start_date_local,
-      timezone: activity.timezone,
-      utc_offset: activity.utc_offset,
-      average_speed: activity.average_speed,
-      max_speed: activity.max_speed,
-      average_cadence: activity.average_cadence,
-      average_watts: activity.average_watts,
-      max_watts: activity.max_watts,
-      weighted_average_watts: activity.weighted_average_watts,
-      kilojoules: activity.kilojoules,
-      average_heartrate: activity.average_heartrate,
-      max_heartrate: activity.max_heartrate
-    }));
-    // console.log('Strava:', JSON.stringify(simplifiedStravaActivities));
-    try {
-      const response = await axios.post('/api/chatgpt-analysis', {
-        content: stravaAnalysisPrompt,
-        data: simplifiedStravaActivities
-      });
-
-      if (response.data.choices && response.data.choices.length > 0) {
-        setStravaAnalysisResult(response.data.choices[0].message.content);
-      } else {
-        setStravaAnalysisResult('No analysis available.');
-        // Optionally, set a more specific message if no data is returned
-        setStravaAnalysisError('No analysis could be generated from the data.');
-      }
-    } catch (error: unknown) {
-      let errorMessage = 'Error fetching analysis.';
-      if (axios.isAxiosError(error)) {
-        // This is an Axios Error, check for response and then for the specific error message
-        if (error.response && error.response.data && 'message' in error.response.data) {
-          errorMessage = error.response.data.message;
-        } else if (error.response && error.response.statusText) {
-          errorMessage = error.response.statusText;
-        }
-      } else if (error instanceof Error) {
-        // This is a generic JavaScript Error
-        console.error('Error in getStravaAnalysis:', error.message);
-        errorMessage = error.message;
-      }
-      setStravaAnalysisError(errorMessage);
-    }
-
-
-    setIsStravaAnalysisLoading(false);
-  };
-
-  // Function for Oura Readiness Data Analysis
-  const getOuraAnalysis = async () => {
-    // Clear any previous error at the start
-    setOuraAnalysisError(null);
-
-    if (!isOuraAuthed) {
-      console.error('Not authenticated for Oura.');
-      setOuraAnalysisError('Not authenticated for Oura.');
-      return;
-    }
-
-    if (!readinessData) {
-      console.error('Readiness data is not available.');
-      setOuraAnalysisError('Readiness data is not available.');
-      return;
-    }
-
-    setIsOuraAnalysisLoading(true);
-
-    try {
-      const response = await axios.post('/api/chatgpt-analysis', {
-        content: hrvAnalysisPrompt,
-        data: transformedHrvData
-      });
-
-      if (response.data.choices && response.data.choices.length > 0) {
-        setOuraAnalysisResult(response.data.choices[0].message.content);
-      } else {
-        setOuraAnalysisResult('No analysis available.');
-        // Optionally, if no data is returned, you might consider setting a specific error message
-        setOuraAnalysisError('No analysis could be generated from the data.');
-      }
-    } catch (error) {
-      console.error('Error in getOuraAnalysis:', error);
-      let errorMessage = 'Error fetching analysis.';
-      // Handle the case if error is an AxiosError for more specific error messaging
-      if (axios.isAxiosError(error) && error.response) {
-        errorMessage = error.response.data.message || 'Error fetching analysis.';
-      }
-      setOuraAnalysisError(errorMessage);
-    }
-
-    setIsOuraAnalysisLoading(false);
-  };
 
   // Function to Analyze Combined Data
   const getCombinedDataAnalyse = async () => {
@@ -448,7 +281,7 @@ export default function Home() {
               totalDistance={totalDistance}
               totalElevationGain={totalElevationGain}
             />
-            <h2 className="text-2xl font-semibold mb-2 px-5">Strava Overview</h2>
+            <h2 className="text-2xl font-semibold px-5">Strava Overview</h2>
 
             <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
               <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
@@ -497,10 +330,10 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <h2 className="text-2xl font-semibold mb-2 px-5">Oura Readiness</h2>
-            <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
+            <h2 className="text-2xl font-semibold mt-2 mb-2 px-5">Oura Readiness</h2>
+            <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
-                <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
+              <div className="m-1 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
                   <ReadinessChart readinessData={readinessData} isLoading={isReadinessLoading} startDate={startDate} endDate={endDate} />
                 </div>
               </div>

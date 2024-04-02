@@ -35,7 +35,7 @@ describe('Strava Auth Status API', () => {
       expires_in: 21600,
       refresh_token: 'oldRefreshToken',
       access_token: 'oldAccessToken',
-      athlete: {/* Mock athlete data */},
+      athlete: {/* Mock athlete data */ },
     };
 
     // Set up mock return values
@@ -68,6 +68,58 @@ describe('Strava Auth Status API', () => {
       isStravaAuthed: true,
     }));
   });
+  it('identifies valid authentication cookie and does not attempt to refresh token', async () => {
+    // Mock data for a valid Strava token
+    const validTokenData = {
+      token_type: 'Bearer',
+      expires_at: Math.floor(Date.now() / 1000) + 3600, // 1 hour into the future
+      expires_in: 3600,
+      refresh_token: 'validRefreshToken',
+      access_token: 'validAccessToken',
+      athlete: {
+        id: 12345,
+        username: 'testathlete',
+        resource_state: 2,
+        firstname: 'Test',
+        lastname: 'Athlete',
+        bio: '',
+        city: 'Test City',
+        state: 'Test State',
+        country: 'Test Country',
+        sex: 'M',
+        premium: false,
+        summit: false,
+        created_at: '2020-01-01',
+        updated_at: '2020-01-02',
+        badge_type_id: 1,
+        weight: 70,
+        profile_medium: '',
+        profile: '',
+        friend: null,
+        follower: null,
+      },
+    };
+  
+    // Mock the cookie parsing to return the valid token data
+    mockedCookie.parse.mockReturnValue({
+      stravaData: JSON.stringify(validTokenData),
+    });
+  
+    const req = mockReq(cookie.serialize('stravaData', JSON.stringify(validTokenData)));
+    const res = mockRes();
+  
+    // Execute the handler with the mock request and response
+    await handler(req, res);
+  
+    // Assertions to verify the behavior
+    expect(mockedAxios.post).not.toHaveBeenCalled(); // Asserts that the token refresh wasn't attempted
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      isStravaAuthed: true,
+      athlete: validTokenData.athlete, // This checks if the athlete data is correctly included in the response
+    }));
+  });
+  
 
   // Add more tests here to cover other scenarios and edge cases
 });
