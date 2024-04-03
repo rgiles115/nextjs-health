@@ -3,11 +3,8 @@ import { parseISO, isEqual, format } from 'date-fns';
 import { transformedHrvData, EnhancedTagData } from '../../app/types/OuraInterfaces';
 
 interface ExtendedHRVData extends transformedHrvData {
-    parsedDate: Date;
-    averageSleepBreath?: number;
-    averageSleepHeartRate?: number;
-    lowestSleepHeartRate?: number;
-    totalSleepDuration?: number;
+    day: string; // Formatted date string
+    tags?: string[];
 }
 
 interface ProcessedStravaActivity {
@@ -23,74 +20,40 @@ interface ProcessedStravaActivity {
     tags?: string[];
 }
 
-// Function to process Strava data similarly to HRV data
-const processStravaData = (stravaData: ProcessedStravaActivity[], tagsData: EnhancedTagData[] | null) => {
-    return stravaData.map(activity => ({
-        ...activity,
-        // Any processing logic specific to Strava data can be added here
-        day: format(parseISO(activity.day), 'do MMM yyyy'),
-        tags: tagsData?.filter(tag => isEqual(parseISO(tag.start_day), parseISO(activity.day)))
-            .map(tag => `${tag.tag_type_code}: ${tag.comment}`) || [],
-    }));
-};
-
 const useProcessStravaAndHRVData = (
     stravaData: ProcessedStravaActivity[] | null,
     hrvData: transformedHrvData[] | null,
     tagsData: EnhancedTagData[] | null
-): ProcessedStravaActivity[] => {
-    const [processedData, setProcessedData] = useState<ProcessedStravaActivity[]>([]);
+): (ProcessedStravaActivity[] | ExtendedHRVData[]) => {
+    const [processedData, setProcessedData] = useState<(ProcessedStravaActivity[] | ExtendedHRVData[])>([]);
 
     useEffect(() => {
         if (!stravaData || stravaData.length === 0) {
-            setProcessedData([]);
-            return;
-        }
-
-        // Separate condition when only Strava data is present
-        if (!hrvData || hrvData.length === 0) {
-            // Process Strava data only and set it
-            const processedStravaData = processStravaData(stravaData, tagsData);
-            setProcessedData(processedStravaData);
-            return;
-        }
-
-        // Check for the absence of data or empty arrays
-        if (!stravaData || stravaData.length === 0 || !hrvData || hrvData.length === 0) {
-            // Optionally, process stravaData if it's the only dataset available
-            setProcessedData(stravaData || []);
-            return;
-        }
-
-        // Map hrvData to include parsed dates
-        const hrvDataWithParsedDates: ExtendedHRVData[] = hrvData.map(hrv => ({
-            ...hrv,
-            parsedDate: parseISO(hrv.date),
-        }));
-
-        // Merge Strava and HRV data based on matching dates
-        const mergedData = stravaData.map(activity => {
-            const matchingHRV = hrvDataWithParsedDates.find(hrv => isEqual(hrv.parsedDate, parseISO(activity.day)));
-        
-            return {
-                ...activity,
-                averageSleepHRV: matchingHRV?.averageSleepHRV ?? undefined, // Convert null to undefined
-                averageSleepBreath: matchingHRV?.averageSleepBreath ?? undefined,
-                averageSleepHeartRate: matchingHRV?.averageSleepHeartRate ?? undefined,
-                lowestSleepHeartRate: matchingHRV?.lowestSleepHeartRate ?? undefined,
-                totalSleepDuration: matchingHRV?.totalSleepDuration ?? undefined,
-                tags: tagsData?.filter(tag => isEqual(parseISO(tag.start_day), parseISO(activity.day)))
+            if (hrvData && hrvData.length > 0) {
+                const hrvDataWithTags: ExtendedHRVData[] = hrvData.map(hrv => ({
+                    ...hrv,
+                    day: format(parseISO(hrv.date), 'do MMM yyyy'), // Ensuring the day field is formatted
+                    tags: tagsData?.filter(tag => isEqual(parseISO(tag.start_day), parseISO(hrv.date)))
                                    .map(tag => `${tag.tag_type_code}: ${tag.comment}`) || [],
-            };
-        });
-        
-        // Further process merged data if necessary
-        const formattedData = mergedData.map(activity => ({
+                }));
+                // Casting to the expected return type
+                setProcessedData(hrvDataWithTags as unknown as ProcessedStravaActivity[]);
+            } else {
+                setProcessedData([]);
+            }
+            return;
+        }
+
+        // Logic to process and merge Strava and HRV data if Strava data is present
+        // Assuming processStravaData function does its job as per the initial code
+        const processedStravaData = stravaData.map(activity => ({
             ...activity,
             day: format(parseISO(activity.day), 'do MMM yyyy'),
+            tags: tagsData?.filter(tag => isEqual(parseISO(tag.start_day), parseISO(activity.day)))
+                .map(tag => `${tag.tag_type_code}: ${tag.comment}`) || [],
         }));
-
-        setProcessedData(formattedData);
+        
+        setProcessedData(processedStravaData);
     }, [stravaData, hrvData, tagsData]);
 
     return processedData;

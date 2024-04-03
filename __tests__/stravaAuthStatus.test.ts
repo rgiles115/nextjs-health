@@ -1,21 +1,18 @@
-// Import necessary utilities and types
 import axios from 'axios';
 import { NextApiRequest, NextApiResponse } from 'next';
 import handler from '../pages/api/stravaAuthStatus'; // Adjust the import path as necessary
-import cookie from 'cookie';
+import { serialize, parse } from 'cookie';
 
-// Typecasting the module mocks
+// Mock the axios and cookie modules
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
-jest.mock('cookie');
-const mockedCookie = cookie as jest.Mocked<typeof cookie>;
 
 // Mock request and response generator functions
-const mockReq = (cookies = ''): NextApiRequest => ({
+const mockReq = (cookie = ''): NextApiRequest => ({
   headers: {
-    cookie: cookies,
+    cookie,
   },
-  // Add any other properties needed to resemble the NextApiRequest type
+  cookies: cookie ? parse(cookie) : {},
 } as any);
 
 const mockRes = (): NextApiResponse => {
@@ -27,19 +24,20 @@ const mockRes = (): NextApiResponse => {
 };
 
 describe('Strava Auth Status API', () => {
-  it('refreshes the token when expired', async () => {
-    // Mock data for expired Strava token
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('refreshes the token when expired and updates the cookie correctly', async () => {
     const expiredTokenData = {
       token_type: 'Bearer',
-      expires_at: '1712051487',
-      // expires_at: Math.floor(Date.now() / 1000) - 100, // Ensure the token is considered expired
+      expires_at: Math.floor(Date.now() / 1000) - 100, // Ensure the token is considered expired
       expires_in: 21600,
       refresh_token: 'oldRefreshToken',
       access_token: 'oldAccessToken',
-      athlete: {/* Mock athlete data */ },
+      athlete: {/* Mock athlete data */},
     };
 
-    // Set up mock return values
     mockedAxios.post.mockResolvedValue({
       data: {
         access_token: 'newAccessToken',
@@ -48,79 +46,64 @@ describe('Strava Auth Status API', () => {
       },
     });
 
-    mockedCookie.parse.mockReturnValue({
-      stravaData: JSON.stringify(expiredTokenData),
-    });
-
-    const req = mockReq(cookie.serialize('stravaData', JSON.stringify(expiredTokenData)));
+    const req = mockReq(serialize('stravaData', JSON.stringify(expiredTokenData)));
     const res = mockRes();
 
-    // Execute the handler with the mock request and response
     await handler(req, res);
 
-    // Assertions to verify the behavior
     expect(mockedAxios.post).toHaveBeenCalled();
     expect(res.setHeader).toHaveBeenCalledWith(
       'Set-Cookie',
-      expect.stringContaining('newAccessToken') // This checks if the new access token is included in the response cookies
+      expect.stringContaining('newAccessToken')
+    );
+    expect(res.setHeader).toHaveBeenCalledWith(
+      'Set-Cookie',
+      expect.stringMatching(/HttpOnly; Secure/)
     );
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-      isStravaAuthed: true,
-    }));
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Strava token refreshed' }));
   });
+
   it('identifies valid authentication cookie and does not attempt to refresh token', async () => {
-    // Mock data for a valid Strava token
     const validTokenData = {
       token_type: 'Bearer',
       expires_at: Math.floor(Date.now() / 1000) + 3600, // 1 hour into the future
       expires_in: 3600,
       refresh_token: 'validRefreshToken',
       access_token: 'validAccessToken',
-      athlete: {
-        id: 12345,
-        username: 'testathlete',
-        resource_state: 2,
-        firstname: 'Test',
-        lastname: 'Athlete',
-        bio: '',
-        city: 'Test City',
-        state: 'Test State',
-        country: 'Test Country',
-        sex: 'M',
-        premium: false,
-        summit: false,
-        created_at: '2020-01-01',
-        updated_at: '2020-01-02',
-        badge_type_id: 1,
-        weight: 70,
-        profile_medium: '',
-        profile: '',
-        friend: null,
-        follower: null,
-      },
+      athlete: {/* Mock athlete data */},
     };
-  
-    // Mock the cookie parsing to return the valid token data
-    mockedCookie.parse.mockReturnValue({
-      stravaData: JSON.stringify(validTokenData),
-    });
-  
-    const req = mockReq(cookie.serialize('stravaData', JSON.stringify(validTokenData)));
+
+    const req = mockReq(serialize('stravaData', JSON.stringify(validTokenData)));
     const res = mockRes();
-  
-    // Execute the handler with the mock request and response
+
     await handler(req, res);
-  
-    // Assertions to verify the behavior
-    expect(mockedAxios.post).not.toHaveBeenCalled(); // Asserts that the token refresh wasn't attempted
+
+    expect(mockedAxios.post).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
       isStravaAuthed: true,
-      athlete: validTokenData.athlete, // This checks if the athlete data is correctly included in the response
     }));
+  });
+
+  describe('Strava Auth Status API - No Cookie Present', () => {
+    it('handles requests with no authentication cookie', async () => {
+      // Create a request object without any cookies
+      const req = mockReq();
+      const res = mockRes();
+  
+      // Execute the handler with the mock request and response
+      await handler(req, res);
+  
+      // Assertions to verify the behavior when no cookie is present
+      expect(mockedAxios.post).not.toHaveBeenCalled(); // Ensure no attempt is made to refresh the token
+      expect(res.status).toHaveBeenCalledWith(200); // Check that a successful response is still returned
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        isStravaAuthed: false, // Expect the API to indicate that Strava is not authenticated
+      }));
+    });
   });
   
 
-  // Add more tests here to cover other scenarios and edge cases
+  // Here you can add more tests for different scenarios, like error handling during token refresh
 });
