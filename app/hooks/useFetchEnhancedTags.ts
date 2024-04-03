@@ -22,7 +22,6 @@ export const useFetchEnhancedTags = (startDate: Date, endDate: Date, isOuraAuthe
   useEffect(() => {
     // Early exit if not authenticated with Oura.
     if (!isOuraAuthed) {
-      console.log("Oura is not authenticated, skipping fetch.");
       setIsLoading(false);
       return;
     }

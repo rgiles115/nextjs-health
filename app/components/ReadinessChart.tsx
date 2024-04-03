@@ -97,6 +97,11 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
                                     maxTicksLimit: 10
                                 },
                             },
+                            y: {
+                                grid: {
+                                    display: false,
+                                },
+                            },
                             // Other scales configurations...
                         },
                         plugins: {

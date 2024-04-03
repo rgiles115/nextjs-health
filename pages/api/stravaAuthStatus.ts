@@ -52,6 +52,11 @@ interface CustomCookies {
 
 // Main handler for the API route
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    // Set Cache-Control headers
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+
     // Parse cookies from the request
     console.log("Attempting to check cookie for Strava token");
 
@@ -83,10 +88,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     refresh_token: stravaData.refresh_token,
                 }
             );
-    
+
             // Log the entire response from Strava
             console.log('Strava refresh token response:', response.data);
-    
+
             if (response.data) {
                 return {
                     ...stravaData,
@@ -114,7 +119,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return null;
         }
     };
-    
+
 
 
     // Initialize stravaData variable, to be populated with parsed cookie data

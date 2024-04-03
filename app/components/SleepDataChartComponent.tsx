@@ -124,6 +124,9 @@ function SleepDataChartComponent({ sleepData, isLoading }: SleepDataChartProps) 
                                     display: true,
                                     text: 'Rates (BPM)'
                                 },
+                                grid: {
+                                    display: false,
+                                },
                             },
                             y1: { // Second Y axis configuration for total sleep duration
                                 position: 'right',

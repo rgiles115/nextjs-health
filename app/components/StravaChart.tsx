@@ -139,10 +139,14 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                                 grid: {
                                     display: false,
                                 },
+
                             },
                             y: {
                                 grid: {
-                                    drawOnChartArea: true, // Keeps your previous setting for horizontal grid lines
+                                    display: false,
+                                },
+                                ticks: {
+                                    display: true,
                                 },
                             },
                             ...(hasHRVData && hasWattsData && {

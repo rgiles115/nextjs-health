@@ -19,6 +19,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import useFetchStravaActivities from './hooks/useFetchStravaActivities';
 import useFetchOuraData from './hooks/useFetchOuraData';
 import useFetchHrvData from './hooks/useFetchHrvData';
+import useFetchReadinessData from './hooks/useFetchReadinessData';
 import useProcessStravaData from './hooks/useProcessStravaData';
 import useFetchEnhancedTags from './hooks/useFetchEnhancedTags';
 import useProcessStravaAndHRVData from './hooks/useProcessStravaAndHRVData';
@@ -63,6 +64,7 @@ export default function Home() {
   const { activities: stravaActivities, ytdRideTotals, isLoading: isStravaLoading, error: stravaError } = useFetchStravaActivities(startDate, endDate, isStravaAuthed);
   const { data: readinessData, isLoading: isReadinessLoading, error: ouraError } = useFetchOuraData(startDate, endDate, isOuraAuthed || false);
   const { data: transformedHrvData, isLoading: isHrvLoading, error: hrvError } = useFetchHrvData(startDate, endDate, isOuraAuthed || false);
+  const { data: detailedReadinessData, isLoading: isDetailedReadinessLoading, error: readinessError } = useFetchReadinessData(startDate, endDate, isOuraAuthed || false);
   const { tagsData: tagsData, isLoading: isLoadingTags, error: errorTags } = useFetchEnhancedTags(startDate, endDate, isOuraAuthed || false);
 
   // Processing Strava data with a custom hook
@@ -83,7 +85,6 @@ export default function Home() {
   // console.log('Processed Results:', JSON.stringify(processedResults));
 
   const errors = [stravaError, ouraError, hrvError].filter(Boolean); // Filter out null values
-
 
   // Function to get a cookie value by name
   const getCookie = (name: string): string | undefined => {

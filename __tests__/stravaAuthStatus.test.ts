@@ -31,7 +31,8 @@ describe('Strava Auth Status API', () => {
     // Mock data for expired Strava token
     const expiredTokenData = {
       token_type: 'Bearer',
-      expires_at: Math.floor(Date.now() / 1000) - 100, // Ensure the token is considered expired
+      expires_at: '1712051487',
+      // expires_at: Math.floor(Date.now() / 1000) - 100, // Ensure the token is considered expired
       expires_in: 21600,
       refresh_token: 'oldRefreshToken',
       access_token: 'oldAccessToken',
