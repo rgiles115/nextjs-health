@@ -11,11 +11,15 @@ Chart.register(...registerables, annotationPlugin);
 
 interface ProcessedStravaActivity {
     day: string;
-    distance: number;
-    totalElevationGain: number;
+    distance?: number;
+    totalElevationGain?: number;
     averageSleepHRV?: number;
     averageWatts?: number;
-    tags?: string[]; // Include tags here
+    tags?: string[];
+    averageSleepBreath?: number;
+    averageSleepHeartRate?: number;
+    lowestSleepHeartRate?: number;
+    totalSleepDuration?: number;
 }
 
 interface StravaChartProps {
@@ -80,7 +84,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                 const datasets = [
                     {
                         label: 'Distance (km)',
-                        data: processedData.map(data => data.distance),
+                        data: processedData.map(data => data.distance ?? 0),
                         borderColor: '#219ebc',
                         tension: 0.4,
                         pointRadius: 0,
@@ -88,7 +92,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                     },
                     {
                         label: 'Elevation Gain (m)',
-                        data: processedData.map(data => data.totalElevationGain),
+                        data: processedData.map(data => data.totalElevationGain ?? 0),
                         borderColor: '#fb8500',
                         tension: 0.4,
                         pointRadius: 0,

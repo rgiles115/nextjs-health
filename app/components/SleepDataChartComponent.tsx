@@ -10,8 +10,8 @@ Chart.register(...registerables, annotationPlugin);
 
 interface SleepData {
     day: string;
-    distance: number;
-    totalElevationGain: number;
+    distance?: number;
+    totalElevationGain?: number;
     averageSleepHRV?: number;
     averageWatts?: number;
     tags?: string[];
