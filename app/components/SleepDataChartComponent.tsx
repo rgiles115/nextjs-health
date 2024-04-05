@@ -128,7 +128,7 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                             y: { // Primary Y axis configuration
                                 position: 'left',
                                 title: {
-                                    display: true,
+                                    display: false,
                                     text: 'Rates (BPM)'
                                 },
                                 grid: {
@@ -138,7 +138,7 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                             y1: { // Second Y axis configuration for total sleep duration
                                 position: 'right',
                                 title: {
-                                    display: true,
+                                    display: false,
                                     text: 'Total Sleep Duration (hours)'
                                 },
                                 grid: {

@@ -49,102 +49,105 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
                 data: {
                     labels: convertedDates, // Use converted dates here
                     datasets: [
-                            {
-                                label: 'Resting Heart Rate',
-                                data: readinessData.restingHeartRate,
-                                pointRadius: 0, // Set point radius to 0 to hide the dots
-                                backgroundColor: 'rgba(93, 166, 180, 0.5)', // Pale Turquoise with transparency
-                                borderColor: '#5da6b4', // Pale Turquoise
-                                tension: 0.4,
-                            },
-                            {
-                                label: 'HRV Balance',
-                                data: readinessData.hrvBalance,
-                                pointRadius: 0, // Set point radius to 0 to hide the dots
-                                backgroundColor: 'rgba(50, 115, 136, 0.5)', // Teal Blue with some transparency
-                                borderColor: '#327388', // Teal Blue
-                                tension: 0.4,
-                            },
-                            {
-                                label: 'Body Temperature',
-                                data: readinessData.bodyTemperature,
-                                pointRadius: 0, // Set point radius to 0 to hide the dots
-                                backgroundColor: 'rgba(87, 160, 174, 0.5)', // Soft Cyan with some transparency
-                                borderColor: '#57a0ae', // Soft Cyan
-                                tension: 0.4,
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        layout: {
-                            padding: window.innerWidth <= 600 ? 5 : 15, // Dynamic padding based on window width
+                        {
+                            label: 'Resting Heart Rate',
+                            data: readinessData.restingHeartRate,
+                            pointRadius: 0, // Set point radius to 0 to hide the dots
+                            backgroundColor: 'rgba(93, 166, 180, 0.5)', // Pale Turquoise with transparency
+                            borderColor: '#5da6b4', // Pale Turquoise
+                            tension: 0.4,
                         },
-                        scales: {
-                            x: {
-                                type: 'time',
-                                time: {
-                                    tooltipFormat: 'd MMM yy',
-                                    displayFormats: {
-                                        day: 'd MMM yy',
-                                    }
-                                },
-                                grid: {
-                                    display: false
-                                },
-                                ticks: {
-                                    autoSkip: true,
-                                    maxRotation: 0,
-                                    minRotation: 0,
-                                    maxTicksLimit: 10
-                                },
-                                min: format(startDate, 'yyyy-MM-dd'), // Setting minimum bound
-                                max: format(endDate, 'yyyy-MM-dd'),   // Setting maximum bound
-                            },
-                            y: {
-                                grid: {
-                                    display: false,
-                                },
-                            },
-                            // Other scales configurations...
+                        {
+                            label: 'HRV Balance',
+                            data: readinessData.hrvBalance,
+                            pointRadius: 0, // Set point radius to 0 to hide the dots
+                            backgroundColor: 'rgba(50, 115, 136, 0.5)', // Teal Blue with some transparency
+                            borderColor: '#327388', // Teal Blue
+                            tension: 0.4,
                         },
-                        plugins: {
-                            tooltip: {
-                                enabled: true,
-                            }
+                        {
+                            label: 'Body Temperature',
+                            data: readinessData.bodyTemperature,
+                            pointRadius: 0, // Set point radius to 0 to hide the dots
+                            backgroundColor: 'rgba(87, 160, 174, 0.5)', // Soft Cyan with some transparency
+                            borderColor: '#57a0ae', // Soft Cyan
+                            tension: 0.4,
                         }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    layout: {
+                        padding: window.innerWidth <= 600 ? 5 : 15, // Dynamic padding based on window width
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                tooltipFormat: 'd MMM yy',
+                                displayFormats: {
+                                    day: 'd MMM yy',
+                                }
+                            },
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                autoSkip: true,
+                                maxRotation: 0,
+                                minRotation: 0,
+                                maxTicksLimit: 10
+                            },
+                            min: format(startDate, 'yyyy-MM-dd'), // Setting minimum bound
+                            max: format(endDate, 'yyyy-MM-dd'),   // Setting maximum bound
+                        },
+                        y: {
+                            grid: {
+                                display: false,
+                            },
+                        },
+                        // Other scales configurations...
+                    },
+                    plugins: {
+                        tooltip: {
+                            enabled: true,
+                        },
+                        legend: {
+                            display: window.innerWidth > 600,
+                        },
                     }
-                });
-            }
-    
-            return () => chartInstanceRef.current?.destroy();
-        }, [readinessData, startDate, endDate]); // Add startDate and endDate to the dependency list
-    
-        useEffect(() => {
-            const handleResize = () => {
-                if (chartInstanceRef.current) {
-                    chartInstanceRef.current.resize();
                 }
-            };
-    
-            window.addEventListener('resize', handleResize);
-            return () => window.removeEventListener('resize', handleResize);
-        }, []);
-    
-        return (
-            <div>
-                {isLoading ? <Loading /> : <div className="graph-container"><canvas ref={chartRef} /></div>}
-            </div>
-        );
-    };
-    
-    // Custom comparison function for React.memo with explicit types
-    const areEqual = (prevProps: ReadinessChartProps, nextProps: ReadinessChartProps) => {
-        // Perform a deep comparison between prevProps and nextProps
-        return isEqual(prevProps, nextProps);
-    };
-    
-    const MemoizedReadinessChart = React.memo(ReadinessChart, areEqual);
-    
-    export default MemoizedReadinessChart;
+            });
+        }
+
+        return () => chartInstanceRef.current?.destroy();
+    }, [readinessData, startDate, endDate]); // Add startDate and endDate to the dependency list
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (chartInstanceRef.current) {
+                chartInstanceRef.current.resize();
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    return (
+        <div>
+            {isLoading ? <Loading /> : <div className="graph-container"><canvas ref={chartRef} /></div>}
+        </div>
+    );
+};
+
+// Custom comparison function for React.memo with explicit types
+const areEqual = (prevProps: ReadinessChartProps, nextProps: ReadinessChartProps) => {
+    // Perform a deep comparison between prevProps and nextProps
+    return isEqual(prevProps, nextProps);
+};
+
+const MemoizedReadinessChart = React.memo(ReadinessChart, areEqual);
+
+export default MemoizedReadinessChart;
