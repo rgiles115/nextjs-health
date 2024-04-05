@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
   content: [
@@ -9,13 +9,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'custom-lightblue': '#f0faff', // Example custom color
+        'custom-lightblue': '#f0faff',
+        'custom-darkblue': '#e0eaff', // Adding another custom color for the gradient
       },
       backgroundImage: {
-
+        'blue-gradient': 'linear-gradient(to right, #f0faff, #e0eaff)', // Custom gradient
       },
     },
   },
   plugins: [],
-}
-export default config
+};
+
+export default config;

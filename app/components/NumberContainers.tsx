@@ -15,7 +15,7 @@ const NumberContainers: React.FC<NumberContainersProps> = ({ totalDistance, tota
 
     return (
         <div className="flex justify-between">
-            <div className="flex flex-1 flex-col justify-center items-center mx-5 my-5 border border-gray-200 rounded-lg overflow-hidden bg-white py-2.5">
+            <div className="flex flex-1 flex-col justify-center items-center mx-4 my-5 border border-gray-200 rounded-lg overflow-hidden bg-white py-2.5">
                 <FontAwesomeIcon icon={faRoad} className="icon" style={{ color: "#219ebc" }} />
                 <div className="total-distance text-center">
                     <div className={`total-value text-black mb-1 font-bold dynamic-font-size`}>
@@ -26,7 +26,7 @@ const NumberContainers: React.FC<NumberContainersProps> = ({ totalDistance, tota
                     </div>
                 </div>
             </div>
-            <div className="flex flex-1 flex-col justify-center items-center mx-5 my-5 border border-gray-200 rounded-lg overflow-hidden bg-white py-2.5">
+            <div className="flex flex-1 flex-col justify-center items-center mx-4 my-5 border border-gray-200 rounded-lg overflow-hidden bg-white py-2.5">
                 <FontAwesomeIcon icon={faMountain} className="icon" style={{ color: "#fb8500" }} />
                 <div className="total-distance text-center">
                     <div className={`total-value text-black mb-1 font-bold dynamic-font-size`}>

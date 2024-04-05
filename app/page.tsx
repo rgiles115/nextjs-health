@@ -190,19 +190,23 @@ export default function Home() {
   }, [isOuraAnalysisLoading]);
 
   return (
-    <div className="bg-custom-lightblue min-h-screen flex flex-col">
+    <div className="bg-blue-gradient min-h-screen flex flex-col">
       <SideMenu />
       <Head>
         <title>My Health Data</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="/style.css" />
+        <meta name="theme-color" content="#f0faff" /> {/* Adjust this color as needed */}
       </Head>
+
       <div className="flex flex-col min-h-screen">
-        <div className="bg-white text-black text-center py-5 sticky top-0 z-50 shadow-md">
+        <div className="bg-blue-gradient text-black text-center py-5 sticky top-0 z-50 border-b border-gray-300">
           <h1>
             <FontAwesomeIcon icon={faHeartbeat} width="32" /> My Health Data
           </h1>
         </div>
+
+
 
         < Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
 
@@ -282,19 +286,21 @@ export default function Home() {
               totalDistance={totalDistance}
               totalElevationGain={totalElevationGain}
             />
-            <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
-              <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
-                <h2 className="text-2xl font-semibold mt-4 mb-2 px-12">Strava Overview</h2>
-                <StravaChart
-                  processedData={processedResults}
-                  isLoading={isStravaLoading}
-                  startDate={startDate} // Pass startDate
-                  endDate={endDate}     // Pass endDate
-                />
+            <div className="flex flex-wrap -m-4 px-2.5">
+              <div className="w-full md:w-1/2 p-4">
 
+                <div className="flex-1 m-2 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
+                  <h2 className="text-2xl font-semibold mt-4 mb-2 px-12">Strava Overview</h2>
+                  <StravaChart
+                    processedData={processedResults}
+                    isLoading={isStravaLoading}
+                    startDate={startDate} // Pass startDate
+                    endDate={endDate}     // Pass endDate
+                  />
+                </div>
               </div>
 
-              <div className="p-4 w-full md:w-1/2">
+              <div className="p-10 w-full md:w-1/2">
                 <div className="button-container">
                   <a href="#"
                     onClick={(e) => {
@@ -326,7 +332,7 @@ export default function Home() {
           <div>
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
-                <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
+                <div className="flex-1 m-2 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
                   <h2 className="text-2xl font-semibold mt-4 mb-2 px-12">Oura Sleep</h2>
                   <SleepDataChartComponent
                     sleepData={processedResults}
@@ -339,7 +345,7 @@ export default function Home() {
             </div>
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
-                <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
+                <div className="flex-1 m-2 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
                   <h2 className="text-2xl font-semibold mt-4 mb-2 px-12">Oura Readiness</h2>
                   <ReadinessChart readinessData={readinessData} isLoading={isReadinessLoading} startDate={startDate} endDate={endDate} />
                 </div>
