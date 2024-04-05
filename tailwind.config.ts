@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        'custom-lightblue': '#f0faff', // Example custom color
+      },
       backgroundImage: {
 
       },

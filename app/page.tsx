@@ -190,7 +190,7 @@ export default function Home() {
   }, [isOuraAnalysisLoading]);
 
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
+    <div className="bg-custom-lightblue min-h-screen flex flex-col">
       <SideMenu />
       <Head>
         <title>My Health Data</title>
@@ -326,7 +326,7 @@ export default function Home() {
           <div>
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
-              <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
+                <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
                   <h2 className="text-2xl font-semibold mt-4 mb-2 px-12">Oura Sleep</h2>
                   <SleepDataChartComponent
                     sleepData={processedResults}
@@ -339,7 +339,7 @@ export default function Home() {
             </div>
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
-              <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
+                <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
                   <h2 className="text-2xl font-semibold mt-4 mb-2 px-12">Oura Readiness</h2>
                   <ReadinessChart readinessData={readinessData} isLoading={isReadinessLoading} startDate={startDate} endDate={endDate} />
                 </div>
