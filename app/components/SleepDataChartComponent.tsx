@@ -106,6 +106,9 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                     options: {
                         responsive: true,
                         maintainAspectRatio: true,
+                        layout: {
+                            padding: window.innerWidth <= 600 ? 5 : 15, // Dynamic padding based on window width
+                        },
                         scales: {
                             x: {
                                 type: 'time',

@@ -78,6 +78,9 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
                     options: {
                         responsive: true,
                         maintainAspectRatio: true,
+                        layout: {
+                            padding: window.innerWidth <= 600 ? 5 : 15, // Dynamic padding based on window width
+                        },
                         scales: {
                             x: {
                                 type: 'time',
