@@ -35,8 +35,7 @@ const useFetchHrvData = (startDate: Date, endDate: Date, isAuthenticated: boolea
             setIsLoading(true);
             setError(null);
 
-            const adjustedStartDate = subDays(startDate, 1);
-            const formattedStartDate = format(adjustedStartDate, 'yyyy-MM-dd');
+            const formattedStartDate = format(startDate, 'yyyy-MM-dd');
             const formattedEndDate = format(endDate, 'yyyy-MM-dd');
 
             try {
@@ -78,7 +77,7 @@ const useFetchHrvData = (startDate: Date, endDate: Date, isAuthenticated: boolea
 
         fetchHRVData();
     }, [startDate, endDate, isAuthenticated]);
-
+    console.log('Data from HRV:', data);
     return { data, isLoading, error };
 };
 

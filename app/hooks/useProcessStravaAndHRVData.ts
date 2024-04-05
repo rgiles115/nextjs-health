@@ -4,15 +4,17 @@ import { transformedHrvData, EnhancedTagData } from '../../app/types/OuraInterfa
 
 interface ExtendedHRVData extends transformedHrvData {
     parsedDate: Date;
+    sortDate: Date; // For sorting
     averageSleepBreath?: number;
     averageSleepHeartRate?: number;
     lowestSleepHeartRate?: number;
     totalSleepDuration?: number;
-    tags?: string[]; // Include tags in the ExtendedHRVData interface
+    tags?: string[];
 }
 
 interface EnhancedStravaActivity {
     day: string;
+    sortDate?: Date; // Now optional
     distance?: number;
     totalElevationGain?: number;
     averageSleepHRV?: number;
@@ -24,12 +26,11 @@ interface EnhancedStravaActivity {
     tags?: string[];
 }
 
-
-// Function to process Strava data similarly to HRV data
 const processStravaData = (stravaData: EnhancedStravaActivity[], tagsData: EnhancedTagData[] | null) => {
     return stravaData.map(activity => ({
         ...activity,
         day: format(parseISO(activity.day), 'do MMM yyyy'),
+        sortDate: parseISO(activity.day), // Ensure sortDate is populated
         tags: tagsData?.filter(tag => isEqual(parseISO(tag.start_day), parseISO(activity.day)))
             .map(tag => `${tag.tag_type_code}: ${tag.comment}`) || [],
     }));
@@ -46,6 +47,7 @@ const useProcessStravaAndHRVData = (
         const hrvDataWithParsedDates: ExtendedHRVData[] = hrvData?.map(hrv => ({
             ...hrv,
             parsedDate: parseISO(hrv.date),
+            sortDate: parseISO(hrv.date), // Ensure sortDate is populated
             tags: tagsData?.filter(tag => isEqual(parseISO(tag.start_day), parseISO(hrv.date)))
                 .map(tag => `${tag.tag_type_code}: ${tag.comment}`) || [],
         })) || [];
@@ -57,13 +59,11 @@ const useProcessStravaAndHRVData = (
             initialProcessedData = [...processedStravaData];
         }
 
-        // Ensure all days in HRV data are formatted and merged correctly
         hrvDataWithParsedDates.forEach(hrv => {
             const dateFormatted = format(hrv.parsedDate, 'do MMM yyyy');
             const existingEntryIndex = initialProcessedData.findIndex(activity => activity.day === dateFormatted);
 
             if (existingEntryIndex > -1) {
-                // Merge with existing Strava data entry
                 initialProcessedData[existingEntryIndex] = {
                     ...initialProcessedData[existingEntryIndex],
                     averageSleepHRV: hrv.averageSleepHRV ?? undefined,
@@ -71,12 +71,12 @@ const useProcessStravaAndHRVData = (
                     averageSleepHeartRate: hrv.averageSleepHeartRate ?? undefined,
                     lowestSleepHeartRate: hrv.lowestSleepHeartRate ?? undefined,
                     totalSleepDuration: hrv.totalSleepDuration ?? undefined,
-                    tags: hrv.tags ?? undefined,
+                    tags: [...(initialProcessedData[existingEntryIndex].tags || []), ...(hrv.tags || [])],
                 };
             } else {
-                // Add as new entry with formatted day
                 initialProcessedData.push({
                     day: dateFormatted,
+                    sortDate: hrv.sortDate, // Use sortDate for sorting
                     averageSleepHRV: hrv.averageSleepHRV ?? undefined,
                     averageSleepBreath: hrv.averageSleepBreath ?? undefined,
                     averageSleepHeartRate: hrv.averageSleepHeartRate ?? undefined,
@@ -87,6 +87,14 @@ const useProcessStravaAndHRVData = (
             }
         });
 
+        // Sort the combined data by sortDate before setting the state
+        initialProcessedData.sort((a, b) => {
+            // Use a fallback if sortDate is undefined (e.g., current date or another safe value)
+            const dateA = a.sortDate ? a.sortDate.getTime() : new Date().getTime();
+            const dateB = b.sortDate ? b.sortDate.getTime() : new Date().getTime();
+            return dateA - dateB;
+        });
+        
         setProcessedData(initialProcessedData);
     }, [stravaData, hrvData, tagsData]);
 

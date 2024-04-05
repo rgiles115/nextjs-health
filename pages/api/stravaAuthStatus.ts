@@ -77,7 +77,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                 console.log("Setting refreshed cookie");
                 res.setHeader('Set-Cookie', serializedCookie);
-                res.status(200).json({ message: 'Strava token refreshed' });
+                res.status(200).json({ isStravaAuthed: true, message: 'Strava token refreshed' });
             } catch (error) {
                 console.error('Error refreshing Strava token:', error);
                 res.status(500).json({ message: 'Failed to refresh Strava token' });

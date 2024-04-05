@@ -2,21 +2,29 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import Cookies from 'cookies';
 import { OuraData, SleepData } from '../../app/types/OuraInterfaces';
 
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { start_date, end_date } = req.query;
+    let { start_date, end_date } = req.query;
 
     if (!start_date || !end_date) {
-        res.status(400).json({ error: 'Start and end dates are required' });
-        return;
+        return res.status(400).json({ error: 'Start and end dates are required' });
     }
 
+    // Convert and adjust the start and end dates to UTC
+    // Move start_date back by one day to include the starting day fully in the range
+    const adjustedStartDate = new Date(start_date + 'T00:00:00Z');
+    adjustedStartDate.setDate(adjustedStartDate.getDate() - 1);
+    start_date = adjustedStartDate.toISOString().split('T')[0];
+    
+    // Extend end_date by one day if necessary, to ensure the end date is inclusive
+    const adjustedEndDate = new Date(end_date + 'T00:00:00Z');
+    adjustedEndDate.setDate(adjustedEndDate.getDate() + 1); // Comment this line out if extending the end date is not desired
+    end_date = adjustedEndDate.toISOString().split('T')[0];
+
     const cookies = new Cookies(req, res);
-    const encodedOuraCookie = cookies.get('ouraData'); // Replace with your actual cookie name
+    const encodedOuraCookie = cookies.get('ouraData'); 
     
     if (!encodedOuraCookie) {
-        res.status(400).json({ error: 'Oura cookie not found' });
-        return;
+        return res.status(400).json({ error: 'Oura cookie not found' });
     }
     
     const decodedOuraCookie = decodeURIComponent(encodedOuraCookie);
@@ -30,8 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
 
         if (!response.ok) {
-            res.status(response.status).json({ error: `Error from Oura API: ${response.statusText}` });
-            return;
+            return res.status(response.status).json({ error: `Error from Oura API: ${response.statusText}` });
         }
 
         const data: SleepData = await response.json();
@@ -50,29 +57,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 entry.hrv_values = detailedSleepData.hrv_values;
             }
         });
-
         res.status(200).json(data);
     } catch (error) {
         console.error('Error fetching sleep data:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-        return;
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 
 // Function to fetch detailed sleep data
 async function fetchDetailedSleepData(sleepId: string, token: string) {
-    const detailedSleepApiUrl = `https://api.ouraring.com/v2/usercollection/sleep/${sleepId}`; // Ensure correct API endpoint
+    const detailedSleepApiUrl = `https://api.ouraring.com/v2/usercollection/sleep/${sleepId}`;
     try {
         const response = await fetch(detailedSleepApiUrl, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!response.ok) {
             console.error(`Error fetching detailed sleep data for ID ${sleepId}: Status ${response.status}`);
-            return null; // Handle error as appropriate
+            return null; // Handle error appropriately
         }
         return await response.json();
     } catch (error) {
         console.error(`Error fetching detailed sleep data for ID ${sleepId}:`, error);
-        return null; // Handle error as appropriate
+        return null; // Handle error appropriately
     }
 }
