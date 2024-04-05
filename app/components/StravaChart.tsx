@@ -54,10 +54,31 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
 
     useEffect(() => {
         const handleResize = () => {
-            if (chartInstanceRef.current) {
-                chartInstanceRef.current.resize();
+            // Early exit if `chartInstanceRef.current` is null
+            if (!chartInstanceRef.current) {
+                return;
             }
+        
+            const isMobileSize = window.innerWidth <= 600;
+        
+            // Assuming `chartInstanceRef.current` is now guaranteed to be non-null, proceed with updates
+            if (!chartInstanceRef.current.options.plugins) {
+                chartInstanceRef.current.options.plugins = {};
+            }
+            if (!chartInstanceRef.current.options.plugins.legend) {
+                chartInstanceRef.current.options.plugins.legend = {};
+            }
+        
+            chartInstanceRef.current.options.plugins.legend.display = !isMobileSize;
+        
+            // Further operations on `chartInstanceRef.current` can continue here, with the assurance it's not null
+            // ...
+            chartInstanceRef.current.update();
         };
+        
+        
+        
+        
 
         const annotationType: 'label' = 'label'; // Correctly typed
 
@@ -135,9 +156,10 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                             x: {
                                 type: 'time',
                                 time: {
+                                    unit: 'day', // Explicitly set the unit to 'day'
                                     tooltipFormat: 'd MMM yy',
                                     displayFormats: {
-                                        day: 'd MMM yy',
+                                        day: 'd MMM yy', // You may adjust this format as needed
                                     }
                                 },
                                 grid: {

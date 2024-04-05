@@ -48,8 +48,28 @@ function SleepDataChartComponent({ sleepData, isLoading }: SleepDataChartProps) 
 
     useEffect(() => {
         const handleResize = () => {
-            chartInstanceRef.current?.resize();
+            // Early exit if `chartInstanceRef.current` is null
+            if (!chartInstanceRef.current) {
+                return;
+            }
+        
+            const isMobileSize = window.innerWidth <= 600;
+        
+            // Assuming `chartInstanceRef.current` is now guaranteed to be non-null, proceed with updates
+            if (!chartInstanceRef.current.options.plugins) {
+                chartInstanceRef.current.options.plugins = {};
+            }
+            if (!chartInstanceRef.current.options.plugins.legend) {
+                chartInstanceRef.current.options.plugins.legend = {};
+            }
+        
+            chartInstanceRef.current.options.plugins.legend.display = !isMobileSize;
+        
+            // Further operations on `chartInstanceRef.current` can continue here, with the assurance it's not null
+            // ...
+            chartInstanceRef.current.update();
         };
+        
 
         if (!isLoading && sleepData.length > 0 && chartRef.current) {
             const convertedSleepData = sleepData.map(data => ({
@@ -109,9 +129,10 @@ function SleepDataChartComponent({ sleepData, isLoading }: SleepDataChartProps) 
                             x: {
                                 type: 'time',
                                 time: {
+                                    unit: 'day', // Explicitly set the unit to 'day'
                                     tooltipFormat: 'd MMM yy',
                                     displayFormats: {
-                                        day: 'd MMM yy',
+                                        day: 'd MMM yy', // You may adjust this format as needed
                                     }
                                 },
                                 grid: {
