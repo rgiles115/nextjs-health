@@ -29,7 +29,6 @@ interface StravaChartProps {
     endDate: Date;   // Adding endDate
 }
 
-
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
 function convertDateString(dateString: string): string {
@@ -56,29 +55,6 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
 
 
         useEffect(() => {
-            const handleResize = () => {
-                if (!chartInstanceRef.current) {
-                    return;
-                }
-            
-                const isMobileSize = window.innerWidth <= 600;
-            
-                if (!chartInstanceRef.current.options.plugins) {
-                    chartInstanceRef.current.options.plugins = {};
-                }
-                if (!chartInstanceRef.current.options.plugins.legend) {
-                    chartInstanceRef.current.options.plugins.legend = {};
-                }
-            
-                chartInstanceRef.current.options.plugins.legend.display = !isMobileSize;
-        
-                // Dynamically adjust chart padding for mobile devices
-                chartInstanceRef.current.options.layout = {
-                    padding: isMobileSize ? 5 : 15, // Example padding values, adjust as necessary
-                };
-            
-                chartInstanceRef.current.update();
-            };
         
 
         const annotationType: 'label' = 'label'; // Correctly typed
@@ -205,17 +181,22 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
 
                 chartInstanceRef.current = new Chart(ctx, chartConfig);
 
-                // Add the resize event listener
-                window.addEventListener('resize', handleResize);
             }
         }
 
-        // Cleanup function to remove the resize event listener and destroy the chart instance
-        return () => {
-            chartInstanceRef.current?.destroy();
-            window.removeEventListener('resize', handleResize);
-        };
+
     }, [processedData, isLoading, startDate, endDate]); // Include startDate and endDate
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (chartInstanceRef.current) {
+                chartInstanceRef.current.resize();
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     return (
         <div>

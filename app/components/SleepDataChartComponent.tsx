@@ -50,28 +50,6 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
     const chartInstanceRef = useRef<Chart | null>(null);
 
     useEffect(() => {
-        const handleResize = () => {
-            // Early exit if `chartInstanceRef.current` is null
-            if (!chartInstanceRef.current) {
-                return;
-            }
-
-            const isMobileSize = window.innerWidth <= 600;
-
-            // Assuming `chartInstanceRef.current` is now guaranteed to be non-null, proceed with updates
-            if (!chartInstanceRef.current.options.plugins) {
-                chartInstanceRef.current.options.plugins = {};
-            }
-            if (!chartInstanceRef.current.options.plugins.legend) {
-                chartInstanceRef.current.options.plugins.legend = {};
-            }
-
-            chartInstanceRef.current.options.plugins.legend.display = !isMobileSize;
-
-            // Further operations on `chartInstanceRef.current` can continue here, with the assurance it's not null
-            // ...
-            chartInstanceRef.current.update();
-        };
 
 
         if (!isLoading && sleepData.length > 0 && chartRef.current) {
@@ -175,16 +153,22 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                 };
 
                 chartInstanceRef.current = new Chart(ctx, chartConfig);
-                window.addEventListener('resize', handleResize);
-
             }
         }
 
-        return () => {
-            chartInstanceRef.current?.destroy();
-            window.removeEventListener('resize', handleResize);
-        };
+
     }, [sleepData, isLoading]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (chartInstanceRef.current) {
+                chartInstanceRef.current.resize();
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     return (
         <div>
