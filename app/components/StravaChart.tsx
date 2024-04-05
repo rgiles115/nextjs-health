@@ -55,29 +55,30 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
         // console.log('Day:', processedData);
 
 
-    useEffect(() => {
-        const handleResize = () => {
-            // Early exit if `chartInstanceRef.current` is null
-            if (!chartInstanceRef.current) {
-                return;
-            }
+        useEffect(() => {
+            const handleResize = () => {
+                if (!chartInstanceRef.current) {
+                    return;
+                }
+            
+                const isMobileSize = window.innerWidth <= 600;
+            
+                if (!chartInstanceRef.current.options.plugins) {
+                    chartInstanceRef.current.options.plugins = {};
+                }
+                if (!chartInstanceRef.current.options.plugins.legend) {
+                    chartInstanceRef.current.options.plugins.legend = {};
+                }
+            
+                chartInstanceRef.current.options.plugins.legend.display = !isMobileSize;
         
-            const isMobileSize = window.innerWidth <= 600;
-        
-            // Assuming `chartInstanceRef.current` is now guaranteed to be non-null, proceed with updates
-            if (!chartInstanceRef.current.options.plugins) {
-                chartInstanceRef.current.options.plugins = {};
-            }
-            if (!chartInstanceRef.current.options.plugins.legend) {
-                chartInstanceRef.current.options.plugins.legend = {};
-            }
-        
-            chartInstanceRef.current.options.plugins.legend.display = !isMobileSize;
-        
-            // Further operations on `chartInstanceRef.current` can continue here, with the assurance it's not null
-            // ...
-            chartInstanceRef.current.update();
-        };
+                // Dynamically adjust chart padding for mobile devices
+                chartInstanceRef.current.options.layout = {
+                    padding: isMobileSize ? 5 : 15, // Example padding values, adjust as necessary
+                };
+            
+                chartInstanceRef.current.update();
+            };
         
 
         const annotationType: 'label' = 'label'; // Correctly typed
@@ -152,6 +153,9 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                     options: {
                         responsive: true,
                         maintainAspectRatio: true,
+                        layout: {
+                            padding: window.innerWidth <= 600 ? 5 : 15, // Dynamic padding based on window width
+                        },
                         scales: {
                             x: {
                                 type: 'time',
