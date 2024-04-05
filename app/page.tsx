@@ -289,7 +289,10 @@ export default function Home() {
                 <StravaChart
                   processedData={processedResults}
                   isLoading={isStravaLoading}
+                  startDate={startDate} // Pass startDate
+                  endDate={endDate}     // Pass endDate
                 />
+
               </div>
 
               <div className="p-4 w-full md:w-1/2">
@@ -326,8 +329,12 @@ export default function Home() {
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
                 <div className="m-1 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
-                  <SleepDataChartComponent sleepData={processedResults}
-                    isLoading={isStravaLoading} />
+                  <SleepDataChartComponent
+                    sleepData={processedResults}
+                    isLoading={isStravaLoading}
+                    startDate={startDate}
+                    endDate={endDate}
+                  />
                 </div>
               </div>
             </div>

@@ -25,7 +25,10 @@ interface ProcessedStravaActivity {
 interface StravaChartProps {
     processedData: ProcessedStravaActivity[];
     isLoading: boolean;
+    startDate: Date; // Adding startDate
+    endDate: Date;   // Adding endDate
 }
+
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
@@ -41,7 +44,7 @@ function convertDateString(dateString: string): string {
     return format(parsedDate, 'yyyy-MM-dd');
 }
 
-const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoading }) => {
+const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoading, startDate, endDate }) => {
     const chartRef = useRef<HTMLCanvasElement>(null);
     const chartInstanceRef = useRef<Chart | null>(null);
 
@@ -75,9 +78,6 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
             // ...
             chartInstanceRef.current.update();
         };
-        
-        
-        
         
 
         const annotationType: 'label' = 'label'; // Correctly typed
@@ -162,6 +162,8 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                                         day: 'd MMM yy', // You may adjust this format as needed
                                     }
                                 },
+                                min: format(startDate, 'yyyy-MM-dd'), // Use formatted startDate
+                                max: format(endDate, 'yyyy-MM-dd'),   // Use formatted endDate
                                 grid: {
                                     display: false,
                                 },
@@ -209,7 +211,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
             chartInstanceRef.current?.destroy();
             window.removeEventListener('resize', handleResize);
         };
-    }, [processedData, isLoading]);
+    }, [processedData, isLoading, startDate, endDate]); // Include startDate and endDate
 
     return (
         <div>

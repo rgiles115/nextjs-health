@@ -96,6 +96,8 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
                                     minRotation: 0,
                                     maxTicksLimit: 10
                                 },
+                                min: format(startDate, 'yyyy-MM-dd'), // Setting minimum bound
+                                max: format(endDate, 'yyyy-MM-dd'),   // Setting maximum bound
                             },
                             y: {
                                 grid: {
@@ -114,7 +116,7 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
             }
     
             return () => chartInstanceRef.current?.destroy();
-        }, [readinessData]);
+        }, [readinessData, startDate, endDate]); // Add startDate and endDate to the dependency list
     
         useEffect(() => {
             const handleResize = () => {

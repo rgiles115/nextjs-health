@@ -24,7 +24,10 @@ interface SleepData {
 interface SleepDataChartProps {
     sleepData: SleepData[];
     isLoading: boolean;
+    startDate: Date; // Added startDate
+    endDate: Date;   // Added endDate
 }
+
 
 const Loading = dynamic(() => import('./Loading'), { ssr: false });
 
@@ -42,7 +45,7 @@ const arePropsEqual = (prevProps: SleepDataChartProps, nextProps: SleepDataChart
         JSON.stringify(prevProps.sleepData) === JSON.stringify(nextProps.sleepData);
 };
 
-function SleepDataChartComponent({ sleepData, isLoading }: SleepDataChartProps) {
+function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: SleepDataChartProps) {
     const chartRef = useRef<HTMLCanvasElement>(null);
     const chartInstanceRef = useRef<Chart | null>(null);
 
@@ -52,9 +55,9 @@ function SleepDataChartComponent({ sleepData, isLoading }: SleepDataChartProps) 
             if (!chartInstanceRef.current) {
                 return;
             }
-        
+
             const isMobileSize = window.innerWidth <= 600;
-        
+
             // Assuming `chartInstanceRef.current` is now guaranteed to be non-null, proceed with updates
             if (!chartInstanceRef.current.options.plugins) {
                 chartInstanceRef.current.options.plugins = {};
@@ -62,14 +65,14 @@ function SleepDataChartComponent({ sleepData, isLoading }: SleepDataChartProps) 
             if (!chartInstanceRef.current.options.plugins.legend) {
                 chartInstanceRef.current.options.plugins.legend = {};
             }
-        
+
             chartInstanceRef.current.options.plugins.legend.display = !isMobileSize;
-        
+
             // Further operations on `chartInstanceRef.current` can continue here, with the assurance it's not null
             // ...
             chartInstanceRef.current.update();
         };
-        
+
 
         if (!isLoading && sleepData.length > 0 && chartRef.current) {
             const convertedSleepData = sleepData.map(data => ({
@@ -138,6 +141,8 @@ function SleepDataChartComponent({ sleepData, isLoading }: SleepDataChartProps) 
                                 grid: {
                                     display: false,
                                 },
+                                min: format(startDate, 'yyyy-MM-dd'), // Set minimum bound to selected start date
+                                max: format(endDate, 'yyyy-MM-dd'),   // Set maximum bound to selected end date
                             },
                             y: { // Primary Y axis configuration
                                 position: 'left',
