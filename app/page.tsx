@@ -282,10 +282,9 @@ export default function Home() {
               totalDistance={totalDistance}
               totalElevationGain={totalElevationGain}
             />
-            <h2 className="text-2xl font-semibold px-5">Strava Overview</h2>
-
             <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
-              <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
+              <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
+                <h2 className="text-2xl font-semibold mt-4 mb-2 px-12">Strava Overview</h2>
                 <StravaChart
                   processedData={processedResults}
                   isLoading={isStravaLoading}
@@ -325,10 +324,10 @@ export default function Home() {
         {isOuraAuthed && !isReadinessLoading && readinessData && (
 
           <div>
-            <h2 className="text-2xl font-semibold mb-2 px-5">Oura Sleep</h2>
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
-                <div className="m-1 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
+              <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
+                  <h2 className="text-2xl font-semibold mt-4 mb-2 px-12">Oura Sleep</h2>
                   <SleepDataChartComponent
                     sleepData={processedResults}
                     isLoading={isStravaLoading}
@@ -338,10 +337,10 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <h2 className="text-2xl font-semibold mt-2 mb-2 px-5">Oura Readiness</h2>
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
-                <div className="m-1 border border-gray-200 rounded-lg bg-white max-h-[400px] overflow-hidden">
+              <div className="flex-1 m-5 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
+                  <h2 className="text-2xl font-semibold mt-4 mb-2 px-12">Oura Readiness</h2>
                   <ReadinessChart readinessData={readinessData} isLoading={isReadinessLoading} startDate={startDate} endDate={endDate} />
                 </div>
               </div>

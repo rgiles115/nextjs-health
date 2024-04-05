@@ -26,13 +26,6 @@ function StravaSkeletonLoader() {
         </div>
       </div>
 
-      {/* Strava Overview Heading */}
-      <div className="px-5">
-        <div className="mt-4 h-10 bg-gray-300 rounded w-1/3"></div>
-      </div>
-
-
-
       {/* Charts and Analysis */}
       <div className="flex flex-wrap -m-4 px-2.5 py-2.5">
         {/* Chart Skeleton */}
