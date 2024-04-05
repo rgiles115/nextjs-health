@@ -122,6 +122,12 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                                 grid: {
                                     display: false,
                                 },
+                                ticks: {
+                                    autoSkip: true,
+                                    maxRotation: 0,
+                                    minRotation: 0,
+                                    maxTicksLimit: 10
+                                },
                                 min: format(startDate, 'yyyy-MM-dd'), // Set minimum bound to selected start date
                                 max: format(endDate, 'yyyy-MM-dd'),   // Set maximum bound to selected end date
                             },

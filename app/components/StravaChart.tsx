@@ -142,6 +142,12 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                                         day: 'd MMM yy', // You may adjust this format as needed
                                     }
                                 },
+                                ticks: {
+                                    autoSkip: true,
+                                    maxRotation: 0,
+                                    minRotation: 0,
+                                    maxTicksLimit: 10
+                                },
                                 min: format(startDate, 'yyyy-MM-dd'), // Use formatted startDate
                                 max: format(endDate, 'yyyy-MM-dd'),   // Use formatted endDate
                                 grid: {
