@@ -247,7 +247,7 @@ export default function Home() {
             {athleteProfile && ytdRideTotals && (
               <div className="m-5 p-4 border border-gray-200 rounded-lg bg-white">
                 <div className="flex justify-start items-center mt-0">
-                  <img src={athleteProfile.profile_medium} alt="Profile" className="h-16 w-16 rounded-full border-2 border-gray-300" />
+                  <img src={athleteProfile.profile} alt="Profile" className="h-32 w-32 rounded-full border-2 border-gray-300" />
                   <div className="ml-4">
                     <h2 className="text-xl font-semibold">{athleteProfile.firstname} {athleteProfile.lastname}</h2>
                     <div>
