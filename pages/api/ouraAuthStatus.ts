@@ -18,6 +18,7 @@ interface OuraCookieData {
 
 // Main handler for the API route
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    res.setHeader('Cache-Control', 'no-store');
     // Parse cookies from the request
     console.log("Attempting to check cookie for Oura token");
     const cookies = cookie.parse(req.headers.cookie || '');

@@ -39,6 +39,7 @@ interface StravaCookieData {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    res.setHeader('Cache-Control', 'no-store');
     console.log("Strava Auth Status Check Started");
 
     const cookies = req.cookies;
