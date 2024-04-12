@@ -291,6 +291,38 @@ h1 .fa-heartbeat {
   padding-top: 10px;
 }
 
+.custom-legend-container {
+  display: flex;
+  flex-direction: row; /* Align legend items in a row */
+  align-items: center; /* Align items vertically in the center */
+  justify-content: center; /* Center the items horizontally */
+  width: auto; /* Or set a specific width if needed */
+  padding: 10px; /* Optional, for some spacing around the content */
+}
+
+.custom-legend-item {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.custom-legend-color-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px; /* Adjust width as needed */
+  height: 30px; /* Adjust height as needed */
+  padding: 5px; /* Adds some padding inside the box */
+  color: white; /* Ensures text color is white for better visibility on darker backgrounds */
+}
+
+.custom-legend-color-box span {
+  font-size: 10px; /* Set to your preferred size */
+  color: white; /* Ensuring text color contrasts with the background */
+}
+
+
 /* Desktop View */
 @media (min-width: 768px) {
   .content-container {

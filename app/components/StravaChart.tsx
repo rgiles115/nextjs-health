@@ -51,11 +51,11 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
         ...data,
         day: convertDateString(data.day), // Convert to a format that can be parsed
     }));
-        // console.log('Day:', processedData);
+    // console.log('Day:', processedData);
 
 
-        useEffect(() => {
-        
+    useEffect(() => {
+
 
         const annotationType: 'label' = 'label'; // Correctly typed
 
@@ -69,7 +69,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                 rotation: -90,
             }));
         });
-        
+
 
         if (!isLoading && processedData.length > 0 && chartRef.current) {
             const ctx = chartRef.current.getContext('2d');
@@ -172,10 +172,10 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                                 }
                             }),
                         },
-                                         
+
                         plugins: {
                             legend: {
-                                display: window.innerWidth > 600, // Only show legend if window width is greater than 600px
+                                display: false // Disable default legend
                             },
                             annotation: {
                                 annotations: tagAnnotations,
@@ -186,12 +186,44 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
 
 
                 chartInstanceRef.current = new Chart(ctx, chartConfig);
+                createCustomLegend(chartInstanceRef.current); // Create custom legend after chart initialization
 
             }
         }
 
 
     }, [processedData, isLoading, startDate, endDate]); // Include startDate and endDate
+
+    function createCustomLegend(chart: Chart) {
+        const legendContainer = document.getElementById('chart-legend');
+        if (!legendContainer) return;
+    
+        legendContainer.innerHTML = ''; // Clear existing legend items
+        chart.data.datasets.forEach((dataset, index) => {
+            const legendItem = document.createElement('div');
+            legendItem.className = 'custom-legend-item';
+    
+            const colorBox = document.createElement('div');
+            colorBox.className = 'custom-legend-color-box';
+            colorBox.style.backgroundColor = typeof dataset.borderColor === 'string' ? dataset.borderColor : 'grey';
+    
+            const labelText = document.createElement('span');
+            labelText.textContent = dataset.label || '';
+            colorBox.appendChild(labelText); // Place the text inside the color box
+    
+            legendItem.appendChild(colorBox);
+            legendItem.onclick = function() {
+                const meta = chart.getDatasetMeta(index);
+                meta.hidden = meta.hidden === null ? true : !meta.hidden;
+                chart.update();
+            };
+            legendContainer.appendChild(legendItem);
+        });
+    }
+    
+
+
+
 
     useEffect(() => {
         const handleResize = () => {
@@ -211,6 +243,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
             ) : (
                 <div className="graph-container">
                     <canvas ref={chartRef} />
+                    <div id="chart-legend" className="custom-legend-container"></div>
                 </div>
             )}
         </div>
