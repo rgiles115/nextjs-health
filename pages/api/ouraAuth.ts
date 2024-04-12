@@ -36,19 +36,24 @@ export default async function handler(
       const data = await response.json();
 
       // Calculate the expires_at timestamp (Unix time in seconds)
-      const currentTimestamp = Math.floor(Date.now() / 1000); // current time in seconds
-      const expiresAt = currentTimestamp + data.expires_in; // calculate when the token will expire
-      data.expires_at = expiresAt; // Add expires_at to the data object
-
-      // Serialize the data and set it as a cookie with the calculated expiry date
-      const cookie = serialize('ouraData', JSON.stringify(data), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV !== 'development',
-        expires: new Date(expiresAt * 1000), // Convert back to milliseconds for the cookie expiry
-        path: '/',
-      });
-
+      // Assuming data.expires_in is for the access token and data.refresh_expires_in is for the refresh token
+      const currentTimestamp = Math.floor(Date.now() / 1000);
+      const accessExpiresAt = currentTimestamp + data.expires_in; // Access token expiration
+  
+      // Set a long arbitrary expiration time for the refresh token (e.g., 1 year)
+      const refreshExpiresAt = currentTimestamp + 31536000; // 1 year = 31,536,000 seconds
+  
+      const cookieOptions = {
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== 'development',
+          path: '/',
+          expires: new Date(refreshExpiresAt * 1000)
+      };
+  
+      const cookie = serialize('ouraData', JSON.stringify(data), cookieOptions);
+  
       res.setHeader('Set-Cookie', cookie);
+
       res.writeHead(302, { Location: '/' }); // Redirect to the success page
       res.end();
     } catch (error) {
