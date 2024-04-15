@@ -195,24 +195,24 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
     }, [processedData, isLoading, startDate, endDate]); // Include startDate and endDate
 
     function createCustomLegend(chart: Chart) {
-        const legendContainer = document.getElementById('chart-legend');
+        const legendContainer = document.getElementById('strava-chart-legend');
         if (!legendContainer) return;
-    
+
         legendContainer.innerHTML = ''; // Clear existing legend items
         chart.data.datasets.forEach((dataset, index) => {
             const legendItem = document.createElement('div');
             legendItem.className = 'custom-legend-item';
-    
+
             const colorBox = document.createElement('div');
             colorBox.className = 'custom-legend-color-box';
             colorBox.style.backgroundColor = typeof dataset.borderColor === 'string' ? dataset.borderColor : 'grey';
-    
+
             const labelText = document.createElement('span');
             labelText.textContent = dataset.label || '';
             colorBox.appendChild(labelText); // Place the text inside the color box
-    
+
             legendItem.appendChild(colorBox);
-            legendItem.onclick = function() {
+            legendItem.onclick = function () {
                 const meta = chart.getDatasetMeta(index);
                 meta.hidden = meta.hidden === null ? true : !meta.hidden;
                 chart.update();
@@ -220,10 +220,6 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
             legendContainer.appendChild(legendItem);
         });
     }
-    
-
-
-
 
     useEffect(() => {
         const handleResize = () => {
@@ -243,7 +239,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
             ) : (
                 <div className="graph-container">
                     <canvas ref={chartRef} />
-                    <div id="chart-legend" className="custom-legend-container"></div>
+                    <div id="strava-chart-legend" className="custom-legend-container"></div>
                 </div>
             )}
         </div>

@@ -171,55 +171,6 @@ h1 .fa-heartbeat {
   text-align: left;
 }
 
-.graph-container {
-  margin: 20px;
-  border-radius: 20px;
-}
-
-.graph-container canvas {
-  width: auto; /* Ensure the canvas can grow */
-  height: auto; /* Responsive height */
-  margin: 20px;
-}
-
-.analysis-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column; /* Stack button and analysis box vertically */
-  justify-content: space-between; /* This will put space between button and analysis box */
-  margin: 20px;
-  padding: 20px;
-  border-radius: 20px;
-  overflow-y: auto; /* Add vertical scrolling if necessary */
-  max-width: 50%;
-}
-
-.strava-analysis-container {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px; /* Space before Oura graphs */
-  margin-right: 20px;
-  align-items: stretch; /* This will make children stretch to fill the container height */
-}
-
-.strava-chart {
-  flex: 1;
-  margin: 20px; /* Adjust as needed */
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  max-height: 400px; /* Limit the height to the parent's height */
-}
-
-
-
-.analysis-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  margin-left: 10px; /* Space between chart and analysis section */
-  padding-top: 20px;
-  
-}
 
 .StravaAnalysis {
   flex-grow: 1;
@@ -291,31 +242,64 @@ h1 .fa-heartbeat {
   padding-top: 10px;
 }
 
+.graph-container {
+  margin: 20px;
+  border-radius: 20px;
+}
+
+.graph-container canvas {
+  width: auto; /* Ensure the canvas can grow */
+  height: auto; /* Responsive height */
+  margin: 20px;
+}
+
+
+/* Additional responsiveness */
+@media (max-width: 768px) {
+  .graph-container {
+      flex-direction: column;
+  }
+  .graph-container canvas {
+      max-height: 300px; /* Smaller max-height for smaller screens */
+  }
+}
+
 .custom-legend-container {
   display: flex;
-  flex-direction: row; /* Align legend items in a row */
-  align-items: center; /* Align items vertically in the center */
-  justify-content: center; /* Center the items horizontally */
-  width: auto; /* Or set a specific width if needed */
-  padding: 10px; /* Optional, for some spacing around the content */
+  flex-direction: row; /* Layout items in a row */
+  flex-wrap: wrap; /* Allow items to wrap onto new lines */
+  justify-content: center; /* Center items horizontally */
+  align-items: center; /* Center items vertically */
+  align-content: center; /* Center wrapped lines vertically within the container */
+  width: 100%; /* Full width of its parent */
+  padding: 10px;
+  overflow: hidden; /* Adjust as needed */
 }
+
+
 
 .custom-legend-item {
   display: flex;
   align-items: center;
-  margin-right: 10px;
+  margin-right: 10px; /* Right margin for spacing between items */
+  margin-bottom: 5px; /* Bottom margin for spacing between lines when wrapped */
   cursor: pointer;
+  flex-shrink: 0; /* Prevents the legend items from shrinking too small */
 }
+
 
 .custom-legend-color-box {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100px; /* Adjust width as needed */
-  height: 30px; /* Adjust height as needed */
+  height: 25px; /* Adjust height as needed */
   padding: 5px; /* Adds some padding inside the box */
   color: white; /* Ensures text color is white for better visibility on darker backgrounds */
+  background-color: #000; /* Example background color, adjust as needed */
+  border-radius: 10px; /* Rounded corners */
 }
+
 
 .custom-legend-color-box span {
   font-size: 10px; /* Set to your preferred size */
@@ -323,30 +307,21 @@ h1 .fa-heartbeat {
 }
 
 
+
 /* Desktop View */
 @media (min-width: 768px) {
   .content-container {
     display: flex;
     justify-content: space-between;
-  }
-  .graph-container, .analysis-container  {
-    flex: 1;
-    max-height: 370px; /* Example maximum height */
-    /* Add more styles as needed */
+    flex-wrap: nowrap; 
   }
 }
 
-/* Mobile View */
+/* Adjustments for smaller screens - ensure stacking and full width */
 @media (max-width: 767px) {
   .content-container {
     display: block;
   }
-  .strava-analysis-container {
-    flex-direction: column;
-  }
-  .strava-chart, .analysis-container {
-    margin-right: 0;
-    margin-bottom: 0px; /* Add some space between the chart and the analysis container */
-  }
+
 }
 

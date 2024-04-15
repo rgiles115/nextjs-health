@@ -33,7 +33,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return expired || isNewDay || lessThanAnHourLeft;
     };
 
-
     // Function to refresh the Oura token
     const refreshOuraToken = async (ouraData: OuraCookieData): Promise<OuraCookieData | null> => {
         console.log("Attempting to refresh token for Oura");
@@ -45,26 +44,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         params.append('refresh_token', ouraData.refresh_token);
 
         try {
-            const response = await axios.post('https://api.ouraring.com/oauth/token', params.toString(), {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            });
+            const response = await axios.post('https://api.ouraring.com/oauth/token', params);
+            const { access_token, token_type, expires_in, refresh_token } = response.data;
+            const expiresAt = Math.floor(Date.now() / 1000) + expires_in;
 
-            const data = response.data;
-            console.log('Refresh token response:', data);
-
-            const currentTimestamp = Math.floor(Date.now() / 1000);
-            const currentDate = new Date().toDateString(); // Get the current date as a string
-            const expiresAt = currentTimestamp + data.expires_in;
-
-            const refreshedData = {
-                ...ouraData,
-                access_token: data.access_token,
-                refresh_token: data.refresh_token,
-                expires_in: data.expires_in,
+            const refreshedData: OuraCookieData = {
+                access_token,
+                token_type,
+                expires_in,
+                refresh_token,
                 expires_at: expiresAt,
-                last_checked: currentDate, // Update last_checked to today's date
+                last_checked: new Date().toDateString() // Update to today's date
             };
 
             // Serialize the updated cookie data

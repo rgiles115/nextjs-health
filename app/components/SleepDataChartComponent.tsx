@@ -64,7 +64,7 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                 const datasets = [
                     // Dataset configurations
                     {
-                        label: 'Average Sleep Heart Rate',
+                        label: 'Avg. Sleep HR',
                         data: sleepData.map(data => data.averageSleepHeartRate ?? 0),
                         borderColor: '#eb4034',
                         tension: 0.4,
@@ -72,7 +72,7 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                         yAxisID: 'y',
                     },
                     {
-                        label: 'Lowest Sleep Heart Rate',
+                        label: 'Lowest Sleep HR',
                         data: sleepData.map(data => data.lowestSleepHeartRate ?? 0),
                         borderColor: '#34eb98',
                         tension: 0.4,
@@ -80,7 +80,7 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                         yAxisID: 'y',
                     },
                     {
-                        label: 'Average Sleep Breath Rate',
+                        label: 'Avg. Breath Rate',
                         data: sleepData.map(data => data.averageSleepBreath ?? 0),
                         borderColor: '#3496eb',
                         tension: 0.4,
@@ -88,7 +88,7 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                         yAxisID: 'y',
                     },
                     {
-                        label: 'Total Sleep Duration (hours)',
+                        label: 'Sleep Duration',
                         data: sleepData.map(data => Number(((data.totalSleepDuration ?? 0) / 3600).toFixed(2))),
                         borderColor: '#eb34d2',
                         tension: 0.4,
@@ -154,9 +154,7 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                             },
                         },
                         plugins: {
-                            legend: {
-                                display: window.innerWidth > 600,
-                            },
+                            legend: { display: false } // Disable default legend
                         },
                     },
                 };
@@ -167,6 +165,46 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
 
 
     }, [sleepData, isLoading]);
+
+    useEffect(() => {
+        if (chartInstanceRef.current) {
+            const chart = chartInstanceRef.current;
+            const legendContainer = document.getElementById('sleep-chart-legend');
+
+            if (legendContainer) { // Check if the element is not null
+                legendContainer.innerHTML = ''; // Clear existing legend items
+
+                chart.data.datasets.forEach((dataset, index) => {
+                    const legendItem = document.createElement('div');
+                    legendItem.className = 'custom-legend-item';
+
+                    const colorBox = document.createElement('div');
+                    colorBox.className = 'custom-legend-color-box';
+                    colorBox.style.backgroundColor = typeof dataset.borderColor === 'string' ? dataset.borderColor : 'grey';
+
+                    const labelText = document.createElement('span');
+                    labelText.textContent = dataset.label || ''; // Using dataset.label with a fallback to an empty string
+                    colorBox.appendChild(labelText);
+
+                    legendItem.appendChild(colorBox);
+                    legendItem.onclick = function () {
+                        const meta = chart.getDatasetMeta(index);
+                        // Explicitly handle null and boolean values
+                        if (meta.hidden === null) {
+                            meta.hidden = true; // Set hidden to true if it's currently null
+                        } else {
+                            meta.hidden = !meta.hidden; // Toggle the boolean value
+                        }
+                        chart.update();
+                    };
+
+
+                    legendContainer.appendChild(legendItem);
+                });
+            }
+        }
+    }, [sleepData]); // Dependency on sleepData to rebuild the legend when data changes
+
 
     useEffect(() => {
         const handleResize = () => {
@@ -181,8 +219,14 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
 
     return (
         <div>
-            {isLoading ? <Loading /> : <div className="graph-container"><canvas ref={chartRef} /></div>}
+            {isLoading ? <Loading /> : (
+                <div className="graph-container">
+                    <canvas ref={chartRef} />
+                    <div id="sleep-chart-legend" className="custom-legend-container"></div>
+                </div>
+            )}
         </div>
+
     );
 }
 

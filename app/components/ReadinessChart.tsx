@@ -114,7 +114,7 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
                             enabled: true,
                         },
                         legend: {
-                            display: window.innerWidth > 600,
+                            display: false // Disable the default legend
                         },
                     }
                 }
@@ -123,6 +123,47 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
 
         return () => chartInstanceRef.current?.destroy();
     }, [readinessData, startDate, endDate]); // Add startDate and endDate to the dependency list
+
+
+    useEffect(() => {
+        const chart = chartInstanceRef.current;
+        const legendContainer = document.getElementById('readiness-chart-legend');
+
+        if (chart && legendContainer) {
+            legendContainer.innerHTML = ''; // Clear existing legend items
+
+            chart.data.datasets.forEach((dataset, index) => {
+                const legendItem = document.createElement('div');
+                legendItem.className = 'custom-legend-item';
+
+                const colorBox = document.createElement('div');
+                colorBox.className = 'custom-legend-color-box';
+                // Check if borderColor is a string, otherwise default to 'grey'
+                const borderColor = typeof dataset.borderColor === 'string' ? dataset.borderColor : 'grey';
+                colorBox.style.backgroundColor = borderColor;
+
+                const labelText = document.createElement('span');
+                labelText.textContent = dataset.label || 'No label'; // Provide a default label if undefined
+                colorBox.appendChild(labelText);
+
+                legendItem.appendChild(colorBox);
+                legendItem.onclick = function () {
+                    const meta = chart.getDatasetMeta(index);
+                    // Explicitly handle null and boolean values
+                    if (meta.hidden === null || meta.hidden === false) {
+                        meta.hidden = true; // If hidden is null or false, set it to true
+                    } else {
+                        meta.hidden = false; // Otherwise, set it to false
+                    }
+                    chart.update();
+                };
+                legendContainer.appendChild(legendItem);
+            });
+        }
+    }, [readinessData]); // Ensure dependencies are properly managed
+
+
+
 
     useEffect(() => {
         const handleResize = () => {
@@ -137,7 +178,11 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
 
     return (
         <div>
-            {isLoading ? <Loading /> : <div className="graph-container"><canvas ref={chartRef} /></div>}
+            {isLoading ? <Loading /> : <div className="graph-container"><
+                canvas ref={chartRef} />
+                <div id="readiness-chart-legend" className="custom-legend-container"></div>
+
+            </div>}
         </div>
     );
 };
