@@ -83,7 +83,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                     {
                         label: 'Distance (km)',
                         data: processedData.map(data => data.distance ?? 0),
-                        borderColor: '#219ebc',
+                        borderColor: '#3567fa',
                         tension: 0.4,
                         pointRadius: 0,
                         yAxisID: 'y',
@@ -91,7 +91,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                     {
                         label: 'Elevation Gain (m)',
                         data: processedData.map(data => data.totalElevationGain ?? 0),
-                        borderColor: '#fb8500',
+                        borderColor: '#37c6ff',
                         tension: 0.4,
                         pointRadius: 0,
                         yAxisID: 'y',
@@ -102,7 +102,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                     datasets.push({
                         label: 'Average Watts',
                         data: processedData.map(data => data.averageWatts ?? 0),
-                        borderColor: '#ffbe0b',
+                        borderColor: '#d84bff',
                         tension: 0.4,
                         pointRadius: 0,
                         yAxisID: 'y',

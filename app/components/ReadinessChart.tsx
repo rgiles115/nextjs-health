@@ -54,7 +54,7 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
                             data: readinessData.restingHeartRate,
                             pointRadius: 0, // Set point radius to 0 to hide the dots
                             backgroundColor: 'rgba(93, 166, 180, 0.5)', // Pale Turquoise with transparency
-                            borderColor: '#5da6b4', // Pale Turquoise
+                            borderColor: '#3567fa', // Pale Turquoise
                             tension: 0.4,
                         },
                         {
@@ -62,7 +62,7 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
                             data: readinessData.hrvBalance,
                             pointRadius: 0, // Set point radius to 0 to hide the dots
                             backgroundColor: 'rgba(50, 115, 136, 0.5)', // Teal Blue with some transparency
-                            borderColor: '#327388', // Teal Blue
+                            borderColor: '#37c6ff', // Teal Blue
                             tension: 0.4,
                         },
                         {
@@ -70,7 +70,7 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
                             data: readinessData.bodyTemperature,
                             pointRadius: 0, // Set point radius to 0 to hide the dots
                             backgroundColor: 'rgba(87, 160, 174, 0.5)', // Soft Cyan with some transparency
-                            borderColor: '#57a0ae', // Soft Cyan
+                            borderColor: '#d84bff', // Soft Cyan
                             tension: 0.4,
                         }
                     ]

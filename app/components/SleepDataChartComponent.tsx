@@ -66,7 +66,7 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                     {
                         label: 'Avg. Sleep HR',
                         data: sleepData.map(data => data.averageSleepHeartRate ?? 0),
-                        borderColor: '#eb4034',
+                        borderColor: '#3567fa',
                         tension: 0.4,
                         pointRadius: 0,
                         yAxisID: 'y',
@@ -74,7 +74,7 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                     {
                         label: 'Lowest Sleep HR',
                         data: sleepData.map(data => data.lowestSleepHeartRate ?? 0),
-                        borderColor: '#34eb98',
+                        borderColor: '#37c6ff',
                         tension: 0.4,
                         pointRadius: 0,
                         yAxisID: 'y',
@@ -82,7 +82,7 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                     {
                         label: 'Avg. Breath Rate',
                         data: sleepData.map(data => data.averageSleepBreath ?? 0),
-                        borderColor: '#3496eb',
+                        borderColor: '#d84bff',
                         tension: 0.4,
                         pointRadius: 0,
                         yAxisID: 'y',
@@ -90,7 +90,7 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                     {
                         label: 'Sleep Duration',
                         data: sleepData.map(data => Number(((data.totalSleepDuration ?? 0) / 3600).toFixed(2))),
-                        borderColor: '#eb34d2',
+                        borderColor: '#8338ec',
                         tension: 0.4,
                         pointRadius: 0,
                         yAxisID: 'y1',
