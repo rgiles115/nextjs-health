@@ -237,9 +237,10 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
             {isLoading ? (
                 <Loading />
             ) : (
-                <div className="graph-container">
-                    <canvas ref={chartRef} />
-                    <div id="strava-chart-legend" className="custom-legend-container"></div>
+                <div className="m-5 rounded-lg bg-white p-5">
+                    <canvas ref={chartRef} className="w-auto h-auto m-5" />
+                    <div id="strava-chart-legend" className="flex flex-row flex-wrap justify-center items-center content-center w-full p-2.5 overflow-hidden">
+                    </div>
                 </div>
             )}
         </div>

@@ -77,7 +77,6 @@ const useFetchHrvData = (startDate: Date, endDate: Date, isAuthenticated: boolea
 
         fetchHRVData();
     }, [startDate, endDate, isAuthenticated]);
-    console.log('Data from HRV:', data);
     return { data, isLoading, error };
 };
 

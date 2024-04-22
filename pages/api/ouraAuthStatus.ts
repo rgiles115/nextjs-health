@@ -33,47 +33,52 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return expired || isNewDay || lessThanAnHourLeft;
     };
 
-    // Function to refresh the Oura token
-    const refreshOuraToken = async (ouraData: OuraCookieData): Promise<OuraCookieData | null> => {
-        console.log("Attempting to refresh token for Oura");
+// Function to refresh the Oura token
+const refreshOuraToken = async (ouraData: OuraCookieData): Promise<OuraCookieData | null> => {
+    console.log("Attempting to refresh token for Oura");
 
-        const params = new URLSearchParams();
-        params.append('client_id', OURA_CLIENT_ID!);
-        params.append('client_secret', OURA_CLIENT_SECRET!);
-        params.append('grant_type', 'refresh_token');
-        params.append('refresh_token', ouraData.refresh_token);
+    const params = new URLSearchParams();
+    params.append('client_id', OURA_CLIENT_ID!);
+    params.append('client_secret', OURA_CLIENT_SECRET!);
+    params.append('grant_type', 'refresh_token');
+    params.append('refresh_token', ouraData.refresh_token);
 
-        try {
-            const response = await axios.post('https://api.ouraring.com/oauth/token', params);
-            const { access_token, token_type, expires_in, refresh_token } = response.data;
-            const expiresAt = Math.floor(Date.now() / 1000) + expires_in;
+    try {
+        const response = await axios.post('https://api.ouraring.com/oauth/token', params);
+        const { access_token, token_type, expires_in, refresh_token } = response.data;
+        const expiresAt = Math.floor(Date.now() / 1000) + expires_in;
 
-            const refreshedData: OuraCookieData = {
-                access_token,
-                token_type,
-                expires_in,
-                refresh_token,
-                expires_at: expiresAt,
-                last_checked: new Date().toDateString() // Update to today's date
-            };
+        const refreshedData: OuraCookieData = {
+            access_token,
+            token_type,
+            expires_in,
+            refresh_token,
+            expires_at: expiresAt,
+            last_checked: new Date().toDateString() // Update to today's date
+        };
 
-            // Serialize the updated cookie data
-            const cookieString = serialize('ouraData', JSON.stringify(refreshedData), {
-                httpOnly: true,
-                secure: process.env.NODE_ENV !== 'development',
-                expires: new Date(expiresAt * 1000),
-                path: '/',
-            });
+        // Set the cookie to expire in one month
+        const oneMonthFromNow = new Date();
+        oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
 
-            // Set the updated cookie in the response header
-            res.setHeader('Set-Cookie', cookieString);
+        // Serialize the updated cookie data
+        const cookieString = serialize('ouraData', JSON.stringify(refreshedData), {
+            httpOnly: true,
+            secure: process.env.NODE_ENV !== 'development',
+            expires: oneMonthFromNow,
+            path: '/',
+        });
 
-            return refreshedData;
-        } catch (error) {
-            console.error('Error refreshing Oura token:', error);
-            return null;
-        }
-    };
+        // Set the updated cookie in the response header
+        res.setHeader('Set-Cookie', cookieString);
+
+        return refreshedData;
+    } catch (error) {
+        console.error('Error refreshing Oura token:', error);
+        return null;
+    }
+};
+
 
     // Attempt to retrieve and parse the Oura data from the cookie
     let ouraData: OuraCookieData | null = cookies.ouraData ? JSON.parse(cookies.ouraData) : null;

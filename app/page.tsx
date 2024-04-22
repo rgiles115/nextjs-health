@@ -66,7 +66,6 @@ export default function Home() {
   const { data: transformedHrvData, isLoading: isHrvLoading, error: hrvError } = useFetchHrvData(startDate, endDate, isOuraAuthed || false);
   const { data: detailedReadinessData, isLoading: isDetailedReadinessLoading, error: readinessError } = useFetchReadinessData(startDate, endDate, isOuraAuthed || false);
   const { tagsData: tagsData, isLoading: isLoadingTags, error: errorTags } = useFetchEnhancedTags(startDate, endDate, isOuraAuthed || false);
-  console.log('Transformed HRV:', transformedHrvData);
   // Processing Strava data with a custom hook
   const { processedData, totalDistance, totalElevationGain, averageWatts } = useProcessStravaData(stravaActivities, startDate, endDate);
 
@@ -289,7 +288,7 @@ export default function Home() {
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
 
-                <div className="flex-1 m-2 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
+                <div className="flex-1 m-2 border border-gray-200 rounded-lg bg-white  overflow-hidden pb-8">
                   <h2 className="text-2xl font-semibold mt-4 mb-2 px-12">Strava Overview</h2>
                   <StravaChart
                     processedData={processedResults}
@@ -332,7 +331,7 @@ export default function Home() {
           <div>
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
-                <div className="flex-1 m-2 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
+                <div className="flex-1 m-2 border border-gray-200 rounded-lg bg-white overflow-hidden pb-8">
                   <h2 className="text-2xl font-semibold mt-4 mb-2 px-12">Oura Sleep</h2>
                   <SleepDataChartComponent
                     sleepData={processedResults}
@@ -345,7 +344,7 @@ export default function Home() {
             </div>
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
-                <div className="flex-1 m-2 border border-gray-200 rounded-lg bg-white max-h-[440px] overflow-hidden pb-8">
+                <div className="flex-1 m-2 border border-gray-200 rounded-lg bg-white overflow-hidden pb-8">
                   <h2 className="text-2xl font-semibold mt-4 mb-2 px-12">Oura Readiness</h2>
                   <ReadinessChart readinessData={readinessData} isLoading={isReadinessLoading} startDate={startDate} endDate={endDate} />
                 </div>
