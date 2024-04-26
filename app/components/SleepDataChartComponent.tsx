@@ -126,7 +126,7 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                                     autoSkip: true,
                                     maxRotation: 0,
                                     minRotation: 0,
-                                    maxTicksLimit: 10
+                                    maxTicksLimit: 5
                                 },
                                 min: format(startDate, 'yyyy-MM-dd'), // Set minimum bound to selected start date
                                 max: format(endDate, 'yyyy-MM-dd'),   // Set maximum bound to selected end date
@@ -140,6 +140,10 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                                 grid: {
                                     display: false,
                                 },
+                                ticks: {
+                                    display: true,
+                                    maxTicksLimit: 5
+                                },
                             },
                             y1: { // Second Y axis configuration for total sleep duration
                                 position: 'right',
@@ -149,6 +153,10 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
                                 },
                                 grid: {
                                     drawOnChartArea: false,
+                                },
+                                ticks: {
+                                    display: true,
+                                    maxTicksLimit: 5
                                 },
                                 // Additional customization as needed
                             },
@@ -220,8 +228,8 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
     return (
         <div>
             {isLoading ? <Loading /> : (
-                <div className="m-5 rounded-lg bg-white p-5">
-                    <canvas ref={chartRef} className="w-auto h-auto m-5" />
+                <div className="rounded-lg bg-white p-4">
+                    <canvas ref={chartRef} className="w-auto h-auto" />
                     <div id="sleep-chart-legend" className="flex flex-row flex-wrap justify-center items-center content-center w-full p-2.5 overflow-hidden"></div>
                 </div>
             )}

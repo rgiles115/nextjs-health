@@ -13,7 +13,7 @@ const config: Config = {
         'custom-darkblue': '#e0eaff', // Adding another custom color for the gradient
       },
       backgroundImage: {
-        'blue-gradient': 'linear-gradient(to right, #f0faff, #e0eaff)', // Custom gradient
+        'blue-gradient': 'linear-gradient(to right, #f7fcff, #f0faff)', // Lighter custom gradient
       },
     },
   },

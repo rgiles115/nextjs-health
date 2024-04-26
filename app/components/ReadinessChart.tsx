@@ -97,7 +97,7 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
                                 autoSkip: true,
                                 maxRotation: 0,
                                 minRotation: 0,
-                                maxTicksLimit: 10
+                                maxTicksLimit: 5
                             },
                             min: format(startDate, 'yyyy-MM-dd'), // Setting minimum bound
                             max: format(endDate, 'yyyy-MM-dd'),   // Setting maximum bound
@@ -105,6 +105,10 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
                         y: {
                             grid: {
                                 display: false,
+                            },
+                            ticks: {
+                                display: true,
+                                maxTicksLimit: 5
                             },
                         },
                         // Other scales configurations...
@@ -182,8 +186,8 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
             {isLoading ? (
                 <Loading />
             ) : (
-                <div className="m-5 rounded-lg bg-white p-5">
-                    <canvas ref={chartRef} className="w-auto h-auto m-5" />
+                <div className="rounded-lg bg-white p-4">
+                    <canvas ref={chartRef} className="w-auto h-auto" />
                     <div id="readiness-chart-legend" className="flex flex-row flex-wrap justify-center items-center content-center w-full p-2.5 overflow-hidden">
                     </div>
                 </div>

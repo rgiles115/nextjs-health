@@ -146,7 +146,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                                     autoSkip: true,
                                     maxRotation: 0,
                                     minRotation: 0,
-                                    maxTicksLimit: 10
+                                    maxTicksLimit: 5
                                 },
                                 min: format(startDate, 'yyyy-MM-dd'), // Use formatted startDate
                                 max: format(endDate, 'yyyy-MM-dd'),   // Use formatted endDate
@@ -161,6 +161,7 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                                 },
                                 ticks: {
                                     display: true,
+                                    maxTicksLimit: 5
                                 },
                             },
                             ...(hasHRVData && hasWattsData && {
@@ -168,6 +169,10 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
                                     position: 'right',
                                     grid: {
                                         drawOnChartArea: false, // Keeps your adjustment based on axis preference
+                                    },
+                                    ticks: {
+                                        display: true,
+                                        maxTicksLimit: 5
                                     },
                                 }
                             }),
@@ -237,8 +242,8 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
             {isLoading ? (
                 <Loading />
             ) : (
-                <div className="m-5 rounded-lg bg-white p-5">
-                    <canvas ref={chartRef} className="w-auto h-auto m-5" />
+                <div className=" rounded-lg bg-white p-4">
+                    <canvas ref={chartRef} className="w-auto h-auto" />
                     <div id="strava-chart-legend" className="flex flex-row flex-wrap justify-center items-center content-center w-full p-2.5 overflow-hidden">
                     </div>
                 </div>

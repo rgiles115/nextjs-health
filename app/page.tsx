@@ -115,6 +115,10 @@ export default function Home() {
       setIsAuthCheckLoading,
       setAthleteProfile,
     });
+
+    console.log('Athlete:', athleteProfile);
+    console.log('Ride Totals:', ytdRideTotals);
+
   }, []);
 
   useEffect(() => {
@@ -251,8 +255,8 @@ export default function Home() {
                     <h2 className="text-xl font-semibold">{athleteProfile.firstname} {athleteProfile.lastname}</h2>
                     <div>
                       {/* Displaying YTD Totals */}
-                      <p><span className="text-gray-600">Distance:</span> {((ytdRideTotals.distance / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }))} km</p>
-                      <p><span className="text-gray-600">Elevation Gain:</span> {ytdRideTotals.elevation_gain.toLocaleString()} meters</p>
+                      <p><span className="font-light">Distance:</span> {((ytdRideTotals.distance / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }))} km</p>
+                      <p><span className="font-light">Elevation Gain:</span> {ytdRideTotals.elevation_gain.toLocaleString()} meters</p>
                       {/* Displaying Year-End Estimations */}
                       {(() => {
                         const currentDate = new Date();
@@ -270,8 +274,15 @@ export default function Home() {
 
                         return (
                           <>
-                            <p><span className="text-gray-600">Estimated Distance by {currentYear}:</span> {estimatedDistanceEndOfYear.toLocaleString()} km</p>
-                            <p><span className="text-gray-600">Estimated Elevation Gain by {currentYear}:</span> {estimatedElevationEndOfYear.toLocaleString()} meters</p>
+                            <p>
+                              <span className="font-light">Distance by {currentYear}:</span>
+                              {estimatedDistanceEndOfYear.toLocaleString()} km
+                            </p>
+                            <p>
+                              <span className="font-light">Elevation by {currentYear}:</span>
+                              {estimatedElevationEndOfYear.toLocaleString()} meters
+                            </p>
+
                           </>
                         );
                       })()}
