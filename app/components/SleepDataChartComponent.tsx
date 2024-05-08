@@ -174,45 +174,42 @@ function SleepDataChartComponent({ sleepData, isLoading, startDate, endDate }: S
 
     }, [sleepData, isLoading]);
 
+
     useEffect(() => {
-        if (chartInstanceRef.current) {
-            const chart = chartInstanceRef.current;
-            const legendContainer = document.getElementById('sleep-chart-legend');
-
-            if (legendContainer) { // Check if the element is not null
-                legendContainer.innerHTML = ''; // Clear existing legend items
-
-                chart.data.datasets.forEach((dataset, index) => {
-                    const legendItem = document.createElement('div');
-                    legendItem.className = 'custom-legend-item';
-
-                    const colorBox = document.createElement('div');
-                    colorBox.className = 'custom-legend-color-box';
-                    colorBox.style.backgroundColor = typeof dataset.borderColor === 'string' ? dataset.borderColor : 'grey';
-
-                    const labelText = document.createElement('span');
-                    labelText.textContent = dataset.label || ''; // Using dataset.label with a fallback to an empty string
-                    colorBox.appendChild(labelText);
-
-                    legendItem.appendChild(colorBox);
-                    legendItem.onclick = function () {
-                        const meta = chart.getDatasetMeta(index);
-                        // Explicitly handle null and boolean values
-                        if (meta.hidden === null) {
-                            meta.hidden = true; // Set hidden to true if it's currently null
-                        } else {
-                            meta.hidden = !meta.hidden; // Toggle the boolean value
-                        }
-                        chart.update();
-                    };
-
-
-                    legendContainer.appendChild(legendItem);
-                });
-            }
+        const chart = chartInstanceRef.current;
+        const legendContainer = document.getElementById('sleep-chart-legend');
+    
+        if (chart && legendContainer) {
+            legendContainer.innerHTML = ''; // Clear existing legend items
+    
+            chart.data.datasets.forEach((dataset, index) => {
+                const legendItem = document.createElement('div');
+                legendItem.className = 'custom-legend-item';
+    
+                const colorBox = document.createElement('div');
+                colorBox.className = 'custom-legend-color-box';
+                // Set initial color based on dataset visibility
+                const borderColor = typeof dataset.borderColor === 'string' ? dataset.borderColor : 'grey';
+                colorBox.style.backgroundColor = chart.isDatasetVisible(index) ? borderColor : 'grey';
+    
+                const labelText = document.createElement('span');
+                labelText.textContent = dataset.label || 'No label'; // Provide a default label if undefined
+                colorBox.appendChild(labelText);
+    
+                legendItem.appendChild(colorBox);
+                legendItem.onclick = function () {
+                    const meta = chart.getDatasetMeta(index);
+                    meta.hidden = !meta.hidden; // Toggle the hidden state
+                    chart.update();
+    
+                    // Update color based on new visibility status
+                    colorBox.style.backgroundColor = meta.hidden ? 'grey' : (typeof dataset.borderColor === 'string' ? dataset.borderColor : 'grey');
+                };
+                legendContainer.appendChild(legendItem);
+            });
         }
-    }, [sleepData]); // Dependency on sleepData to rebuild the legend when data changes
-
+    }, [sleepData]); // Include all necessary dependencies in the dependency array    
+    
 
     useEffect(() => {
         const handleResize = () => {

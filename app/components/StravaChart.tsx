@@ -202,29 +202,40 @@ const StravaChartComponent: React.FC<StravaChartProps> = ({ processedData, isLoa
     function createCustomLegend(chart: Chart) {
         const legendContainer = document.getElementById('strava-chart-legend');
         if (!legendContainer) return;
-
+    
         legendContainer.innerHTML = ''; // Clear existing legend items
         chart.data.datasets.forEach((dataset, index) => {
             const legendItem = document.createElement('div');
             legendItem.className = 'custom-legend-item';
-
+    
             const colorBox = document.createElement('div');
             colorBox.className = 'custom-legend-color-box';
-            colorBox.style.backgroundColor = typeof dataset.borderColor === 'string' ? dataset.borderColor : 'grey';
-
+    
+            // Ensure borderColor is a string, use a default color if not
+            const datasetBorderColor = typeof dataset.borderColor === 'string' ? dataset.borderColor : '#ccc';
+    
+            // Set color to grey if dataset is hidden, otherwise use the checked dataset color
+            colorBox.style.backgroundColor = chart.isDatasetVisible(index) ? datasetBorderColor : '#ccc';
+    
             const labelText = document.createElement('span');
             labelText.textContent = dataset.label || '';
-            colorBox.appendChild(labelText); // Place the text inside the color box
-
+            colorBox.appendChild(labelText);
+    
             legendItem.appendChild(colorBox);
             legendItem.onclick = function () {
                 const meta = chart.getDatasetMeta(index);
                 meta.hidden = meta.hidden === null ? true : !meta.hidden;
                 chart.update();
+    
+                // Update color based on visibility
+                colorBox.style.backgroundColor = meta.hidden ? '#ccc' : (typeof dataset.borderColor === 'string' ? dataset.borderColor : '#ccc');
             };
             legendContainer.appendChild(legendItem);
         });
     }
+    
+    
+    
 
     useEffect(() => {
         const handleResize = () => {

@@ -128,43 +128,41 @@ const ReadinessChart: React.FC<ReadinessChartProps> = ({ startDate, endDate, rea
         return () => chartInstanceRef.current?.destroy();
     }, [readinessData, startDate, endDate]); // Add startDate and endDate to the dependency list
 
-
     useEffect(() => {
         const chart = chartInstanceRef.current;
         const legendContainer = document.getElementById('readiness-chart-legend');
-
+    
         if (chart && legendContainer) {
             legendContainer.innerHTML = ''; // Clear existing legend items
-
+    
             chart.data.datasets.forEach((dataset, index) => {
                 const legendItem = document.createElement('div');
                 legendItem.className = 'custom-legend-item';
-
+    
                 const colorBox = document.createElement('div');
                 colorBox.className = 'custom-legend-color-box';
-                // Check if borderColor is a string, otherwise default to 'grey'
+                // Set initial color based on dataset visibility
                 const borderColor = typeof dataset.borderColor === 'string' ? dataset.borderColor : 'grey';
-                colorBox.style.backgroundColor = borderColor;
-
+                colorBox.style.backgroundColor = chart.isDatasetVisible(index) ? borderColor : 'grey';
+    
                 const labelText = document.createElement('span');
                 labelText.textContent = dataset.label || 'No label'; // Provide a default label if undefined
                 colorBox.appendChild(labelText);
-
+    
                 legendItem.appendChild(colorBox);
                 legendItem.onclick = function () {
                     const meta = chart.getDatasetMeta(index);
-                    // Explicitly handle null and boolean values
-                    if (meta.hidden === null || meta.hidden === false) {
-                        meta.hidden = true; // If hidden is null or false, set it to true
-                    } else {
-                        meta.hidden = false; // Otherwise, set it to false
-                    }
+                    meta.hidden = !meta.hidden; // Toggle the hidden state
                     chart.update();
+    
+                    // Update color based on new visibility status
+                    colorBox.style.backgroundColor = meta.hidden ? 'grey' : (typeof dataset.borderColor === 'string' ? dataset.borderColor : 'grey');
                 };
                 legendContainer.appendChild(legendItem);
             });
         }
-    }, [readinessData]); // Ensure dependencies are properly managed
+    }, [readinessData]); // Include all necessary dependencies in the dependency array
+    
 
 
 
