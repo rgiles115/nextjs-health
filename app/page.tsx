@@ -245,53 +245,53 @@ export default function Home() {
           <StravaSkeletonLoader />
         )}
 
-        {isStravaAuthed && !isStravaLoading && stravaData && (
+        {isStravaAuthed && !isStravaLoading && stravaData && athleteProfile && ytdRideTotals && (
           <div>
-            {athleteProfile && ytdRideTotals && (
-              <div className="m-5 p-4 border border-gray-200 rounded-lg bg-white">
-                <div className="flex justify-start items-center mt-0">
-                  <img src={athleteProfile.profile} alt="Profile" className="h-32 w-32 rounded-full border-2 border-gray-300" />
-                  <div className="ml-4">
-                    <h2 className="text-xl font-semibold">{athleteProfile.firstname} {athleteProfile.lastname}</h2>
-                    <div>
-                      {/* Displaying YTD Totals */}
-                      <p><span className="font-light">Distance:</span> {((ytdRideTotals.distance / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }))} km</p>
-                      <p><span className="font-light">Elevation Gain:</span> {ytdRideTotals.elevation_gain.toLocaleString()} meters</p>
-                      {/* Displaying Year-End Estimations */}
-                      {(() => {
-                        const currentDate = new Date();
-                        const currentYear = currentDate.getFullYear(); // Get the current year
-                        const startOfYear = new Date(currentYear, 0, 1);
-                        const endOfYear = new Date(currentYear, 11, 31);
-                        const daysElapsed = (currentDate.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
-                        const totalDaysInYear = (endOfYear.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24) + 1; // +1 to include the last day
 
-                        const dailyDistanceAvg = ytdRideTotals.distance / daysElapsed;
-                        const dailyElevationAvg = ytdRideTotals.elevation_gain / daysElapsed;
+            <div className="m-5 p-4 border border-gray-200 rounded-lg bg-white">
+              <div className="flex justify-start items-center mt-0">
+                <img src={athleteProfile.profile} alt="Profile" className="h-32 w-32 rounded-full border-2 border-gray-300" />
+                <div className="ml-4">
+                  <h2 className="text-xl font-semibold">{athleteProfile.firstname} {athleteProfile.lastname}</h2>
+                  <div>
+                    {/* Displaying YTD Totals */}
+                    <p><span className="font-light">Distance:</span> {((ytdRideTotals.distance / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }))} km</p>
+                    <p><span className="font-light">Elevation Gain:</span> {ytdRideTotals.elevation_gain.toLocaleString()} meters</p>
+                    {/* Displaying Year-End Estimations */}
+                    {(() => {
+                      const currentDate = new Date();
+                      const currentYear = currentDate.getFullYear(); // Get the current year
+                      const startOfYear = new Date(currentYear, 0, 1);
+                      const endOfYear = new Date(currentYear, 11, 31);
+                      const daysElapsed = (currentDate.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
+                      const totalDaysInYear = (endOfYear.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24) + 1; // +1 to include the last day
 
-                        const estimatedDistanceEndOfYear = Math.round((dailyDistanceAvg * totalDaysInYear) / 1000); // Convert to km and round
-                        const estimatedElevationEndOfYear = Math.round(dailyElevationAvg * totalDaysInYear); // Round to nearest whole number
+                      const dailyDistanceAvg = ytdRideTotals.distance / daysElapsed;
+                      const dailyElevationAvg = ytdRideTotals.elevation_gain / daysElapsed;
 
-                        return (
-                          <>
-                            <p>
-                              <span className="font-light">Distance by {currentYear}:</span>
-                              {estimatedDistanceEndOfYear.toLocaleString()} km
-                            </p>
-                            <p>
-                              <span className="font-light">Elevation by {currentYear}:</span>
-                              {estimatedElevationEndOfYear.toLocaleString()} meters
-                            </p>
+                      const estimatedDistanceEndOfYear = Math.round((dailyDistanceAvg * totalDaysInYear) / 1000); // Convert to km and round
+                      const estimatedElevationEndOfYear = Math.round(dailyElevationAvg * totalDaysInYear); // Round to nearest whole number
 
-                          </>
-                        );
-                      })()}
+                      return (
+                        <>
+                          <p>
+                            <span className="font-light">Distance by {currentYear}:</span>
+                            {estimatedDistanceEndOfYear.toLocaleString()} km
+                          </p>
+                          <p>
+                            <span className="font-light">Elevation by {currentYear}:</span>
+                            {estimatedElevationEndOfYear.toLocaleString()} meters
+                          </p>
 
-                    </div>
+                        </>
+                      );
+                    })()}
+
                   </div>
                 </div>
               </div>
-            )}
+            </div>
+
             <NumberContainers
               totalDistance={totalDistance}
               totalElevationGain={totalElevationGain}
