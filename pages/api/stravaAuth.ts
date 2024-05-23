@@ -34,7 +34,7 @@ export default async function handler(
       const cookie = serialize('stravaData', JSON.stringify(data), {
         httpOnly: true,
         secure: process.env.NODE_ENV !== 'development',
-        maxAge: 60 * 60 * 24, // Example: 1 day expiration
+        maxAge: 60 * 60 * 24 * 30, // Example: 30 days expiration
         path: '/',
       });
 
