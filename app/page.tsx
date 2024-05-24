@@ -1,13 +1,10 @@
-// Directive to optimize for client-side rendering only in Next.js
 'use client'
 
-// Importing necessary React and Next.js functionalities
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
 import axios from 'axios';
 
-// Importing third-party components and styles
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -15,7 +12,6 @@ import { faHeartbeat } from '@fortawesome/free-solid-svg-icons';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Custom hooks for data fetching
 import useFetchStravaActivities from './hooks/useFetchStravaActivities';
 import useFetchOuraData from './hooks/useFetchOuraData';
 import useFetchHrvData from './hooks/useFetchHrvData';
@@ -24,7 +20,6 @@ import useProcessStravaData from './hooks/useProcessStravaData';
 import useFetchEnhancedTags from './hooks/useFetchEnhancedTags';
 import useProcessStravaAndHRVData from './hooks/useProcessStravaAndHRVData';
 
-// Importing custom components
 import SleepDataChartComponent from './components/SleepDataChartComponent';
 import ReadinessChart from './components/ReadinessChart';
 import StravaAnalysis from './components/StravaAnalysis';
@@ -35,57 +30,42 @@ import NumberContainers from './components/NumberContainers';
 import StravaSkeletonLoader from './components/StravaSkeletonLoader';
 import OuraSkeletonLoader from './components/OuraSkeletonLoader';
 
-// Utils
-import { checkAuthStatuses } from '../app/utils/authCheck'; // Adjust the import path as needed
-
-
-// Type definitions for the data used in the component
+import { checkAuthStatuses } from '../app/utils/authCheck';
 import { StravaActivity, AthleteProfile } from '../app/types/StravaInterface';
 
 export default function Home() {
-  // State variables for managing date range, authentication status, and data
   const currentDate = new Date();
-  const sevenDaysAgo = new Date(currentDate.getTime() - (7 * 24 * 60 * 60 * 1000));
-  const [startDate, setStartDate] = useState(sevenDaysAgo);
-  const [endDate, setEndDate] = useState(currentDate);
+  const sevenDaysAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const [startDate, setStartDate] = useState<Date>(sevenDaysAgo);
+  const [endDate, setEndDate] = useState<Date>(currentDate);
   const [isStravaAuthed, setIsStravaAuthed] = useState<boolean | undefined>(undefined);
   const [isOuraAuthed, setIsOuraAuthed] = useState<boolean | undefined>(undefined);
-  const [isAuthCheckLoading, setIsAuthCheckLoading] = useState(true);
+  const [isAuthCheckLoading, setIsAuthCheckLoading] = useState<boolean>(true);
 
-  // State for managing fetched and processed data
-  const [stravaData, setStravaData] = useState<StravaActivity[]>([]);
+  const [stravaData, setStravaData] = useState<StravaActivity[] | null>(null);
   const [stravaAnalysisError, setStravaAnalysisError] = useState<string | null>(null);
   const [athleteProfile, setAthleteProfile] = useState<AthleteProfile | null>(null);
 
-  // Loading states for different asynchronous operations
-  const [loadingDots, setLoadingDots] = useState('');
+  const [loadingDots, setLoadingDots] = useState<string>('');
 
-  // Using custom hooks for fetching data from APIs
   const { activities: stravaActivities, ytdRideTotals, isLoading: isStravaLoading, error: stravaError } = useFetchStravaActivities(startDate, endDate, isStravaAuthed);
   const { data: readinessData, isLoading: isReadinessLoading, error: ouraError } = useFetchOuraData(startDate, endDate, isOuraAuthed || false);
   const { data: transformedHrvData, isLoading: isHrvLoading, error: hrvError } = useFetchHrvData(startDate, endDate, isOuraAuthed || false);
   const { data: detailedReadinessData, isLoading: isDetailedReadinessLoading, error: readinessError } = useFetchReadinessData(startDate, endDate, isOuraAuthed || false);
-  const { tagsData: tagsData, isLoading: isLoadingTags, error: errorTags } = useFetchEnhancedTags(startDate, endDate, isOuraAuthed || false);
-  // Processing Strava data with a custom hook
-  const { processedData, totalDistance, totalElevationGain, averageWatts } = useProcessStravaData(stravaActivities, startDate, endDate);
+  const { tagsData, isLoading: isLoadingTags, error: errorTags } = useFetchEnhancedTags(startDate, endDate, isOuraAuthed || false);
+  const { processedData, totalDistance, totalElevationGain, averageWatts } = useProcessStravaData(stravaActivities || [], startDate, endDate);
+  const processedResults = useProcessStravaAndHRVData(processedData, transformedHrvData || [], tagsData || []);
 
-  // States for analysis results
-  const [stravaAnalysisResult, setStravaAnalysisResult] = useState('');
+  const [stravaAnalysisResult, setStravaAnalysisResult] = useState<string>('');
 
-  // Loading states for analysis operations
-  const [isStravaAnalysisLoading, setIsStravaAnalysisLoading] = useState(false);
-  const [isOuraAnalysisLoading, setIsOuraAnalysisLoading] = useState(false);
+  const [isStravaAnalysisLoading, setIsStravaAnalysisLoading] = useState<boolean>(false);
+  const [isOuraAnalysisLoading, setIsOuraAnalysisLoading] = useState<boolean>(false);
 
-  // Animation states for loading indicators
-  const [stravaLoadingDots, setStravaLoadingDots] = useState('');
-  const [ouraLoadingDots, setOuraLoadingDots] = useState('');
+  const [stravaLoadingDots, setStravaLoadingDots] = useState<string>('');
+  const [ouraLoadingDots, setOuraLoadingDots] = useState<string>('');
 
-  const processedResults = useProcessStravaAndHRVData(processedData, transformedHrvData, tagsData);
-  // console.log('Processed Results:', JSON.stringify(processedResults));
+  const errors = [stravaError, ouraError, hrvError].filter(Boolean);
 
-  const errors = [stravaError, ouraError, hrvError].filter(Boolean); // Filter out null values
-
-  // Function to get a cookie value by name
   const getCookie = (name: string): string | undefined => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -96,18 +76,10 @@ export default function Home() {
     return undefined;
   };
 
-  const stravaAnalysisPrompt = `Analyse the following Strava cycling data for an amatuer
-  cyclist, and provide recommendations from the point of view of a cycling coach.
-  The data includes a range of metrics for each activity like distance,
-  elevation gain, max watts, average watts, and moving time. Keep the response very short.`;
+  const stravaAnalysisPrompt = `Analyze the following Strava cycling data for an amateur cyclist, and provide recommendations from the point of view of a cycling coach. The data includes a range of metrics for each activity like distance, elevation gain, max watts, average watts, and moving time. Keep the response very short.`;
 
-  const stravaAndOuraAnalysisPrompt = `Analyse the combined dataset from Strava and Oura for an
-  amateur athlete, and provide integrated insights and recommendations from the perspective of a
-  professional coach. Consider metrics from cycling activities, sleep, HRV, and readiness. Keep
-  the response very short.`;
+  const stravaAndOuraAnalysisPrompt = `Analyze the combined dataset from Strava and Oura for an amateur athlete, and provide integrated insights and recommendations from the perspective of a professional coach. Consider metrics from cycling activities, sleep, HRV, and readiness. Keep the response very short.`;
 
-
-  // Effect hook to check authentication status on component mount
   useEffect(() => {
     checkAuthStatuses({
       setIsStravaAuthed,
@@ -115,23 +87,15 @@ export default function Home() {
       setIsAuthCheckLoading,
       setAthleteProfile,
     });
-
-    console.log('Athlete:', athleteProfile);
-    console.log('Ride Totals:', ytdRideTotals);
-
   }, []);
 
   useEffect(() => {
-    // Display each error in a separate toast message
     errors.forEach(error => {
       toast.error(`Failed to load data: ${error}`);
     });
-  }, [errors]); // Depend on errors to re-trigger when they change
+  }, [errors]);
 
-
-  // Function to Analyze Combined Data
   const getCombinedDataAnalyse = async () => {
-    // Checking for the presence of Oura data
     const hasOuraData = processedResults.some(entry =>
       (entry.averageSleepHRV !== undefined && entry.averageSleepHRV > 0) ||
       (entry.averageSleepBreath !== undefined && entry.averageSleepBreath > 0) ||
@@ -140,18 +104,15 @@ export default function Home() {
       (entry.totalSleepDuration !== undefined && entry.totalSleepDuration > 0)
     );
 
-    // Determine which prompt to use based on the presence of Oura data
     const prompt = hasOuraData ? stravaAndOuraAnalysisPrompt : stravaAnalysisPrompt;
 
-    // Set loading state and clear previous errors
     setIsStravaAnalysisLoading(true);
     setStravaAnalysisError(null);
     try {
       const response = await axios.post('/api/chatgpt-analysis', {
         content: prompt,
-        data: processedResults // Sending the combined/processed data
+        data: processedResults
       });
-      // Handle response
       if (response.data.choices && response.data.choices.length > 0) {
         setStravaAnalysisResult(response.data.choices[0].message.content);
       } else {
@@ -159,7 +120,6 @@ export default function Home() {
         setStravaAnalysisError('No analysis could be generated from the data.');
       }
     } catch (error) {
-      // Handle errors
       console.error('Error in analyzeCombinedData:', error);
       setStravaAnalysisError('Error fetching analysis.');
     } finally {
@@ -178,7 +138,6 @@ export default function Home() {
       if (interval !== undefined) clearInterval(interval);
     };
   }, [isStravaAnalysisLoading]);
-
 
   useEffect(() => {
     let interval: number | undefined;
@@ -199,7 +158,7 @@ export default function Home() {
         <title>My Health Data</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="/style.css" />
-        <meta name="theme-color" content="#f0faff" /> {/* Adjust this color as needed */}
+        <meta name="theme-color" content="#f0faff" />
       </Head>
 
       <div className="flex flex-col min-h-screen">
@@ -209,18 +168,14 @@ export default function Home() {
           </h1>
         </div>
 
+        <Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
 
-
-        < Script src="https://kit.fontawesome.com/0d58ae3c8d.js" strategy="lazyOnload" crossOrigin="anonymous" />
-
-        {(isAuthCheckLoading) && (
-
+        {isAuthCheckLoading && (
           <div className="flex justify-center items-center min-h-screen">
             <div>Loading...</div>
           </div>
         )}
 
-        {/* Empty state message */}
         {!isStravaAuthed && !isOuraAuthed && (
           <main className="flex-1 pt-48 pb-16 md:pt-28">
             <div className="mx-auto flex flex-col justify-center items-center h-[20vh] w-[60vw] text-center">
@@ -241,36 +196,31 @@ export default function Home() {
           </div>
         )}
 
-        {isStravaAuthed && isStravaLoading && (
-          <StravaSkeletonLoader />
-        )}
+        {isStravaAuthed && isStravaLoading && <StravaSkeletonLoader />}
 
-        {isStravaAuthed && !isStravaLoading && stravaData && athleteProfile && ytdRideTotals && (
+        {isStravaAuthed && !isStravaLoading && stravaActivities && athleteProfile && ytdRideTotals && (
           <div>
-
             <div className="m-5 p-4 border border-gray-200 rounded-lg bg-white">
               <div className="flex justify-start items-center mt-0">
                 <img src={athleteProfile.profile} alt="Profile" className="h-32 w-32 rounded-full border-2 border-gray-300" />
                 <div className="ml-4">
                   <h2 className="text-xl font-semibold">{athleteProfile.firstname} {athleteProfile.lastname}</h2>
                   <div>
-                    {/* Displaying YTD Totals */}
                     <p><span className="font-light">Distance:</span> {((ytdRideTotals.distance / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }))} km</p>
                     <p><span className="font-light">Elevation Gain:</span> {ytdRideTotals.elevation_gain.toLocaleString()} meters</p>
-                    {/* Displaying Year-End Estimations */}
                     {(() => {
                       const currentDate = new Date();
-                      const currentYear = currentDate.getFullYear(); // Get the current year
+                      const currentYear = currentDate.getFullYear();
                       const startOfYear = new Date(currentYear, 0, 1);
                       const endOfYear = new Date(currentYear, 11, 31);
                       const daysElapsed = (currentDate.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
-                      const totalDaysInYear = (endOfYear.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24) + 1; // +1 to include the last day
+                      const totalDaysInYear = (endOfYear.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24) + 1;
 
                       const dailyDistanceAvg = ytdRideTotals.distance / daysElapsed;
                       const dailyElevationAvg = ytdRideTotals.elevation_gain / daysElapsed;
 
-                      const estimatedDistanceEndOfYear = Math.round((dailyDistanceAvg * totalDaysInYear) / 1000); // Convert to km and round
-                      const estimatedElevationEndOfYear = Math.round(dailyElevationAvg * totalDaysInYear); // Round to nearest whole number
+                      const estimatedDistanceEndOfYear = Math.round((dailyDistanceAvg * totalDaysInYear) / 1000);
+                      const estimatedElevationEndOfYear = Math.round(dailyElevationAvg * totalDaysInYear);
 
                       return (
                         <>
@@ -282,11 +232,9 @@ export default function Home() {
                             <span className="font-light">Elevation by {currentYear}:</span>
                             {estimatedElevationEndOfYear.toLocaleString()} meters
                           </p>
-
                         </>
                       );
                     })()}
-
                   </div>
                 </div>
               </div>
@@ -298,14 +246,13 @@ export default function Home() {
             />
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
-
-                <div className="flex-1 m-2 border border-gray-200 rounded-lg bg-white  overflow-hidden pb-8">
+                <div className="flex-1 m-2 border border-gray-200 rounded-lg bg-white overflow-hidden pb-8">
                   <h2 className="text-2xl font-semibold mt-4 mb-2 px-12">Strava Overview</h2>
                   <StravaChart
                     processedData={processedResults}
                     isLoading={isStravaLoading}
-                    startDate={startDate} // Pass startDate
-                    endDate={endDate}     // Pass endDate
+                    startDate={startDate}
+                    endDate={endDate}
                   />
                 </div>
               </div>
@@ -334,11 +281,8 @@ export default function Home() {
             </div>
           </div>
         )}
-        {isOuraAuthed && isReadinessLoading && (
-          <OuraSkeletonLoader />
-        )}
+        {isOuraAuthed && isReadinessLoading && <OuraSkeletonLoader />}
         {isOuraAuthed && !isReadinessLoading && readinessData && (
-
           <div>
             <div className="flex flex-wrap -m-4 px-2.5">
               <div className="w-full md:w-1/2 p-4">
@@ -377,7 +321,6 @@ export default function Home() {
         />
         <div id="footer"><Footer /></div>
       </div>
-
     </div>
   );
 }
