@@ -15,7 +15,7 @@ const useFetchReadinessData = (startDate: Date, endDate: Date, isAuthenticated: 
 
     useEffect(() => {
         if (!isAuthenticated) {
-            console.log("Not authenticated, skipping readiness data fetch.");
+            // console.log("Not authenticated, skipping readiness data fetch.");
             setIsLoading(false);
             return;
         }

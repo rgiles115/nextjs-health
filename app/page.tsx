@@ -33,13 +33,20 @@ import OuraSkeletonLoader from './components/OuraSkeletonLoader';
 import { checkAuthStatuses } from '../app/utils/authCheck';
 import { StravaActivity, AthleteProfile } from '../app/types/StravaInterface';
 
+type CheckAuthStatusesParams = {
+  setIsStravaAuthed: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsOuraAuthed: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsAuthCheckLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setAthleteProfile: React.Dispatch<React.SetStateAction<AthleteProfile | null>>;
+};
+
 export default function Home() {
   const currentDate = new Date();
   const sevenDaysAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
   const [startDate, setStartDate] = useState<Date>(sevenDaysAgo);
   const [endDate, setEndDate] = useState<Date>(currentDate);
-  const [isStravaAuthed, setIsStravaAuthed] = useState<boolean | undefined>(undefined);
-  const [isOuraAuthed, setIsOuraAuthed] = useState<boolean | undefined>(undefined);
+  const [isStravaAuthed, setIsStravaAuthed] = useState<boolean>(false);
+  const [isOuraAuthed, setIsOuraAuthed] = useState<boolean>(false);
   const [isAuthCheckLoading, setIsAuthCheckLoading] = useState<boolean>(true);
 
   const [stravaData, setStravaData] = useState<StravaActivity[] | null>(null);
@@ -49,10 +56,10 @@ export default function Home() {
   const [loadingDots, setLoadingDots] = useState<string>('');
 
   const { activities: stravaActivities, ytdRideTotals, isLoading: isStravaLoading, error: stravaError } = useFetchStravaActivities(startDate, endDate, isStravaAuthed);
-  const { data: readinessData, isLoading: isReadinessLoading, error: ouraError } = useFetchOuraData(startDate, endDate, isOuraAuthed || false);
-  const { data: transformedHrvData, isLoading: isHrvLoading, error: hrvError } = useFetchHrvData(startDate, endDate, isOuraAuthed || false);
-  const { data: detailedReadinessData, isLoading: isDetailedReadinessLoading, error: readinessError } = useFetchReadinessData(startDate, endDate, isOuraAuthed || false);
-  const { tagsData, isLoading: isLoadingTags, error: errorTags } = useFetchEnhancedTags(startDate, endDate, isOuraAuthed || false);
+  const { data: readinessData, isLoading: isReadinessLoading, error: ouraError } = useFetchOuraData(startDate, endDate, isOuraAuthed);
+  const { data: transformedHrvData, isLoading: isHrvLoading, error: hrvError } = useFetchHrvData(startDate, endDate, isOuraAuthed);
+  const { data: detailedReadinessData, isLoading: isDetailedReadinessLoading, error: readinessError } = useFetchReadinessData(startDate, endDate, isOuraAuthed);
+  const { tagsData, isLoading: isLoadingTags, error: errorTags } = useFetchEnhancedTags(startDate, endDate, isOuraAuthed);
   const { processedData, totalDistance, totalElevationGain, averageWatts } = useProcessStravaData(stravaActivities || [], startDate, endDate);
   const processedResults = useProcessStravaAndHRVData(processedData, transformedHrvData || [], tagsData || []);
 
@@ -81,21 +88,39 @@ export default function Home() {
   const stravaAndOuraAnalysisPrompt = `Analyze the combined dataset from Strava and Oura for an amateur athlete, and provide integrated insights and recommendations from the perspective of a professional coach. Consider metrics from cycling activities, sleep, HRV, and readiness. Keep the response very short.`;
 
   useEffect(() => {
-    checkAuthStatuses({
+    const params: CheckAuthStatusesParams = {
       setIsStravaAuthed,
       setIsOuraAuthed,
       setIsAuthCheckLoading,
       setAthleteProfile,
-    });
+    };
+    checkAuthStatuses(params);
   }, []);
 
   useEffect(() => {
-    errors.forEach(error => {
-      toast.error(`Failed to load data: ${error}`);
-    });
+    if (errors.length > 0) {
+      errors.forEach(error => {
+        toast.error(`Failed to load data: ${error}`);
+      });
+    }
   }, [errors]);
 
+  useEffect(() => {
+    console.log('isStravaAuthed:', isStravaAuthed);
+    console.log('isStravaLoading:', isStravaLoading);
+    console.log('stravaActivities:', stravaActivities);
+    console.log('athleteProfile:', athleteProfile);
+    console.log('ytdRideTotals:', ytdRideTotals);
+  }, [isStravaAuthed, isStravaLoading, stravaActivities, athleteProfile, ytdRideTotals]);
+
   const getCombinedDataAnalyse = async () => {
+    console.log('getCombinedDataAnalyse called');
+    console.log('Before Analysis - isStravaAuthed:', isStravaAuthed);
+    console.log('Before Analysis - isStravaLoading:', isStravaLoading);
+    console.log('Before Analysis - stravaActivities:', stravaActivities);
+    console.log('Before Analysis - athleteProfile:', athleteProfile);
+    console.log('Before Analysis - ytdRideTotals:', ytdRideTotals);
+
     const hasOuraData = processedResults.some(entry =>
       (entry.averageSleepHRV !== undefined && entry.averageSleepHRV > 0) ||
       (entry.averageSleepBreath !== undefined && entry.averageSleepBreath > 0) ||
@@ -123,6 +148,11 @@ export default function Home() {
       console.error('Error in analyzeCombinedData:', error);
       setStravaAnalysisError('Error fetching analysis.');
     } finally {
+      console.log('After Analysis - isStravaAuthed:', isStravaAuthed);
+      console.log('After Analysis - isStravaLoading:', isStravaLoading);
+      console.log('After Analysis - stravaActivities:', stravaActivities);
+      console.log('After Analysis - athleteProfile:', athleteProfile);
+      console.log('After Analysis - ytdRideTotals:', ytdRideTotals);
       setIsStravaAnalysisLoading(false);
     }
   };
@@ -176,7 +206,7 @@ export default function Home() {
           </div>
         )}
 
-        {!isStravaAuthed && !isOuraAuthed && (
+        {!isAuthCheckLoading && !isStravaAuthed && !isOuraAuthed && (
           <main className="flex-1 pt-48 pb-16 md:pt-28">
             <div className="mx-auto flex flex-col justify-center items-center h-[20vh] w-[60vw] text-center">
               <div className="empty-state-message-header text-[1.8em] font-light">

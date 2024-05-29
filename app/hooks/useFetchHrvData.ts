@@ -26,7 +26,7 @@ const useFetchHrvData = (startDate: Date, endDate: Date, isAuthenticated: boolea
 
     useEffect(() => {
         if (!isAuthenticated) {
-            console.log("Not authenticated, skipping HRV data fetch.");
+            // console.log("Not authenticated, skipping HRV data fetch.");
             setIsLoading(false);
             return;
         }

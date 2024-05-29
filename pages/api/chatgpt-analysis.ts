@@ -32,7 +32,7 @@ const sendMessageToOpenAI = async (params: AnalysisRequest) => {
 
   // Setting up the request payload for the OpenAI API
   const requestData = {
-    model: 'gpt-4-turbo-preview', // Specifies the model to use
+    model: 'gpt-4o', // Specifies the model to use
     messages: [
       { 
         "role": "user", 

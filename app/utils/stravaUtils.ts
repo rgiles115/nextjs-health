@@ -19,7 +19,7 @@ const isStravaExpired = (stravaData: StravaData): boolean => {
 
 // Function to refresh Strava token
 const refreshStravaToken = async (stravaData: StravaData): Promise<StravaData> => {
-    console.log("Refreshing Strava token...");
+    // console.log("Refreshing Strava token...");
 
     const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID;
     const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
@@ -31,7 +31,7 @@ const refreshStravaToken = async (stravaData: StravaData): Promise<StravaData> =
         refresh_token: stravaData.refresh_token,
     });
 
-    console.log("Strava token refreshed.");
+    // console.log("Strava token refreshed.");
 
     return {
         ...stravaData,

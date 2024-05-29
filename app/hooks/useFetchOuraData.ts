@@ -18,7 +18,7 @@ const useFetchOuraData = (startDate: Date, endDate: Date, isOuraAuthed: boolean)
   useEffect(() => {
     // Early exit if the user is not authenticated with Oura, logging a message to the console.
     if (!isOuraAuthed) {
-      console.log("Oura is not authenticated, skipping fetch.");
+      // console.log("Oura is not authenticated, skipping fetch.");
       setLoading(false);
       return;
     }

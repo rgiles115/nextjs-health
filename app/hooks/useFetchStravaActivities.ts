@@ -17,13 +17,13 @@ const useFetchStravaActivities = (startDate: Date, endDate: Date, isStravaAuthed
   useEffect(() => {
     // Skip fetching if authentication status is undetermined.
     if (isStravaAuthed === undefined) {
-      console.log("Authentication status undetermined, waiting...");
+      // console.log("Authentication status undetermined, waiting...");
       return;
     }
 
     // Skip fetching and log a message if not authenticated.
     if (!isStravaAuthed) {
-      console.log("Strava is not authenticated, skipping fetch.");
+      // console.log("Strava is not authenticated, skipping fetch.");
       setIsLoading(false); // Ensure loading state is false.
       return;
     }
