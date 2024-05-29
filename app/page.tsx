@@ -98,6 +98,18 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const stravaCookie = getCookie('strava');
+    if (stravaCookie) {
+      try {
+        const athleteData = JSON.parse(decodeURIComponent(stravaCookie));
+        setAthleteProfile(athleteData);
+      } catch (error) {
+        console.error('Error parsing strava cookie:', error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     if (errors.length > 0) {
       errors.forEach(error => {
         toast.error(`Failed to load data: ${error}`);
