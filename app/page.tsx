@@ -31,7 +31,8 @@ import StravaSkeletonLoader from './components/StravaSkeletonLoader';
 import OuraSkeletonLoader from './components/OuraSkeletonLoader';
 
 import { checkAuthStatuses } from '../app/utils/authCheck';
-import { StravaActivity, AthleteProfile } from '../app/types/StravaInterface';
+import { StravaActivity, AthleteProfile, YtdRideTotals } from '../app/types/StravaInterface';
+import { hasRequiredStravaData } from './utils/typeGuards';
 
 type CheckAuthStatusesParams = {
   setIsStravaAuthed: React.Dispatch<React.SetStateAction<boolean>>;
@@ -240,7 +241,7 @@ export default function Home() {
 
         {isStravaAuthed && isStravaLoading && <StravaSkeletonLoader />}
 
-        {isStravaAuthed && !isStravaLoading && stravaActivities && athleteProfile && ytdRideTotals && (
+        {hasRequiredStravaData(isStravaAuthed, isStravaLoading, stravaActivities, athleteProfile, ytdRideTotals) && athleteProfile && ytdRideTotals && (
           <div>
             <div className="m-5 p-4 border border-gray-200 rounded-lg bg-white">
               <div className="flex justify-start items-center mt-0">
