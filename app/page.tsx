@@ -95,14 +95,20 @@ export default function Home() {
       setIsAuthCheckLoading,
       setAthleteProfile,
     };
-    checkAuthStatuses(params);
+    checkAuthStatuses(params).then(() => {
+      console.log('Auth check completed');
+      console.log('isStravaAuthed:', isStravaAuthed);
+      console.log('athleteProfile:', athleteProfile);
+    });
   }, []);
 
   useEffect(() => {
     const stravaCookie = getCookie('strava');
+    console.log('Strava cookie:', stravaCookie); // Log the cookie value
     if (stravaCookie) {
       try {
         const athleteData = JSON.parse(decodeURIComponent(stravaCookie));
+        console.log('Parsed athlete data:', athleteData); // Log parsed data
         setAthleteProfile(athleteData);
       } catch (error) {
         console.error('Error parsing strava cookie:', error);
