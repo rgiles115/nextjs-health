@@ -1,5 +1,3 @@
-// utils/authCheck.ts
-
 import { AthleteProfile } from '../types/StravaInterface';
 
 interface CheckAuthStatusesParams {
@@ -21,29 +19,29 @@ export const checkAuthStatuses = async ({
     const stravaResponse = await fetch('/api/stravaAuthStatus');
     if (!stravaResponse.ok) throw new Error('Failed to fetch Strava auth status');
     const stravaData = await stravaResponse.json();
-    console.log('Strava auth status response:', stravaData); // Log the response
+    console.log('Strava auth status response:', stravaData);
 
-    const isStravaAuthed = !!stravaData.isStravaAuthed; // Ensure a boolean value
+    const isStravaAuthed = !!stravaData.isStravaAuthed;
     setIsStravaAuthed(isStravaAuthed);
 
     if (isStravaAuthed && stravaData.athlete) {
       setAthleteProfile(stravaData.athlete);
     } else {
-      setAthleteProfile(null); // Clear athlete profile if not authed
+      setAthleteProfile(null);
     }
   } catch (error) {
     console.error('Error fetching Strava authentication status:', error);
     setIsStravaAuthed(false);
-    setAthleteProfile(null); // Clear athlete profile on error
+    setAthleteProfile(null);
   }
 
   try {
     const ouraResponse = await fetch('/api/ouraAuthStatus');
     if (!ouraResponse.ok) throw new Error('Failed to fetch Oura auth status');
     const ouraData = await ouraResponse.json();
-    console.log('Oura auth status response:', ouraData); // Log the response
+    console.log('Oura auth status response:', ouraData);
 
-    const isOuraAuthed = !!ouraData.isOuraAuthed; // Ensure a boolean value
+    const isOuraAuthed = !!ouraData.isOuraAuthed;
     setIsOuraAuthed(isOuraAuthed);
   } catch (error) {
     console.error('Error fetching Oura authentication status:', error);
@@ -52,3 +50,4 @@ export const checkAuthStatuses = async ({
 
   setIsAuthCheckLoading(false);
 };
+''
